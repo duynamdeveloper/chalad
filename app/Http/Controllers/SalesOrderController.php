@@ -98,7 +98,7 @@ class SalesOrderController extends Controller
         $data['payments'] = DB::table('payment_terms')->get();
 
         $data['salesType'] = DB::table('sales_types')->select('sales_type','id','defaults')->get();
-       // d($data['salesType'],1);
+         // d($data['salesType'],1);
         $order_count = DB::table('sales_orders')->where('trans_type',SALESORDER)->count();
 
         if($order_count>0){
