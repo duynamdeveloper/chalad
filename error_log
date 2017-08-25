@@ -1,0 +1,2 @@
+[19-Jul-2017 06:32:40 UTC] PHP Fatal error:  Call to a member function where() on a non-object in /home/technohi/public_html/source-code-v1.3/app/Http/Controllers/QuoteController.php on line 421
+[19-Jul-2017 06:33:46 UTC] PHP Fatal error:  Call to a member function where() on a non-object in /home/technohi/public_html/source-code-v1.3/app/Http/Controllers/QuoteController.php on line 421
