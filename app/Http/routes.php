@@ -162,41 +162,58 @@
 		Route::get('order/shipping_cost_price/{weight}/{method}','QuoteController@shipping_cost_price');
 
 		// create sales order
-		Route::get('order/list','SalesOrderController@index');
-		Route::get('order/add','SalesOrderController@create');
-		Route::post('order/save','SalesOrderController@store');
-		Route::get('order/edit/{id}','SalesOrderController@edit');
-		Route::post('order/update','SalesOrderController@update');
-		Route::post('order/delete/{id}','SalesOrderController@destroy');
-		Route::get('order/view-order/{id}','SalesOrderController@viewOrder');
-		Route::post('order/convert-order','SalesOrderController@convertOrder');
-		Route::get('order/customer_mobile_no/{mobile_no}','SalesOrderController@customer_mobile_no');
+		Route::group([
+			'prefix' => 'order',
+			'namespace' =>'Backend',
+			'as' => 'order.',
+		], function(){
+			Route::get('/test','OrderController@index');
+			Route::get('/list','SalesOrderController@index');
+			Route::get('/add','SalesOrderController@create');
+			Route::post('/save','SalesOrderController@store');
+			Route::get('/edit/{id}','SalesOrderController@edit');
+			Route::post('/update','SalesOrderController@update');
+			Route::post('/delete/{id}','SalesOrderController@destroy');
+			Route::get('/view-order/{id}','SalesOrderController@viewOrder');
+			Route::post('/convert-order','SalesOrderController@convertOrder');
+			Route::get('/customer_mobile_no/{mobile_no}','SalesOrderController@customer_mobile_no');
+	
+			Route::get('/edit/shipping_cost_price/{weight}/{method}','QuoteController@shipping_cost_price');
+	
+			Route::post('/search','SalesOrderController@search');
+			Route::post('/quantity-validation','SalesOrderController@quantityValidation');
+	
+			Route::get('/view-order-details/{id}','SalesOrderController@viewOrderDetails');
+			Route::get('/manual-invoice-create/{id}','SalesOrderController@manualInvoiceCreate');
+			Route::post('/save-manual-invoice','SalesOrderController@storeManualInvoice');
+			Route::get('/auto-invoice-create/{id}','SalesOrderController@autoInvoiceCreate');
+			Route::post('/check-quantity-after-invoice','SalesOrderController@checkQuantityAfterInvoice');
+			Route::get('/pdf/{order_id}','SalesOrderController@orderPdf');
+			Route::get('/print/{order_id}','SalesOrderController@orderPrint');
+			Route::post('/email-order-info','SalesOrderController@sendOrderInformationByEmail');	
+			Route::get('/filtering','SalesOrderController@orderFiltering');
+			Route::post('/checkphonenumber','SalesOrderController@checkIfCustomerPhoneNumberExist');	
+			Route::post('/addpayment','SalesOrderController@addPayment');
+			Route::post('/update-status','SalesOrderController@updateStatus');
+			Route::get('/printpdf','SalesOrderController@printPDF');
+		});
+		//Route::get('order/list','SalesOrderController@index');
+	
 
-		Route::get('order/edit/shipping_cost_price/{weight}/{method}','QuoteController@shipping_cost_price');
+		/* Stock Routes */
+		Route::group([
+			'prefix'=>'stock',
+			'as' => 'stock.'
+		], function(){
 
-		Route::post('order/search','SalesOrderController@search');
-		Route::post('order/quantity-validation','SalesOrderController@quantityValidation');
-
-		Route::get('order/view-order-details/{id}','SalesOrderController@viewOrderDetails');
-		Route::get('order/manual-invoice-create/{id}','SalesOrderController@manualInvoiceCreate');
-		Route::post('order/save-manual-invoice','SalesOrderController@storeManualInvoice');
-		Route::get('order/auto-invoice-create/{id}','SalesOrderController@autoInvoiceCreate');
-		Route::post('order/check-quantity-after-invoice','SalesOrderController@checkQuantityAfterInvoice');
-		Route::get('order/pdf/{order_id}','SalesOrderController@orderPdf');
-		Route::get('order/print/{order_id}','SalesOrderController@orderPrint');
-		Route::post('order/email-order-info','SalesOrderController@sendOrderInformationByEmail');	
-		Route::get('order/filtering','SalesOrderController@orderFiltering');
-		Route::post('order/checkphonenumber','SalesOrderController@checkIfCustomerPhoneNumberExist');	
-		Route::post('order/addpayment','SalesOrderController@addPayment');
-		Route::post('order/update-status','SalesOrderController@updateStatus');
+			//Stock Movement
+			Route::get('/movement','StockController@index');
+			Route::post('/movement/create','StockController@create');
+			Route::get('/movement/get-by-id','StockController@getStockMovementsById');
+			Route::post('/movement/edit','StockController@update');
+			Route::post('/movement/delete','StockController@delete');
+		});
 		
-		//Stock Movenents
-		
-		Route::get('stock/movement','StockMovementController@index');
-		Route::post('stock/movement/create','StockMovementController@create');
-		Route::get('stock/movement/get-by-id','StockMovementController@getStockMovementsById');
-		Route::post('/stock/movement/edit','StockMovementController@update');
-		Route::post('/stock/movement/delete','StockMovementController@delete');
 
 
 		//QUOTE 

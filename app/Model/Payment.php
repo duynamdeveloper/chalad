@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-	protected $table = 'payment_history';
+	protected $table = 'sale_orders_payment';
 
   /**
   * Update order table with invoice payment

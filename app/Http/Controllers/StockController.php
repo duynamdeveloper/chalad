@@ -8,7 +8,7 @@ use App\Http\Requests;
 use App\Model\StockMovement;
 use App\Model\Item;
 use App\Model\Reason;
-class StockMovementController extends Controller
+class StockController extends Controller
 {
     function index(){
     	$stock_movement = new StockMovement();
