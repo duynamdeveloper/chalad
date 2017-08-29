@@ -12,7 +12,15 @@ ORDER.updateStatistic = function(){
     });
     $("#subTotal").html(parseInt(total));
 }
-
+ORDER.updateAmount = function(item_id){
+    var row = $("#product_table > tbody").find('tr[item_id="'+item_id+'"]');
+    var qty = row.find("input[name=quantity]");
+    var price =row.find("input.inp_price").val();
+    var amount = parseInt(qty)*parseInt(price);
+    
+    console.log(row);
+    row.find("input[name=amount]").val(amount);
+}
 
 /* Define Customer Object */
 CUSTOMER = {
@@ -50,8 +58,8 @@ ITEM.writeToTable = function(item){
     $("<td>").html(item.description).appendTo(tr);
     $("<td>").html('<img src="'+SITE_URL+'/public/uploads/itemPic/'+item.item_image+'" width="80px" height="80px">').appendTo(tr);
     $("<td>").html(item.stock_on_hand).appendTo(tr);
-    $("<td>").html('<input type="text" name="quantity" value="1" class="form-control text-center">').appendTo(tr);
-    $("<td>").html('<input type="text" name="price" value="'+item.special_price+'" class="form-control text-center">').appendTo(tr);
+    $("<td>").html('<input type="text" name="quantity" value="1" class="form-control text-center inp_qty">').appendTo(tr);
+    $("<td>").html('<input type="text" name="price" value="'+item.special_price+'" class="form-control text-center inp_price">').appendTo(tr);
     $("<td>").html('<input type="text" name="amount" value="'+item.special_price+'" class="form-control text-center" readonly>').appendTo(tr);
     $("<td>").html('<span class="glyphicon glyphicon-trash text-danger removebtn" item-id="'+item.stock_id +'" style="cursor:pointer; font-size:18px"></span>').appendTo(tr);
     tbody.append(tr);
@@ -99,6 +107,16 @@ $("#sel_product").change(function(){
     $('#sel_product option[value="'+stock_id+'"]').remove();
     ITEM.get(stock_id);
 });
+
+$(".inp_qty").keyup(function(){
+    alert($(this).val());
+});
+
+$(document).on('keyup','.inp_qty', function(){
+    var item_id = $(this).closest('tr').attr('item-id');
+    ORDER.updateAmount(item_id);
+});
+
 $(document).on('click','.removebtn', function(){
     var stock_id = $(this).attr('item-id');7
     var stock_name = $(this).closest('tr').find('td:first').html();

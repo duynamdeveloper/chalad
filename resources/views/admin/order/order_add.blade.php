@@ -1,15 +1,15 @@
 @extends('layouts.app')
 @section('content')
     <div class="container-fluid">
-        <div class="row">
+    
             <div class="box box-success">
                 <div class="box-header with-border">
                     <h3 class="text-info">Create New Order</h3>
                 </div>
                 <div class="box-body">
-                    <div class="container-fluid">
+                   
                      <form class="form-horizontal">
-                        <div class="row">
+                       <div class="row">
                             <div class="col-md-6">
                                 <form class="form-horizontal">
                                     <div class="form-group">
@@ -25,9 +25,9 @@
                                         </div>
                                     </div>
                             </div>
-                        </div>
+                      </div>
                         <hr>
-                        <div class="row">
+                       
                             <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label col-md-4">Name</label>
@@ -72,11 +72,13 @@
                                 </form>
                                 </div>
                             </div>
-                        </div>
-<hr>
+
+</div>
                         <!--Select Product-->
-                        <div class="row">
-                            <div class="col-md-4">
+                        
+                        <div class="box box-success">
+                            <div class="box-body">
+                                              <div class="col-md-4">
                                 <div class="form-group">
                                     <label class="control-label">Add a product</label>
                                     <select class="select2 form-control" id="sel_product">
@@ -87,12 +89,12 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
+                     
                         <!-- End Select Product -->
 
                         <!-- Product Table -->
 
-                        <div class="row">
+                      
                             <div class="col-md-12">
                                 <table class="table table-reponsive info" id="product_table" >
                                     <thead>
@@ -157,12 +159,13 @@
                                     </tfoot>
                                 </table>
                             </div>
+                       
                         </div>
+              
 
                     </div>
-                </div>
-            </div>
-        </div>
+            
+         
     </div>
 @endsection
 @section('js')
