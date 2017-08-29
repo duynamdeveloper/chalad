@@ -120,7 +120,7 @@
 		Route::post('update-sale-price','ItemController@updateSalePrice');
 		Route::post('delete-sale-price/{id}/{item_id}','ItemController@deleteSalePrice');
 		Route::post('update-purchase-price','ItemController@updatePurchasePrice');
-
+		Route::get('item/ajax/get-item','ItemController@ajaxGetItem');
 		Route::post('add-stock','ItemController@addStock');
 		Route::post('remove-stock','ItemController@removeStock');
 		Route::post('move-stock','ItemController@moveStock');
@@ -164,7 +164,7 @@
 		// create sales order
 		Route::group([
 			'prefix' => 'order',
-			'namespace' =>'Backend',
+			
 			'as' => 'order.',
 		], function(){
 			Route::get('/test','OrderController@index');
@@ -268,31 +268,41 @@
 		Route::post('invoice/delete/{id}','InvoiceController@destroy');
 		Route::get('invoice/delete-invoice/{id}','InvoiceController@destroy');
 		// Customer 
-		Route::get('customer/list','CustomerController@index');
-		Route::get('create-customer','CustomerController@create');
-		Route::post('save-customer','CustomerController@store');
-		Route::get('customer/edit/{id}','CustomerController@edit');
-		Route::get('customer/order/{id}','CustomerController@salesOrder');
-		Route::get('customer/invoice/{id}','CustomerController@invoice');
-		Route::get('customer/payment/{id}','CustomerController@payment');
-		Route::get('customer/shipment/{id}','CustomerController@shipment');
-		Route::post('update-customer/{id}','CustomerController@update');
-		Route::post('customer/update-password','CustomerController@updatePassword');
-		Route::post('delete-customer/{id}','CustomerController@destroy');
 
-		Route::get('customerdownloadCsv/{type}', 'CustomerController@downloadCsv');
-		Route::get('customerimport', 'CustomerController@import');
-		Route::post('customerimportcsv', 'CustomerController@importCsv');
-		Route::post('customer/delete-sales-info', 'CustomerController@deleteSalesInfo');
+		Route::group([
+			
+			'prefix'   =>'customer',
+			'as'       =>'customer.'
+		], function(){
+
+		Route::get('/list','CustomerController@index');
+		Route::get('/create-customer','CustomerController@create');
+		Route::post('save-customer','CustomerController@store');
+		Route::get('/edit/{id}','CustomerController@edit');
+		Route::get('/order/{id}','CustomerController@salesOrder');
+		Route::get('/invoice/{id}','CustomerController@invoice');
+		Route::get('/payment/{id}','CustomerController@payment');
+		Route::get('/shipment/{id}','CustomerController@shipment');
+		Route::post('/update-customer/{id}','CustomerController@update');
+		Route::post('/customer/update-password','CustomerController@updatePassword');
+		Route::post('/delete-customer/{id}','CustomerController@destroy');
+
+		Route::get('/customerdownloadCsv/{type}', 'CustomerController@downloadCsv');
+		Route::get('/customerimport', 'CustomerController@import');
+		Route::post('/customerimportcsv', 'CustomerController@importCsv');
+		Route::post('/delete-sales-info', 'CustomerController@deleteSalesInfo');
 		//Route::post('customerimportcsv', 'CustomerController@importCsv');
 
 		// Customer Branch
-		Route::get('branch','CustomerController@index');
-		Route::get('create-branch','CustomerController@create');
-		Route::post('save-branch','CustomerController@storeBranch');
-		Route::post('edit-branch','CustomerController@editBranch');
-		Route::post('update-branch','CustomerController@updateBranch');
-		Route::post('delete-branch/{id}','CustomerController@destroyBranch');
+		Route::get('/branch','CustomerController@index');
+		Route::get('/create-branch','CustomerController@create');
+		Route::post('/save-branch','CustomerController@storeBranch');
+		Route::post('/edit-branch','CustomerController@editBranch');
+		Route::post('/update-branch','CustomerController@updateBranch');
+		Route::post('/delete-branch/{id}','CustomerController@destroyBranch');
+
+		Route::get('/ajax/get-customer','CustomerController@ajaxGetCustomer');
+		});
 
 		// supplier 
 		Route::get('supplier','SupplierController@index');

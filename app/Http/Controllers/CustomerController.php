@@ -11,6 +11,7 @@ use Excel;
 use Validator;
 use Session;
 use URL;
+use App\Model\Customer;
 
 class CustomerController extends Controller
 {
@@ -650,5 +651,14 @@ class CustomerController extends Controller
          return redirect()->intended('customer/shipment/'.$customer_id);
         
         }
+    }
+
+    public function ajaxGetCustomer(Request $request){
+        $debtor_no = $request->debtor_no;
+        $customer = Customer::find($debtor_no);
+        if(!empty($customer)){
+            return response()->json(['state'=>true,'customer'=>$customer]);
+        }
+        return response()->json(['state'=>false,'msg'=>'Customer not found!']);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Payment;
+use App\Model\Shipment;
 class Order extends Model
 {
     protected $table = 'sales_orders';
@@ -24,7 +25,7 @@ class Order extends Model
         if($status == 0){
             return "Cancelled";
         }else if($status==2){
-            if($this->checkIfExistPendingPayments()){
+            if($this->existPendingPayments()){
                 return "Awaiting Confirmation";
             }else{
                 return "Pending";
@@ -32,14 +33,17 @@ class Order extends Model
         }else if($status == 1){
             return "Confirm";
         }
-        return "Nothing";
+        return "Unknown State";
     }
-    public function checkIfExistPendingPayments(){
+    public function existPendingPayments(){
         
         $state = Payment::where('sale_orders_no',$this->getKey())->where('status',0)->get();
         if(empty($state)){
             return false;
         }
         return true;
+    }
+    public function existReadyToShipShipment(){
+        $state = Shipment::where('shipment');
     }
 }

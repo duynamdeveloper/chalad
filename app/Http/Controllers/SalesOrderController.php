@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Backend;
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\EmailController;
-use App\Http\Controllers\Controller;
 use App\Model\Orders;
 use App\Http\Requests;
 use App\Model\Sales;

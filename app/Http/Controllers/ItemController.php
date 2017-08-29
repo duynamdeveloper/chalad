@@ -795,7 +795,14 @@ class ItemController extends Controller
             
         })->download($type);
     }
-
+    public function ajaxGetItem(Request $request){
+        $stock_id = $request->stock_id;
+        $item = Item::where('stock_id',$stock_id)->first();
+        if(!empty($item)){
+            return response()->json(['state'=>true,'item'=>$item]);
+        }
+        return response()->json(['state'=>false,'msg'=>'Item not found!']);
+    }
     public function import()
     {
         $data['menu'] = 'item';

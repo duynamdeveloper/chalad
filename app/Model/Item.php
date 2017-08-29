@@ -9,15 +9,24 @@ class Item extends Model
 {
     protected $table = 'item_code';
     protected $appends = ['stock_on_hand'];
+    //protected $primaryKey = 'stock_id';
 
-    public function getStockOnHandAtribute(){
+    public $incrementing = false;
+
+    public function getStockOnHandAttribute(){
       $data = DB::table('stock_movements')
       ->select(DB::raw('sum(quantity) as total'))
-      ->where(['stock_id'=>$id])
+      ->where(['stock_id'=>$this->stock_id])
       ->groupBy('stock_id')
       ->first();
-
-    return $data->total;
+      if(!empty($data)){
+        return $data->total;
+      }
+      return 0;
+   
+    }
+    public function getStockIdAttribute($value){
+        return $value;
     }
     public function getAllItem()
     {
