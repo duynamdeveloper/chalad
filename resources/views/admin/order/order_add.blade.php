@@ -11,7 +11,7 @@
                      <form class="form-horizontal">
                        <div class="row">
                             <div class="col-md-6">
-                                <form class="form-horizontal">
+                                <form class="form-horizontal customer_form" id="customer_form">
                                     <div class="form-group">
                                         <label class="control-label col-md-4">Select Customer</label>
                                         <div class="col-md-8">
@@ -163,12 +163,23 @@
                                     </tfoot>
                                 </table>
                             </div>
-                       
+                      
                         </div>
               
 
                     </div>
-            
+            <div class="box box-default">
+            <div class="box-body">
+              
+                    <div class="form-group">
+                        <label class="control-label">Note</label>
+                        <textarea class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                             <button class="btn btn-primary pull-right" id="submitBtn">Submit</button>
+                    </div>
+           </div>
+            </div>
          
     </div>
 @endsection

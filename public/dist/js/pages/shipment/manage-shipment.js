@@ -160,7 +160,7 @@ SHIPMENT.getManualAllocateDataFromTable = function(shipmentId){
 		var item = [stock_id, additional_packing, shipment_detail_id];
 		data.push(item);
 	});
-	console.log(data);
+	
 	return data;
 }
 SHIPMENT.getEditShipmentDataFromTable = function(shipment_id){
@@ -207,7 +207,7 @@ SHIPMENT.validateAdditionalQuantity = function(order_no,stock_id){
 		},
 		error: function(xhr, status, error){
 			var err = JSON.parse(xhr.responseText);
-  			console.log(err);
+  		
 		},
 		success: function(data){
 			return data;

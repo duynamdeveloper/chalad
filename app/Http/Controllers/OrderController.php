@@ -39,4 +39,7 @@ class OrderController extends Controller
         }
         return response()->json(['state'=>false,'cost'=>0]);
     }
+    public function create(Request $request){
+        
+    }
 }

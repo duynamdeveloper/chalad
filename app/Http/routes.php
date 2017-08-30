@@ -171,14 +171,14 @@
 			Route::get('/shipping-cost','OrderController@getShippingCost');
 			Route::get('/list','SalesOrderController@index');
 			Route::get('/add','SalesOrderController@create');
-			Route::post('/save','SalesOrderController@store');
+			//Route::post('/save','SalesOrderController@store');
 			Route::get('/edit/{id}','SalesOrderController@edit');
 			Route::post('/update','SalesOrderController@update');
 			Route::post('/delete/{id}','SalesOrderController@destroy');
 			Route::get('/view-order/{id}','SalesOrderController@viewOrder');
 			Route::post('/convert-order','SalesOrderController@convertOrder');
 			Route::get('/customer_mobile_no/{mobile_no}','SalesOrderController@customer_mobile_no');
-	
+			Route::post('save','OrderController@create');
 			Route::get('/edit/shipping_cost_price/{weight}/{method}','QuoteController@shipping_cost_price');
 	
 			Route::post('/search','SalesOrderController@search');

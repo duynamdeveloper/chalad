@@ -7,6 +7,7 @@ var ORDER = {};
 ORDER = {
     API:{
         getShippingCost:SITE_URL+'/order/shipping-cost',
+        save:SITE_URL+'/order/save'
     }
 }
 
@@ -21,8 +22,15 @@ ORDER.updateStatistic = function(){
     });
     $("#subTotal").html(parseInt(sub_total));
     var tax_rate = $("#sel_tax").val();
+    if(parseFloat(tax_rate)<0){
+        tax_rate = 0;
+    }
     var shipping_cost = $("#shipping_cost").val();
     var discount_amount = $("#discount_amount").val();
+    discount_amount = parseFloat(discount_amount);
+    if(isNaN(discount_amount)){
+        discount_amount = 0;
+    }
     total = parseFloat(sub_total) + parseFloat(shipping_cost) - parseFloat(discount_amount);
     var tax_amount = total*(parseFloat(tax_rate)/100);
     $("#tax_amount").val(tax_amount);
@@ -41,7 +49,15 @@ ORDER.updateAmount = function(item_id){
     var row = $("#product_table > tbody").find('tr[item-id="'+item_id+'"]');
     var qty = row.find("input[name=quantity]").val();
     var price =row.find("input.inp_price").val();
-    var amount = parseInt(qty)*parseInt(price);
+    qty = parseInt(qty);
+    price = parseFloat(price);
+    var amount;
+    if(isNaN(qty)||isNaN(price)){
+        amount = 0;
+    }else{
+        amount = parseInt(qty)*parseInt(price);
+    }
+    
     row.find("input[name=amount]").val(amount);
 }
 
@@ -59,7 +75,23 @@ ORDER.getShippingCost = function(shipping_method, weight){
 
     });
 }
+ORDER.getFormData = function(){
+    var formData = $("form").serializeArray();
+    var itemArray = [];
+    var rows = $("#product_table > tbody").find("tr.item-row");
+    $.each(rows, function(i, row){
+       var item = {};
+       item = {
+        item_id : $(row).attr('item-id'),
+        price: $(row).find('input[name=price]').val(),
+        qty : $(row).find('input[name=quantity]').val()
+       } ;
+       itemArray.push(item);
+       
+    });
 
+
+}
 /* Define Customer Object */
 CUSTOMER = {
     API:{
@@ -164,9 +196,6 @@ $("#sel_product").change(function(){
     //ITEM.writeToTable(item);
 });
 
-$(".inp_qty").keyup(function(){
-    alert($(this).val());
-});
 
 $(document).on('keyup','.inp_qty', function(){
     var item_id = $(this).closest('tr').attr('item-id');
@@ -177,6 +206,10 @@ $(document).on('keyup','.inp_qty', function(){
 $(document).on('keyup','.inp_price',function(){
     var item_id = $(this).closest('tr').attr('item-id');
     ORDER.updateAmount(item_id);
+    ORDER.updateStatistic();
+});
+
+$(document).on('keyup','#discount_amount',function(){
     ORDER.updateStatistic();
 });
 
@@ -196,4 +229,7 @@ $(document).on('click','.removebtn', function(){
     ORDER.updateStatistic();
 });
 
+$(document).on('click','#submitBtn', function(){
+    ORDER.getFormData();
+});
 
