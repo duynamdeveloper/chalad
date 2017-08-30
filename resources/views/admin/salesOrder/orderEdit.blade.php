@@ -343,7 +343,7 @@
           <tr class="tableInfos"><td colspan="4" align="right"><strong>{{ trans('message.invoice.discount') }}</strong></td>
             <td align="center" colspan="2">
 
-              <input type="number" min="0" class="form-control" value="{{$saleData->discount_amnount}}" name="discount_amnount" id="discount_amnount">
+              <input type="number" min="0" class="form-control" value="{{$saleData->discount_amount}}" name="discount_amnount" id="discount_amnount">
             </td></tr>
             <tr class="tableInfos"><td colspan="4" align="right"><strong>{{ trans('message.table.grand_total') }}({{Session::get('currency_symbol')}})</strong></td><td align="left" colspan="2"><input type='text' name="total"
              class="form-control" id = "grandTotal" value="{{$saleData->total}}" readonly></td></tr>

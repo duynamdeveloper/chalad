@@ -132,7 +132,7 @@
                           <tr class="tableInfos"><td colspan="3" align="right">Shipping Method</td><td align="right" colspan="1">{{$saleData->shipping_method}}</td></tr>
 
                           <tr class="tableInfos"><td colspan="3" align="right">Shipping Cost</td><td align="right" colspan="1">{{$saleData->shipping_cost}}</td></tr>
-                          <tr class="tableInfos"><td colspan="3" align="right">Discount Amnount</td><td align="right" colspan="1">{{$saleData->discount_amnount}}</td></tr>
+                          <tr class="tableInfos"><td colspan="3" align="right">Discount Amnount</td><td align="right" colspan="1">{{$saleData->discount_amount}}</td></tr>
                           
 
 

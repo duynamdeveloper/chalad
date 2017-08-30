@@ -180,7 +180,7 @@
 			Route::get('/customer_mobile_no/{mobile_no}','SalesOrderController@customer_mobile_no');
 			Route::post('save','OrderController@create');
 			Route::get('/edit/shipping_cost_price/{weight}/{method}','QuoteController@shipping_cost_price');
-	
+			Route::get('/testedit/{id}','OrderController@edit');
 			Route::post('/search','SalesOrderController@search');
 			Route::post('/quantity-validation','SalesOrderController@quantityValidation');
 	

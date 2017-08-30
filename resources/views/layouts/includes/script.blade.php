@@ -27,7 +27,7 @@
 
 <script src="{{ asset('public/dist/js/jquery.validate.min.js') }}"></script>
 <script src="{{ asset('public/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js') }}"></script>
-
+<script src="{{ asset('public/plugins/bootbox.min.js') }}"></script>
 <script src="{{ asset('public/plugins/bootstrap-confirm-delete.js') }}"></script>
 <script type="text/javascript" src="{{ URL::asset('public/plugins/bootstrap-notify-master/bootstrap-notify.min.js') }}"></script>
 

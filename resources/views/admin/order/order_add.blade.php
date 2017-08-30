@@ -11,7 +11,7 @@
                      <form class="form-horizontal">
                        <div class="row">
                             <div class="col-md-6">
-                                <form class="form-horizontal customer_form" id="customer_form">
+                                <form class="form-horizontal customer_form" autocomplete="offs" id="customer_form">
                                     <div class="form-group">
                                         <label class="control-label col-md-4">Select Customer</label>
                                         <div class="col-md-8">
