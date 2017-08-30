@@ -25,9 +25,6 @@ class Item extends Model
       return 0;
    
     }
-    public function getStockIdAttribute($value){
-        return $value;
-    }
     public function getAllItem()
     {
       

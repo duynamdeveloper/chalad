@@ -23,6 +23,8 @@ class Shipment extends Model
     return $data;
   }
 
+  
+
   public function shipmentFiltering($from, $to, $customer, $status)
   { 
     $from = DbDateFormat($from);

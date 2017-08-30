@@ -674,7 +674,5 @@ public function getDataForManualAllocate(Request $request){
      $this->shipment->updateOrderPackedShippedQty($request->order_no);
      return response()->json(['state'=>true]);
   }
-  public function test(){
-    $this->shipment->updateOrderPackedShippedQty(3);
-  }
+
 }

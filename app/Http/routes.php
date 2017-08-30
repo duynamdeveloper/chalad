@@ -168,6 +168,7 @@
 			'as' => 'order.',
 		], function(){
 			Route::get('/test','OrderController@index');
+			Route::get('/shipping-cost','OrderController@getShippingCost');
 			Route::get('/list','SalesOrderController@index');
 			Route::get('/add','SalesOrderController@create');
 			Route::post('/save','SalesOrderController@store');
@@ -195,6 +196,7 @@
 			Route::post('/checkphonenumber','SalesOrderController@checkIfCustomerPhoneNumberExist');	
 			Route::post('/addpayment','SalesOrderController@addPayment');
 			Route::post('/update-status','SalesOrderController@updateStatus');
+			
 			Route::get('/printpdf','SalesOrderController@printPDF');
 		});
 		//Route::get('order/list','SalesOrderController@index');

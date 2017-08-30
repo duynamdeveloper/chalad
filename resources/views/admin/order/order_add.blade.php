@@ -113,25 +113,11 @@
                                         <td colspan="5"><strong>Sub Total</strong></td>
                                         <td colspan="2" id="subTotal" style="font-weight:bold" class="text-left"></td>
                                     </tr>
-                                    <tr class="static_rows">
-                                        <td colspan="5" ><strong>TAX</strong></td>
-                                        <td>
-                                            <select class="form-control" name="tax" id="sel_tax">
-                                                <option value="-1">Select One</option>
-                                            </select>
-                                        </td>
-
-                                    </tr>
-                                    <tr class="static_rows">
-                                        <td colspan="5"><strong>Tax Amount</strong></td>
-                                        <td>
-                                            <input class="form-control" id="tax_amount" readonly>
-                                        </td>
-                                    </tr>
+                             
                                     <tr class="static_rows">
                                         <td colspan="5"><strong>Shipping Method</strong></td>
                                         <td>
-                                            <select name="shipping_method" class="form-control">
+                                            <select name="shipping_method" class="form-control" id="sel_shipping_method">
                                                 <option>Select One</option>
                                                 <option value="EMS">EMS</option>
                                                 <option value="Registered">Registered</option>
@@ -141,19 +127,37 @@
                                         <tr class="static_rows">
                                         <td colspan="5"><strong>Shipping Cost</strong></td>
                                         <td>
-                                            <input class="form-control" id="shipping_cost" readonly>
+                                            <input class="form-control" id="shipping_cost" readonly value="0">
                                         </td>
                                     </tr>
                                         <tr class="static_rows">
                                         <td colspan="5"><strong>Discount Amount</strong></td>
                                         <td>
-                                            <input class="form-control" id="discount_amount" type="number" name="discount_amount">
+                                            <input class="form-control" id="discount_amount" type="number" name="discount_amount" value="0">
+                                        </td>
+                                    </tr>
+                                           <tr class="static_rows">
+                                        <td colspan="5" ><strong>TAX</strong></td>
+                                        <td>
+                                            <select class="form-control" name="tax" id="sel_tax">
+                                                <option value="-1">Select One</option>
+                                                @foreach($tax_types as $tax_type)
+                                                    <option value="{{$tax_type->tax_rate}}">{{$tax_type->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+
+                                    </tr>
+                                    <tr class="static_rows">
+                                        <td colspan="5"><strong>Tax Amount</strong></td>
+                                        <td>
+                                            <input class="form-control" id="tax_amount" value="0" readonly >
                                         </td>
                                     </tr>
                                     <tr class="static_rows">
                                         <td colspan="5"><strong>Grand Total</strong></td>
                                         <td>
-                                            <input class="form-control" id="grand_total" type="number" name="grand_total">
+                                            <input class="form-control" id="grand_total" type="number" name="grand_total" value="0">
                                         </td>
                                     </tr>
                                     </tfoot>
