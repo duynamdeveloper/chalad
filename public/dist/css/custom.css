@@ -331,3 +331,31 @@ color: #367FA9;
 .bootbox-body{
 	text-align: center;
 }
+#navTab li a{
+	border-radius: 0px;
+	width: 200px;
+}
+#navTab li a:hover{
+	background-color: #2194F2;
+	
+	color: #fff;
+}
+#navTab li.active a{
+	color: #fff;
+	background-color: #2194F2;
+}
+#navTab{
+	font-size: 18px;
+	padding-left: 50px;
+	text-transform: uppercase;
+	font-weight: bold;
+	border-color: #2194F2;
+	margin-bottom: 30px;
+}
+.btnSave{
+	width: 100px;
+	border-radius: 0;
+	margin-right: 20px;
+	font-size: 18px;
+	
+}

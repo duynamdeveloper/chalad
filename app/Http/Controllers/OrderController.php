@@ -91,7 +91,32 @@ class OrderController extends Controller
         return response()->json($order);
     }
     public function edit($order_no){
-        $order = Order::where('order_no',$order_no)->with(['details','payments','shipments'])->first();
-        return view('admin.order.order_edit');
+        $data['order'] = Order::where('order_no',$order_no)->with(['details','payments','shipments','customer'])->first();
+        $data['menu'] = 'sales';
+        $data['sub_menu'] = 'order/list';
+        $data['countries'] = DB::table('countries')->get();
+        return view('admin.order.order_edit',$data);
+    }
+    public function updateAddress(Request $request){
+        $order_no = $request->order_no;
+        $order = Order::where('order_no', $order_no)->first();
+        
+        $order->billing_name = $request->billing_name;
+        $order->billing_street = $request->billing_street;
+        $order->billing_city = $request->billing_city;
+        $order->billing_state = $request->billing_state;
+        $order->billing_zip_code = $request->billing_zip_code;
+        $order->billing_country_id = $request->billing_country_id;
+
+        $order->shipping_name= $request->shipping_name;
+        $order->shipping_street = $request->shipping_street;
+        $order->shipping_city= $request->shipping_city;
+        $order->shipping_state = $request->shipping_state;
+        $order->shipping_zip_code = $request->shipping_zip_code;
+        $order->shipping_country_id = $request->shipping_country_id;
+
+        $order->update();
+
+        //return redirect()->url('order/testedit/'.$order->order_no);
     }
 }

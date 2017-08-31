@@ -21,6 +21,9 @@ class Order extends Model
     {
         return $this->hasMany('App\Model\Shipment','order_no');
     }
+    public function customer(){
+        return $this->belongsTo('App\Model\Customer','debtor_no','debtor_no');
+    }
     public function getOrderStatusAttribute($status){
         if($status == 0){
             return "Cancelled";
@@ -37,7 +40,7 @@ class Order extends Model
     }
     public function existPendingPayments(){
         
-        $state = Payment::where('sale_orders_no',$this->getKey())->where('status',0)->get();
+        $state = Payment::where('order_no',$this->getKey())->where('status',0)->get();
         if(empty($state)){
             return false;
         }

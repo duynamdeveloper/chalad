@@ -172,6 +172,7 @@
 			Route::get('/list','SalesOrderController@index');
 			Route::get('/add','SalesOrderController@create');
 			//Route::post('/save','SalesOrderController@store');
+			Route::post('/update-address','OrderController@updateAddress');
 			Route::get('/edit/{id}','SalesOrderController@edit');
 			Route::post('/update','SalesOrderController@update');
 			Route::post('/delete/{id}','SalesOrderController@destroy');
