@@ -537,6 +537,7 @@ class ShipmentController extends Controller
             $shipment->save();
             foreach ($data as $key => $detail) {
                  $orderDetail = OrderDetail::where('order_no',$order_no)->where('stock_id',$detail[0])->first();
+                 
                  $add_packed_qty = 0;
                 if ($unpacked_qty>$detail[1]) {
                     $add_packed_qty = $detail[1];
