@@ -163,8 +163,7 @@
 
 		// create sales order
 		Route::group([
-			'prefix' => 'order',
-			
+			'prefix' => 'order',		
 			'as' => 'order.',
 		], function(){
 			Route::get('/test','OrderController@index');
@@ -172,19 +171,19 @@
 			Route::get('/list','SalesOrderController@index');
 			Route::get('/add','SalesOrderController@create');
 			//Route::post('/save','SalesOrderController@store');
-			Route::post('/update-address','OrderController@updateAddress');
+			Route::get('/updateaddress','OrderController@updateAddress');
 			Route::get('/edit/{id}','SalesOrderController@edit');
-			Route::post('/update','SalesOrderController@update');
+			//Route::post('/update','SalesOrderController@update');
 			Route::post('/delete/{id}','SalesOrderController@destroy');
 			Route::get('/view-order/{id}','SalesOrderController@viewOrder');
 			Route::post('/convert-order','SalesOrderController@convertOrder');
 			Route::get('/customer_mobile_no/{mobile_no}','SalesOrderController@customer_mobile_no');
-			Route::post('save','OrderController@create');
+			Route::post('/save','OrderController@create');
 			Route::get('/edit/shipping_cost_price/{weight}/{method}','QuoteController@shipping_cost_price');
 			Route::get('/testedit/{id}','OrderController@edit');
 			Route::post('/search','SalesOrderController@search');
 			Route::post('/quantity-validation','SalesOrderController@quantityValidation');
-	
+			Route::post('/update','OrderController@update');
 			Route::get('/view-order-details/{id}','SalesOrderController@viewOrderDetails');
 			Route::get('/manual-invoice-create/{id}','SalesOrderController@manualInvoiceCreate');
 			Route::post('/save-manual-invoice','SalesOrderController@storeManualInvoice');

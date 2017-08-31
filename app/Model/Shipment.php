@@ -5,11 +5,18 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Item;
 use App\Model\StockMovement;
+use App\Model\Order;
 class Shipment extends Model
 {
 	protected $table = 'shipment';
   protected $remainingItems;
 
+  public function details(){
+    return $this->hasMany('App\Model\ShipmentDetail');
+  }
+  public function order(){
+    return $this->belongsTo('App\Model\Order','order_no','order_no');
+  }
   public function getAllshipment()
   { 
     $data = DB::table('shipment')

@@ -30,12 +30,10 @@
                                 @include('admin.order.partials.customer_information')
                             </div>
                             <div id="orderTab" class="tab-pane fade">
-                            <h3>Menu 1</h3>
-                            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                @include('admin.order.partials.order_detail')
                             </div>
                             <div id="shipmentTab" class="tab-pane fade">
-                            <h3>Menu 2</h3>
-                            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+                                @include('admin.shipment.includes.manageShipmentPanel')
                             </div>
                         </div>
                     </div>
@@ -55,6 +53,8 @@
         $(document).ready(function(){
             $(".select2").select2();
         });
+        var order_no = {{$order->order_no}};
     </script>
-    <script type="text/javascript" src="{{asset('public/dist/js/pages/order/order-edit.js')}}"></script>
+    <script type="text/javascript" src="{{asset('/dist/js/pages/order/order-edit.js')}}"></script>
+    <script type="text/javascript" src="{{asset('/dist/js/pages/shipment/manage-shipment.js')}}"></script>
 @endsection

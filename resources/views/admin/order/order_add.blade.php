@@ -189,5 +189,5 @@
             $(".select2").select2();
         });
     </script>
-    <script type="text/javascript" src="{{asset('public/dist/js/pages/order/order-add.js')}}"></script>
+    <script type="text/javascript" src="{{asset('/dist/js/pages/order/order-add.js')}}"></script>
 @endsection

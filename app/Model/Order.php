@@ -19,7 +19,7 @@ class Order extends Model
     }
     public function shipments()
     {
-        return $this->hasMany('App\Model\Shipment','order_no');
+        return $this->hasMany('App\Model\Shipment','order_no','order_no');
     }
     public function customer(){
         return $this->belongsTo('App\Model\Customer','debtor_no','debtor_no');
