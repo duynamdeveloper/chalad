@@ -34,7 +34,11 @@
                                         @foreach($order->details as $detail)
                                             <tr class="item-row" item-id="{{$detail->stock_id}}">
                                             <td>{{$detail->item->description}}</td>
+<<<<<<< HEAD
                                             <td><img width="80px" height="80px" src="{{asset('/public/uploads/itemPic/'.$detail->item->item_image)}}"></td>
+=======
+                                            <td><img width="80px" height="80px" src="{{asset('/uploads/itemPic/'.$detail->item->item_image)}}"></td>
+>>>>>>> f6bd814fff2647b73855968f1f617f7e218c4483
                                             <td>{{$detail->item->stock_on_hand}}</td>
                                             <td><input type="text" name="quantity" value="{{$detail->quantity}}" class="form-control text-center inp_qty"></td>
                                             <td><input type="text" name="price" value="{{$detail->unit_price}}" class="form-control text-center inp_price"></td>

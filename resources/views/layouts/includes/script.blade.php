@@ -1,35 +1,35 @@
 <!-- jQuery 2.2.3 -->
-<script src="{{ asset('public/plugins/jQuery/jquery-2.2.3.min.js') }}"></script>
+<script src="{{ asset('plugins/jQuery/jquery-2.2.3.min.js') }}"></script>
 <!-- jQuery UI 1.11.4 -->
-<script src="{{ asset('public/dist/js/jquery-ui.min.js') }}"></script>
+<script src="{{ asset('dist/js/jquery-ui.min.js') }}"></script>
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 <script>
   $.widget.bridge('uibutton', $.ui.button);
 </script>
 <!-- Bootstrap 3.3.6 -->
-<script src="{{ asset('public/bootstrap/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
 <!-- Select2 -->
-<script src="{{ asset('public/plugins/select2/select2.full.min.js') }}"></script>
+<script src="{{ asset('plugins/select2/select2.full.min.js') }}"></script>
 <!-- DataTables -->
-<script src="{{ asset('public/plugins/datatables/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('public/plugins/datatables/dataTables.bootstrap.min.js') }}"></script>
-<script src="{{ asset('public/plugins/moment.min.js')}}"></script>
+<script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables/dataTables.bootstrap.min.js') }}"></script>
+<script src="{{ asset('plugins/moment.min.js')}}"></script>
 <!-- datepicker -->
-<script src="{{ asset('public/plugins/datepicker/bootstrap-datepicker.js') }}"></script>
+<script src="{{ asset('plugins/datepicker/bootstrap-datepicker.js') }}"></script>
 
 <!-- FastClick -->
-<script src="{{ asset('public/plugins/fastclick/fastclick.js') }}"></script>
+<script src="{{ asset('plugins/fastclick/fastclick.js') }}"></script>
 <!-- AdminLTE App -->
-<script src="{{ asset('public/dist/js/app.min.js') }}"></script>
+<script src="{{ asset('dist/js/app.min.js') }}"></script>
 
 <!-- Chart -->
-<script src="{{ asset('public/plugins/chartjs/Chart.min.js') }}"></script>
+<script src="{{ asset('plugins/chartjs/Chart.min.js') }}"></script>
 
-<script src="{{ asset('public/dist/js/jquery.validate.min.js') }}"></script>
-<script src="{{ asset('public/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js') }}"></script>
-<script src="{{ asset('public/plugins/bootbox.min.js') }}"></script>
-<script src="{{ asset('public/plugins/bootstrap-confirm-delete.js') }}"></script>
-<script type="text/javascript" src="{{ URL::asset('public/plugins/bootstrap-notify-master/bootstrap-notify.min.js') }}"></script>
+<script src="{{ asset('dist/js/jquery.validate.min.js') }}"></script>
+<script src="{{ asset('plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js') }}"></script>
+<script src="{{ asset('plugins/bootbox.min.js') }}"></script>
+<script src="{{ asset('plugins/bootstrap-confirm-delete.js') }}"></script>
+<script type="text/javascript" src="{{ URL::asset('plugins/bootstrap-notify-master/bootstrap-notify.min.js') }}"></script>
 
 <script type="text/javascript">
   $.ajaxSetup({
@@ -37,7 +37,7 @@
   });
 </script>
 
-<script src="{{ asset('public/plugins/highchart/highcharts.js') }}"></script>
+<script src="{{ asset('plugins/highchart/highcharts.js') }}"></script>
 
 
 <script>
