@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Payment extends Model
 {
 	protected $table = 'sale_orders_payment';
-
+  protected $appends = ['state_name','state_label'];
   /**
   * Update order table with invoice payment
   * @invoice_reference
@@ -18,6 +18,26 @@ class Payment extends Model
     $sum = ($currentAmount->paid_amount + $amount);
     DB::table('sales_orders')->where('reference',$reference)->update(['paid_amount' => $sum]); 
     return true;
+  }
+  public function getStateNameAttribute(){
+    $status = $this->status;
+    if($status == 0){
+      return "Pending";
+    }else if($status == 1){
+      return "Confirmed";
+    }else{
+      return "Unknown";
+    }
+  }
+  public function getStateLabelAttribute(){
+    $status = $this->status;
+    if($status == 0){
+      return '<label class="label label-default">Pending</label>';
+    }else if($status == 1){
+      return '<label class="label label-success">Confirm</label>';
+    }else{
+      return "Unknown";
+    }
   }
 
   public function getAllPaymentByUserId($from, $to, $customer, $id){

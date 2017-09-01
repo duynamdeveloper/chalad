@@ -241,7 +241,7 @@ class SalesOrderController extends Controller
                             ->select('sales_orders.*', 'debtors_master.name', 'debtors_master.phone', 'debtors_master.channel_id', 'debtors_master.channel_name', 'debtors_master.email')
                             ->first();
 
-        $data['payments'] = DB::table('sale_orders_payment')->where('sale_orders_no', $orderNo)->get();
+        $data['payments'] = DB::table('sale_orders_payment')->where('order_no', $orderNo)->get();
         $data['branchs'] = DB::table('cust_branch')->select('debtor_no', 'branch_code', 'br_name')->where('debtor_no', $data['saleData']->debtor_no)->orderBy('br_name', 'ASC')->get();
         //$data['payments'] = DB::table('payment_terms')->get();
         $data['invoicedItem'] = DB::table('stock_moves')->where(['order_no'=>$orderNo])->lists('stock_id');

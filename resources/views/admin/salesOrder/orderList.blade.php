@@ -52,15 +52,15 @@
             <th>{{ trans('message.invoice.paid') }}</th>
             <th>{{ trans('message.table.total') }}</th>
 
-            <th>{{ trans('message.table.shipped_status') }}</th>
+            
           
             <th width="5%">Status</th>
             <th width="5%">Action</th>
           </tr>
         </thead>
         <tbody>
-          @foreach($salesData as $data)
-          @if($data->order_qty>0)
+          @foreach($orders as $data)
+          @if(!empty($data->details))
           <tr>
           <td><input type="checkbox"></td>
             <td><a href="{{URL::to('/')}}/order/view-order-details/{{$data->order_no}}">{{$data->reference }}</a></td>
@@ -71,51 +71,26 @@
 
 
 
-            @if( $data->packed_qty == 0 || $data->packed_qty==null)
+          
 
-            <td>0/{{ $data->order_qty }}</span></td>
-            @else
-            <td>{{$data->packed_qty}}/{{ $data->order_qty }}</td>
+            <td>{{$data->ready_to_ship_quantity}}/{{ $data->order_quantity }}</span></td>
+           
+            
+            <td>{{$data->shipped_quantity}}/{{ $data->order_quantity }}</td>
 
-            @endif
-            @if( $data->shipped_qty == 0 || $data->shipped_qty==null)
+          
 
-            <td>0/{{ $data->order_qty }}</span></td>
-            @else
-            <td>{{$data->shipped_qty}}/{{ $data->order_qty }}</td>
-
-            @endif
-
-            @if( $data->paid_amount == 0 || $data->paid_amount==null)
-            <td>0/{{$data->total }}</td>
-            @else
+          
             <td>{{ $data->paid_amount}}/{{$data->total }}</td>
 
-            @endif
+            
 
 
             <td>{{ Session::get('currency_symbol').number_format($data->total,2,'.',',') }}</td>
             <td>
-              @if($data->packed_qty>0)
-              <span class="label label-info">Ready to ship</span>
-              @elseif($data->shipped_qty!==null && $data->order_qty!==null && abs($data->order_qty-$data->shipped_qty)==0)
-              <span class="label label-success">Shipped</span>
-              @else
-              <span class="label label-default">Pending</span>
-              
-              @endif
+              {!! $data->label_state !!}
             </td>
-            <td>
-            @if($data->order_status==0)
-            <span class="label label-warning">Canceled</span>
-            
-            @elseif($data->order_status==1)
-            <span class="label label-success">Confirmed</span>
-            
-            @else
-            <span class="label label-default">Pending</span>
-            @endif
-            </td>
+           
             <td>
 
               @if(!empty(Session::get('order_edit')))

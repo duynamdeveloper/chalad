@@ -1,8 +1,8 @@
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<h4>Shipment</h4>
+		<div class="box box-success">
+			<div class="box-heading text-center">
+				<h4 class>SHIPMENT</h4>
 			</div>
-			<div class="panel-body">
+			<div class="box-body">
 				<div class="container-fluid">
 					<div class="row">
 						<div class="control-panel col-md-3">
@@ -21,15 +21,15 @@
 							</div>
 						</div>
 
-						<table class="table table-hover" id="shipmentTable">
+						<table class="table table-stripped" id="shipmentTable">
 							<thead>
 								<th></th>
 								<th>{{ trans('message.table.item_id') }}</th>
 								<th>{{ trans('message.table.description') }}</th>
 								<th>{{ trans('message.table.curr_stock') }}</th>
-								<th>{{ trans('message.table.quantity') }}</th>
-								<th>{{ trans('message.shipment.ready_to_ship') }}</th>
-								<th>{{ trans('message.table.shipped') }}</th>
+								<th>Order Quantity</th>
+								<th>Quantity</th>
+								<th>Status</th>
 								
 								<th class="manually_allocate_td" hidden> {{ trans('message.table.additional_packing_qty') }}</th>
 							</thead>

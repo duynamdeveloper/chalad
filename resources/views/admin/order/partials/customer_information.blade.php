@@ -1,7 +1,7 @@
             
 
             <div class="row">
-            <form class="form-horizontal">
+            
             <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label col-md-4">Name</label>
@@ -37,11 +37,11 @@
                                         </div>
                                     </div>
                                   
-                                </form>
+                           
                                 </div>
                                 </div>
             <div class="row">
-                <form class="form-horizontal" id="shipping_billing_form" method="post" action="{{url('/order/update-address')}}" >
+                <form class="form-horizontal" id="shipping_billing_form" method="get" action="{{url('/order/updateaddress')}}" >
                      <input type="hidden" name="order_no" value="{{$order->order_no}}">
                         <div class="col-md-6">
              <h4 class="text-info"><strong>{{ trans('message.invoice.shipping_address') }}</strong></h4>

@@ -163,28 +163,27 @@
 
 		// create sales order
 		Route::group([
-			'prefix' => 'order',
-			
+			'prefix' => 'order',		
 			'as' => 'order.',
 		], function(){
-			Route::get('/test','OrderController@index');
+			Route::get('/add','OrderController@create');
 			Route::get('/shipping-cost','OrderController@getShippingCost');
-			Route::get('/list','SalesOrderController@index');
-			Route::get('/add','SalesOrderController@create');
+			Route::get('/list','OrderController@index');
+			//Route::get('/add','SalesOrderController@create');
 			//Route::post('/save','SalesOrderController@store');
-			Route::post('/update-address','OrderController@updateAddress');
-			Route::get('/edit/{id}','SalesOrderController@edit');
-			Route::post('/update','SalesOrderController@update');
+			Route::get('/updateaddress','OrderController@updateAddress');
+			//Route::get('/edit/{id}','SalesOrderController@edit');
+			//Route::post('/update','SalesOrderController@update');
 			Route::post('/delete/{id}','SalesOrderController@destroy');
 			Route::get('/view-order/{id}','SalesOrderController@viewOrder');
 			Route::post('/convert-order','SalesOrderController@convertOrder');
 			Route::get('/customer_mobile_no/{mobile_no}','SalesOrderController@customer_mobile_no');
-			Route::post('save','OrderController@create');
+			Route::post('/save','OrderController@save');
 			Route::get('/edit/shipping_cost_price/{weight}/{method}','QuoteController@shipping_cost_price');
-			Route::get('/testedit/{id}','OrderController@edit');
+			Route::get('/edit/{id}','OrderController@edit');
 			Route::post('/search','SalesOrderController@search');
 			Route::post('/quantity-validation','SalesOrderController@quantityValidation');
-	
+			Route::post('/update','OrderController@update');
 			Route::get('/view-order-details/{id}','SalesOrderController@viewOrderDetails');
 			Route::get('/manual-invoice-create/{id}','SalesOrderController@manualInvoiceCreate');
 			Route::post('/save-manual-invoice','SalesOrderController@storeManualInvoice');
@@ -195,8 +194,13 @@
 			Route::post('/email-order-info','SalesOrderController@sendOrderInformationByEmail');	
 			Route::get('/filtering','SalesOrderController@orderFiltering');
 			Route::post('/checkphonenumber','SalesOrderController@checkIfCustomerPhoneNumberExist');	
-			Route::post('/addpayment','SalesOrderController@addPayment');
-			Route::post('/update-status','SalesOrderController@updateStatus');
+			Route::post('/addpayment','OrderController@addPayment');
+			Route::post('/deletepayment','OrderController@deletePayment');
+			Route::post('/deletemultipayment','OrderController@deleteMultiPayment');
+			Route::post('/editpayment','OrderController@editPayment');
+			Route::post('/update-status-multi-payment','OrderController@updateStatusMultiPayment');
+			Route::post('/update-status-payment','OrderController@updateStatusPayment');
+			Route::post('/update-status','OrderController@updateStatus');
 			
 			Route::get('/printpdf','SalesOrderController@printPDF');
 		});

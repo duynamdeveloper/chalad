@@ -22,16 +22,16 @@ class StockMovement extends Model
 		if(!empty($shipment_details)){
 			foreach($shipment_details as $detail){
 
-				$packed_qty = $detail->packed_qty;
-				$shipped_qty = $detail->shipped_qty;
+				$quantity = - $detail->quantity;
+				$status = $detail->status;
 				$stock_id = $detail->stock_id;
 				$condition = true;
 
-				if($packed_qty > 0 && $shipped_qty == 0){
-					$quantity = -$packed_qty;
+				if($status == 0){
+				
 					$reason = Config::get('constants.REASON.READY_TO_SHIP');
-				}else if($packed_qty == 0 && $shipped_qty>0){
-					$quantity = -$shipped_qty;
+				}else if($status == 1){
+	
 					$reason = Config::get('constants.REASON.SHIPPED');
 				}else{
 					$condition = false;
