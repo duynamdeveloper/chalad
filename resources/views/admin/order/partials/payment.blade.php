@@ -6,7 +6,6 @@
                                    <table class="table table-bordered" id="paymentTable">
           <thead>
             <tr class="text-center">
-            <th class="text-center"><input type="checkbox" id="cb-check-all" /></th>
               <th class="text-center">ID</th>
               <th class="text-center">Date</th>
               <th class="text-center">Method</th>
@@ -20,7 +19,6 @@
            @if(!empty($order->payments))
            @foreach($order->payments as $payment)
            <tr payment-id="{{$payment->id}}">
-           <td width="3%" class="text-center"><input type="checkbox" value="{{$payment->id}}" class="cb-payment" /></td>
             <td width="5%" class="text-center">{{$payment->id}}</td>
             <td width="15%" class="text-center">{{$payment->payment_date }}</td>
             <td width="10%" class="text-center">{{$payment->method }}</td>
@@ -37,14 +35,6 @@
           @endforeach
           @endif
         </tbody>
-        <tfoot>
-        <tr>
-            <td colspan="5"><button class="btn btn-danger" id="deleteMultiPayment"><i class="glyphicon glyphicon-trash"></i> Delete</button>
-            <button class="btn btn-default" id="pendingMultiPayment"><i class="glyphicon glyphicon-trash"></i> Pending</button>
-            <button class="btn btn-success" id="confirmMultiPayment"><i class="glyphicon glyphicon-check"></i> Confirm</button></td>
-        </tr>
-            
-        </tfoot>
       </table>
     </div>
 </div>

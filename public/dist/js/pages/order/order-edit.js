@@ -65,13 +65,12 @@ ORDER.updateStatus = function(status) {
         },
         success: function(data) {
             if (data.state) {
-                $("#order_status_label").html(data.label);
-                console.log(data);
                 PAGE.notify("Update status successfully!");
+                location.reload();
             }
         }
     });
-}
+};
 ORDER.updateShippingCost = function() {
     var weight = ITEM.calculateTotalWeight();
     var shipping_method = $("#sel_shipping_method").val();
@@ -83,9 +82,9 @@ ORDER.disabledEdit = function(state) {
     $("#btnSaveAddress").attr('disabled', state);
     $("#submitBtn").attr('disabled', state);
     $("#cbxBillingEqualShipping").attr('disabled', state);
-    $("#orderTab input").attr('disabled', state);
+    $("#orderTab").find("input").attr('disabled', state);
     $("#orderTab select").attr('disabled', state);
-}
+};
 ORDER.updateAmount = function(item_id) {
     var row = $("#product_table > tbody").find('tr[item-id="' + item_id + '"]');
     var qty = row.find("input[name=quantity]").val();
@@ -103,7 +102,7 @@ ORDER.updateAmount = function(item_id) {
 };
 ORDER.checkPaymentState = function() {
 
-}
+};
 ORDER.getShippingCost = function(shipping_method, weight) {
     $.ajax({
         url: ORDER.API.getShippingCost,
@@ -172,14 +171,14 @@ ORDER.save = function() {
             });
         }
     });
-}
+};
 
 /* Define Customer Object */
 CUSTOMER = {
     API: {
         get: SITE_URL + '/customer/ajax/get-customer',
     }
-}
+};
 
 /* Define Item Object */
 
@@ -187,7 +186,7 @@ ITEM = {
     API: {
         get: SITE_URL + '/item/ajax/get-item',
     }
-}
+};
 
 ITEM.get = function(stock_id) {
 
@@ -207,7 +206,7 @@ ITEM.get = function(stock_id) {
 
         }
     });
-}
+};
 
 ITEM.writeToTable = function(item) {
     var tbody = $("#product_table > tbody");
@@ -222,7 +221,7 @@ ITEM.writeToTable = function(item) {
     tbody.append(tr);
     $("#product_table > tfoot").show();
     ORDER.updateStatistic();
-}
+};
 
 ITEM.calculateTotalWeight = function() {
     var rows = $("#product_table >tbody").find("tr.item-row");
@@ -233,7 +232,7 @@ ITEM.calculateTotalWeight = function() {
         total_weight += parseInt(qty) * parseInt(weight);
     });
     return total_weight;
-}
+};
 
 CUSTOMER.get = function(debtor_no) {
     $.ajax({
@@ -251,7 +250,7 @@ CUSTOMER.get = function(debtor_no) {
 
         }
     });
-}
+};
 CUSTOMER.writeToForm = function(customer) {
     $("#inp_customer_name").val(customer.name);
     $("#inp_customer_phone").val(customer.phone);
@@ -259,7 +258,7 @@ CUSTOMER.writeToForm = function(customer) {
     $("#inp_customer_channel").val(customer.channel_name);
     $("#sel_channel_id").val(customer.channel_id);
     $(".customer-form").prop('disabled', true);
-}
+};
 CUSTOMER.getFormData = function() {
     var customer = {
         id: $("#sel_customer").val(),
@@ -268,9 +267,9 @@ CUSTOMER.getFormData = function() {
         email: $("#inp_customer_email").val(),
         channel_name: $("#inp_customer_channel").val(),
         channel_id: $("#sel_channel_id").val(),
-    }
+    };
     return customer;
-}
+};
 PAYMENT.delete = function(payment_id) {
     $.ajax({
         url: ORDER.API.delete_payment,
@@ -279,11 +278,13 @@ PAYMENT.delete = function(payment_id) {
             'payment_id': payment_id
         },
         success: function(data) {
-            $("#paymentTable").find('tr[payment-id="' + payment_id + '"]').fadeOut(1000, function() { $(this).remove(); });;
+            $("#paymentTable").find('tr[payment-id="' + payment_id + '"]').fadeOut(1000, function () {
+                $(this).remove();
+            });
             PAGE.notify('Delete payment successfully');
         }
     });
-}
+};
 PAYMENT.multiDelete = function(list) {
     var list = PAYMENT.getCheckedList();
     if (list.length > 0) {
@@ -306,7 +307,7 @@ PAYMENT.multiDelete = function(list) {
         PAGE.notify("Please at least one payment", 'warning');
     }
 
-}
+};
 PAYMENT.updateMultiStatus = function(status) {
     var list = PAYMENT.getCheckedList();
     if (list.length > 0) {
@@ -330,7 +331,7 @@ PAYMENT.updateMultiStatus = function(status) {
     } else {
         PAGE.notify("Please at least one payment", 'warning');
     }
-}
+};
 PAYMENT.updateStatus = function(payment_id, status) {
 
 
@@ -352,7 +353,7 @@ PAYMENT.updateStatus = function(payment_id, status) {
         }
     });
 
-}
+};
 PAYMENT.getCheckedList = function() {
     var checkboxes = $("#paymentTable > tbody").find(':checkbox');
     var data = [];
@@ -362,7 +363,7 @@ PAYMENT.getCheckedList = function() {
         }
     });
     return data;
-}
+};
 PAGE.notify = function(msg, type = 'success') {
     $.notify({
         message: msg,
@@ -375,19 +376,19 @@ PAGE.notify = function(msg, type = 'success') {
         },
         allow_dismiss: true,
     });
-}
+};
 
 /* Action on events */
 $(document).ready(function() {
-    if (exist_shipments > 0 || order_status == 1) {
+    if (exist_shipments > 0 || order_status === 1) {
         ORDER.disabledEdit(true);
     }
     ORDER.updateStatistic();
     $("#sel_product").change(function() {
         var stock_id = $(this).val();
-        var tr = $("#product_table > tbody").find('tr[item-id="' + stock_id + '"]');
+        var tr = $("#product_table").find("> tbody").find('tr[item-id="' + stock_id + '"]');
         if (tr.length > 0) {
-            qty = tr.find('input[name=quantity]').val();
+            var qty = tr.find('input[name=quantity]').val();
             tr.find('input[name=quantity]').val(++qty);
         } else {
             ITEM.get(stock_id);
@@ -396,7 +397,7 @@ $(document).ready(function() {
         $('#sel_product option[value="' + stock_id + '"]').remove();
 
 
-        //ITEM.writeToTable(item);
+
     });
 
 
@@ -426,11 +427,10 @@ $(document).ready(function() {
 
     $(document).on('click', '.removebtn', function() {
         var stock_id = $(this).attr('item-id');
-        7
         var stock_name = $(this).closest('tr').find('td:first').html();
-        $("#sel_product").append('<option value="' + stock_id + '">' + stock_name + '</option>')
+        $("#sel_product").append('<option value="' + stock_id + '">' + stock_name + '</option>');
         $(this).closest('tr').remove();
-        $('#sel_product option[value="' + stock_id + '"]').show();
+        $('#sel_product').find('option[value="' + stock_id + '"]').show();
         ORDER.updateStatistic();
     });
 
@@ -491,17 +491,22 @@ $(document).ready(function() {
         $("#payment_date").val(date);
         $("#editPaymentModal").modal('show');
     });
-    $(document).on('click', '#pending_status_btn', function() {
+    $(document).on('click', '#pending_status_btn', function(e) {
+        e.preventDefault();
         ORDER.updateStatus(2);
     });
-    $(document).on('click', '#cancel_status_btn', function() {
+    $(document).on('click', '#cancel_status_btn', function(e) {
+        e.preventDefault();
         ORDER.updateStatus(0);
     });
-    $(document).on('click', '#confirm_status_btn', function() {
+    $(document).on('click', '#confirm_status_btn', function(e) {
+        e.preventDefault();
         if (exist_payments > 0) {
             if (confirm(" Are you sure you want to confirm order? There is still payment due")) {
                 ORDER.updateStatus(1);
             }
+        }else{
+            ORDER.updateStatus(1);
         }
     });
     $(document).on('click', '#confirm_create_shipment', function() {

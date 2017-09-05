@@ -707,7 +707,7 @@
         $('#ship_zipCode').val($('#bill_zipCode').val());
       
         $("#shipping_country_id").val($('#billing_country_id').val());
-    })
+    });
 
     $('#copyAddress').on('click', function() {
         $('#add_ship_street').val($('#add_bill_street').val());
@@ -716,7 +716,7 @@
         $('#add_ship_zipCode').val($('#add_bill_zipCode').val());
       
         $("#ship_country_id").val($('#bill_country_id').val());
-    })
+    });
 
 jQuery(function($) {
     var index = 'qpsstats-active-tab';

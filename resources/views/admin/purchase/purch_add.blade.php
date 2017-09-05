@@ -207,7 +207,7 @@ $(function() {
         });
         $('#datepicker').datepicker('update', new Date());
         $('.ref').val(Math.floor((Math.random() * 100) + 1));
-    })
+    });
 
     var stack = [];
     var token = $("#token").val();

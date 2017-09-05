@@ -146,9 +146,8 @@
         $('#ship_zipCode').val($('#bill_zipCode').val());
 
        var bill_country = $('#bill_country_id').val();
-       
-       $("#ship_country_id").val(bill_country).change();;
 
+ $("#ship_country_id").val(bill_country).change();
     });
     </script>
 @endsection

@@ -171,7 +171,7 @@ function toggle(a, recursive) {
     }
 
     return true;
-};
+}
 
 return function (root) {
     root = doc.getElementById(root);
@@ -184,7 +184,7 @@ return function (root) {
                 f(e.target.parentNode, e);
             }
         });
-    };
+    }
     function isCtrlKey(e) {
         return e.ctrlKey || e.metaKey;
     }
@@ -264,7 +264,7 @@ return function (root) {
             } else {
                 a.innerHTML += ' ';
             }
-            a.title = (a.title ? a.title+'\n[' : '[')+keyHint+'+click] Expand all children';
+            a.title = (a.title ? a.title+'\n[' : '[')+keyHint+'+click] Expand all children;';
             a.innerHTML += '<span>▼</span>';
             a.className += ' sf-dump-toggle';
             if ('sf-dump' != elt.parentNode.className) {

@@ -1,91 +1,95 @@
 @extends('layouts.app')
 @section('content')
-    <section class="container-fluid">
+    <section class="container" style="padding-top:30px;">
         {{--  Page Header  --}}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="box box-success">
-                    <div class="box-header text-center">
-                        <h4>ORDER No: #{{$order->order_no}} </h4>
-                        <h4 id="order_status_label"> {!! $order->label_state !!}</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-       {{--  End Page Header  --}}
 
-       {{--  Page Body  --}}
-       <div class=row>
-            {{--  Left Panel  --}}
-            <div class="col-md-8">
-                <div class="box box-success">
-                    <div class="box box-body">
-                        <ul class="nav nav-tabs text-center" id="navTab">
-                            <li class="active"><a data-toggle="tab" href="#customerTab">Customer</a></li>
-                            <li><a data-toggle="tab" href="#orderTab">Order</a></li>
-                            <li><a data-toggle="tab" href="#shipmentTab">Shipment</a></li>
-                             <li><a data-toggle="tab" href="#paymentTab">Payment</a></li>
-                        </ul>
+        {{--  End Page Header  --}}
 
-                        <div class="tab-content">
-                            <div id="customerTab" class="tab-pane fade in active">
-                                @include('admin.order.partials.customer_information')
-                            </div>
-                            <div id="orderTab" class="tab-pane fade">
-                                @include('admin.order.partials.order_detail')
-                            </div>
-                            <div id="shipmentTab" class="tab-pane fade">
-                                @include('admin.shipment.includes.manageShipmentPanel')
-                            </div>
-                             <div id="paymentTab" class="tab-pane fade">
-                                @include('admin.order.partials.payment')
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {{--  End left panel  --}}
-
+        {{--  Page Body  --}}
+        <div class=row>
             {{--  Right Panel  --}}
-            <div class="col-md-4" style="padding-left: 0px;">
+            <div class="col-md-3" style="padding-right: 0px;">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-md-12">
                             <div class="box box-success">
-                                <div class="box-header text-center"><h4>ACTION</h4></div>
-                                <hr>
-                                <div class="box-body text-center">
-                                    <div class="btn-group">
-                                        <button class="btn btn-danger" id="cancel_status_btn">Cancel</button>
-                                        <button class="btn btn-default" id="pending_status_btn">Pending</button>
-                                        <button class="btn btn-info" id="confirm_status_btn">Confirm</button>
-                                       
+                                <div class="box-header text-center">
+                                    <h4>ORDER No: #{{$order->order_no}} </h4>
+                                    <div class="box-body text-center">
+                                        <div class="btn-group" id="state-btn-group">
+                                            <button type="button" class="btn btn-{{$order->state_bootstrap_class}}">{{ $order->state_name }}</button>
+                                            <button type="button" class="btn btn-{{$order->state_bootstrap_class}} dropdown-toggle" data-toggle="dropdown">
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li><a href="#" class="label label-default" id="pending_status_btn">Pending</a></li>
+                                                <li><a href="#" class="label label-success" id="confirm_status_btn">Confirm</a></li>
+                                                <li><a href="#" class="label label-danger" id="cancel_status_btn">Cancel</a></li>
+                                            </ul>
+                                        </div>
+
                                     </div>
-                                   
-                                   <div class="btn-group" style="margin-top: 15px">
-                                    <button class="btn btn-success" id="confirm_create_shipment">Confirm + Create Shipment</button>
-                                   </div>
-                                     
                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="box box-body">
+                                <div class="box-header text-center"><h3 class="box-title">CUSTOMER DETAILS</h3></div>
+                                <hr>
+                                @include('admin.order.partials.customer_information')
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="box box-body">
+                                Order Created By NIT
+
+
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{--  Payment  --}}
 
 
             </div>
             {{--  End Right Panel  --}}
-       </div>
-       {{--  End Page Body  --}}
+            {{--  Left Panel  --}}
+            <div class="col-md-9">
+                <div class="box box-success">
+                    <ul class="nav nav-tabs text-center" id="navTab" style="margin-bottom:0px;">
+                        <li class="active"><a data-toggle="tab" href="#orderTab" aria-expanded="true">Order<br><span style="font-size:12px;"><em>(Complete)</em></a></li>
+                        <li><a data-toggle="tab" href="#paymentTab">Payment<br><span style="font-size:12px;"><em>(Awaiting Confirmation)</em></a></li>
+                        <li><a data-toggle="tab" href="#shipmentTab">Shipment<br><span style="font-size:12px;"><em>(None)</em></a></li>
+
+                    </ul>
+                </div>
+
+
+                <div class="tab-content">
+                    <div id="orderTab" class="tab-pane fade in active">
+                        @include('admin.order.partials.order_detail')
+                    </div>
+                    <div id="paymentTab" class="tab-pane fade">
+                        @include('admin.order.partials.payment')
+                    </div>
+                    <div id="shipmentTab" class="tab-pane fade">
+                        @include('admin.shipment.includes.manageShipmentPanel')
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {{--  End Page Body  --}}
     </section>
 
 
 
 @endsection
 @section('js')
-        <script type="text/javascript">
+    <script type="text/javascript">
         $(document).ready(function(){
             $(".select2").select2();
         });
@@ -96,7 +100,8 @@
         var order_status = {{$order->order_status}};
         console.log(exist_payments);
     </script>
-   
+    <script type="text/javascript" src="{{asset('/dist/js/pages/shipment/manage-shipment.js')}}"></script>
+    <script type="text/javascript" src="{{asset('/dist/js/pages/order/order-edit.js')}}"></script>
     <script type="text/javascript" src="{{asset('/public/dist/js/pages/shipment/manage-shipment.js')}}"></script>
-     <script type="text/javascript" src="{{asset('/public/dist/js/pages/order/order-edit.js')}}"></script>
+    <script type="text/javascript" src="{{asset('/public/dist/js/pages/order/order-edit.js')}}"></script>
 @endsection

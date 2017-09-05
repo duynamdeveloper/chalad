@@ -316,7 +316,7 @@ $(function() {
 
         $('.ref').val(Math.floor((Math.random() * 100) + 1));
        
-    })
+    });
 
     var stack = [];
     var stack = <?php echo json_encode($stack); ?>;

@@ -230,7 +230,7 @@ $(function() {
         $('.ref').val(Math.floor((Math.random() * 100) + 1));
        
          $('#datepicker').datepicker('update', new Date());
-    })
+    });
 
     var stack = [];
     var token = $("#token").val();
@@ -858,10 +858,9 @@ $("#suggesstion-box").hide();
         $('#ship_zipCode').val($('#bill_zipCode').val());
 
        var bill_country = $('#bill_country_id').val();
-       
-       $("#ship_country_id").val(bill_country).change();;
 
-    });
+$("#ship_country_id").val(bill_country).change();
+  });
 
     </script>
 @endsection

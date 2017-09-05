@@ -58,7 +58,7 @@
                     "sNext":     "التالي",
                     "sLast":     "الأخير"
                 }
-            }
+            };
 
   var ch = {
               "sProcessing":   "处理中...",
@@ -83,7 +83,7 @@
                   "sSortAscending":  ": 以升序排列此列",
                   "sSortDescending": ": 以降序排列此列"
               }
-          }
+          };
 
   var en = {
               "decimal":        "",
@@ -122,7 +122,7 @@
                     "previous":   "précédent"
                 },
                 "info": "présentation _START_ to _END_ of _TOTAL_ entrées"
-              }
+              };
 
     var jp = {
                 "sEmptyTable":     "テーブルにデータがありません",
@@ -146,7 +146,7 @@
                       "sSortAscending":  ": 列を昇順に並べ替えるにはアクティブにする",
                       "sSortDescending": ": 列を降順に並べ替えるにはアクティブにする"
                   }
-              }
+              };
 
     var rs = {
                 "processing": "Подождите...",
@@ -169,7 +169,7 @@
                   "sortAscending": ": активировать для сортировки столбца по возрастанию",
                   "sortDescending": ": активировать для сортировки столбца по убыванию"
                 }
-              }
+              };
 
     var sp = {
                 "sProcessing":     "Procesando...",

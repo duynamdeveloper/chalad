@@ -141,7 +141,7 @@ $(function() {
             format: '{{Session::get('date_format_type')}}'
         });
         $('#datepicker').datepicker('update', new Date());
-    })
+    });
 
     var stack = [];
     var token = $("#token").val();

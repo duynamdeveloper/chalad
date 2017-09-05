@@ -256,7 +256,7 @@
 
         });
       });
-    })
+    });
 
 
      // calculate amount with item quantity

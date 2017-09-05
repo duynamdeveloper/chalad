@@ -10,7 +10,7 @@ class Order extends Model
 {
     protected $table = 'sales_orders';
     protected $primaryKey = 'order_no';
-    protected $appends = ['state_name','label_state','ready_to_ship_quantity','shipped_quantity','order_quantity','paid_amount','payment_due'];
+    protected $appends = ['state_name','label_state','ready_to_ship_quantity','shipped_quantity','order_quantity','paid_amount','payment_due','state_bootstrap_class'];
     public function details()
     {
         return  $this->hasMany('App\Model\OrderDetail', 'order_no');
@@ -68,6 +68,27 @@ class Order extends Model
                 return '<span class="label label-success">Complete</span>';
             }else{
                 return '<span class="label label-warning">Processing</span>';
+            }
+        }
+        return '<span class="label label-danger">Unknown State</span>';
+    }
+    public function getStateBootstrapClassAttribute(){
+        $status = $this->order_status;
+        if($status == 0){
+            return "danger";
+        }else if($status==2){
+            if($this->existPendingPayments()){
+                return 'warning';
+            }else{
+                return 'default';
+            }
+        }else if($status == 1){
+            if($this->existReadyToShipShipment()){
+                return 'info';
+            }else if($this->checkAllPaymentArePaid() && $this->checkAllShipmentHaveTracking()){
+                return 'success';
+            }else{
+                return 'warning';
             }
         }
         return '<span class="label label-danger">Unknown State</span>';

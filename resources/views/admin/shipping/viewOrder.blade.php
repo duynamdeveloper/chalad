@@ -231,7 +231,7 @@
        
         var today = moment().format('YYYY-MM-DD');
         $('#datepicker').val(today);
-    })
+    });
 
     var token = $("#token").val();
 

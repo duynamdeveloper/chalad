@@ -192,222 +192,208 @@ SHIPMENT.getEditShipmentDataFromTable = function(shipment_id) {
 
     return data;
 }
-SHIPMENT.getManualAllocateDataFromTable = function(shipmentId) {
-    var rows = $('tr[shipment-id="' + shipmentId + '"]').not(':last');
-    var data = [];
-    $.each(rows, function(index, row) {
-        var stock_id = $(this).find('td:first-child').html();
-        var shipment_detail_id = $(this).attr('shipment-detail-id');
-        var additional_packing = $(this).find('input.additional_packing').val();
-        var item = [stock_id, additional_packing, shipment_detail_id];
-        data.push(item);
+
+
+SHIPMENT.notify = function(msg, type = 'success') {
+    $.notify({
+        message: msg,
+
+    }, {
+        type: type,
+        animate: {
+            enter: "animated fadeInUp",
+            exit: "animated fadeOutDown"
+        },
+        allow_dismiss: true,
+    });
+}
+
+SHIPMENT.validateAdditionalQuantity = function(order_no, stock_id) {
+    $.ajax({
+        url: SHIPMENT.API.validate_addtional_quantity,
+        type: 'get',
+        data: {
+            'order_no': order_no,
+            'stock_id': stock_id
+        },
+        error: function(xhr, status, error) {
+            var err = JSON.parse(xhr.responseText);
+
+        },
+        success: function(data) {
+            return data;
+        }
+
+    });
+}
+SHIPMENT.addTracking = function(shipment_id, tracking_number, shipping_method) {
+    $.ajax({
+        url: SHIPMENT.API.add_tracking_number,
+        type: 'get',
+        data: {
+            'shipment_id': shipment_id,
+            'tracking_number': tracking_number,
+            'shipping_method': shipping_method
+        },
+        success: function(data) {
+            SHIPMENT.notify('Tracking number updated!');
+            SHIPMENT.get(order_no);
+        }
+    });
+}
+SHIPMENT.add_new_shipment_control = function(data) {
+    var tr = $("<tr>").addClass('newShipmentRow');
+
+    $('<td>').html("NEW SHIPMENT").attr('rowspan', data.length + 1).css('vertical-align', 'middle').css('font-weight', 'bold').css('background-color', 'rgba(22,22,22,0.5)').css('color', '#fff').appendTo(tr);
+
+    shipment_tbody.append(tr);
+    $.each(data, function(index, detail) {
+
+
+
+        var tr = $("<tr>").attr('shipment-detail-id', -1).attr('shipment-id', -1).addClass('newShipmentRow');
+        // $('<td>').html('').appendTo(tr);
+        //console.log(detail);
+        $('<td>').html(detail.stock_id).appendTo(tr);
+        $('<td>').html(detail.description).appendTo(tr);
+        $('<td>').html(detail.stock_qty).appendTo(tr);
+        $('<td>').html(detail.quantity).appendTo(tr);
+        $('<td>').html('<input type="number" name="packed_qty" value="0" class="form-control">').appendTo(tr);
+
+
+
+
+
+        shipment_tbody.append(tr);
+
+    });
+    shipment_tbody.append('<tr class="saveBtnRow newShipmentRow" shipment-id="-1" hidden><td colspan="7" class="text-right"><button class="btn btn-primary saveManualAllocate" btn-shipment-id="-1">Save</button><button class="btn btn-danger btnHideNewShipmentControl">Cancel</button></td></tr>');
+}
+SHIPMENT.delete_shipment = function(shipment_id) {
+    $.ajax({
+        url: SHIPMENT.API.remove_shipment,
+        type: 'get',
+        data: {
+            shipment_id: shipment_id
+        },
+        success: function(data) {
+            if (data.state) {
+                SHIPMENT.notify("Delete success");
+                SHIPMENT.get(order_no);
+            } else {
+                SHIPMENT.notify("Something went wrong, please contact administrator", "danger");
+            }
+        }
+    });
+}
+
+
+
+$("#selOrder").change(function(event) {
+
+
+    SHIPMENT.get($(this).val());
+    $(".manually_allocate_td").hide();
+});
+$(".btnAddTracking").click(function() {
+    $shipment_id = $(this).attr('shipment-id');
+    //console.log(shipment_id);
+
+    $("#addTrackingModal modal-title").html('Add Tracking Number for Shipment No #' + shipment_id);
+    $("#addTrackingModal").modal('show');
+
+});
+$("#addShipmentManuallyBtn").click(function(event) {
+    $(".newShipmentRow").hide();
+    $(".saveBtnRow").hide();
+    $("input[name=packed_qty]").attr('readonly', true);
+    /* Act on the event */
+    $.ajax({
+        url: SHIPMENT.API.manual_get_exist_shipment,
+        type: 'get',
+        data: {
+            'order_no': order_no,
+        },
+        success: function(data) {
+
+
+            SHIPMENT.add_new_shipment_control(data.data);
+            $(".manually_allocate_td").show();
+            $(".saveBtnRow").show();
+
+        }
     });
 
-    return data;
-}
-SHIPMENT.getEditShipmentDataFromTable = function(shipment_id) {
-        var rows = $('tr[shipment-id="' + shipment_id + '"]').not(':last');
+    //$(".additional_packing").show();
+});
+$(document).on('click', '.saveEditShipment', function() {
+    var shipment_id = $(this).attr('btn-shipment-id');
+    SHIPMENT.edit_shipment(shipment_id);
+});
+$(document).on('click', '.btnHideNewShipmentControl', function() {
+    $(".newShipmentRow").remove();
+});
+$(document).on('click', '.editShipment', function() {
+    var shipment_id = $(this).attr('shipment-id');
+    $(".saveBtnRow").hide();
+    $(".newShipmentRow").hide();
+    $('tr[shipment-id="' + shipment_id + '"].saveBtnRow').show();
+    $('tr[shipment-id="' + shipment_id + '"] td input[name=packed_qty]').attr('readonly', false);
+});
+$(document).on('click', '.btnAddTracking', function() {
+    shipment_id = $(this).attr('shipment-id');
+    $("#inputShipmentId").val(shipment_id);
+    $("#addTrackingModal .modal-title").html('Add Tracking Number for Shipment No #' + shipment_id);
+    $("#addTrackingModal").modal('show');
+});
+$(document).on('click', '.btnEditTracking', function() {
+    var shipment_id = $(this).attr('shipment-id');
+    var tracking_number = $(this).attr('data-tracking-number');
+    //(shipment_id);
+    $("#inputShipmentId").val(shipment_id);
+    $("#inputTrackingNumber").val(tracking_number);
+    $("#selShippingMethod").val($(this).attr('shipping-method'));
+    $("#addTrackingModal .modal-title").html('Add Tracking Number for Shipment No #' + shipment_id);
+    $("#addTrackingModal").modal('show');
+});
+$(document).on('click', '.saveManualAllocate', function() {
+    var shipment_id = $(this).attr('btn-shipment-id');
 
-        SHIPMENT.notify = function(msg, type = 'success') {
-            $.notify({
-                message: msg,
+    SHIPMENT.manual_allocate(shipment_id, order_no);
+});
+$(document).on('submit', '#addTrackingForm', function(event) {
+    event.preventDefault();
+    var shipment_id = $("#inputShipmentId").val();
+    var tracking_number = $("#inputTrackingNumber").val();
+    var shipping_method = $("#selShippingMethod").val();
 
-            }, {
-                type: type,
-                animate: {
-                    enter: "animated fadeInUp",
-                    exit: "animated fadeOutDown"
-                },
-                allow_dismiss: true,
-            });
-        }
+    $("#addTrackingModal").modal('hide');
+    SHIPMENT.addTracking(shipment_id, tracking_number, shipping_method);
 
-        SHIPMENT.validateAdditionalQuantity = function(order_no, stock_id) {
-            $.ajax({
-                url: SHIPMENT.API.validate_addtional_quantity,
-                type: 'get',
-                data: {
-                    'order_no': order_no,
-                    'stock_id': stock_id
-                },
-                error: function(xhr, status, error) {
-                    var err = JSON.parse(xhr.responseText);
+});
+$(document).on('click', '.deleteShipment', function(e) {
+    var checkstr = confirm("Are you sure?");
+    var shipment_id = $(this).attr('shipment-id');
+    if (checkstr) {
+        SHIPMENT.delete_shipment(shipment_id);
+    }
 
-                },
-                success: function(data) {
-                    return data;
-                }
+});
 
-            });
-        }
-        SHIPMENT.addTracking = function(shipment_id, tracking_number, shipping_method) {
-            $.ajax({
-                url: SHIPMENT.API.add_tracking_number,
-                type: 'get',
-                data: {
-                    'shipment_id': shipment_id,
-                    'tracking_number': tracking_number,
-                    'shipping_method': shipping_method
-                },
-                success: function(data) {
-                    SHIPMENT.notify('Tracking number updated!');
-                    SHIPMENT.get(order_no);
-                }
-            });
-        }
-        SHIPMENT.add_new_shipment_control = function(data) {
-            var tr = $("<tr>").addClass('newShipmentRow');
-
-            $('<td>').html("NEW SHIPMENT").attr('rowspan', data.length + 1).css('vertical-align', 'middle').css('font-weight', 'bold').css('background-color', 'rgba(22,22,22,0.5)').css('color', '#fff').appendTo(tr);
-
-            shipment_tbody.append(tr);
-            $.each(data, function(index, detail) {
-
-
-
-                var tr = $("<tr>").attr('shipment-detail-id', -1).attr('shipment-id', -1).addClass('newShipmentRow');
-                // $('<td>').html('').appendTo(tr);	
-                //console.log(detail);
-                $('<td>').html(detail.stock_id).appendTo(tr);
-                $('<td>').html(detail.description).appendTo(tr);
-                $('<td>').html(detail.stock_qty).appendTo(tr);
-                $('<td>').html(detail.quantity).appendTo(tr);
-                $('<td>').html('<input type="number" name="packed_qty" value="0" class="form-control">').appendTo(tr);
+$("#addShipmentAutoBtn").click(function() {
+    SHIPMENT.automatic_allocate(order_no);
+});
 
 
+$('#btnAddTab').click(function(e) {
+    var nextTab = $('#tabs li').size() + 1;
 
+    // create the tab
+    $('<li><a href="#tab' + nextTab + '" data-toggle="tab">Tab ' + nextTab + '</a></li>').appendTo('#tabs');
 
+    // create the tab content
+    $('<div class="tab-pane" id="tab' + nextTab + '">tab' + nextTab + ' content</div>').appendTo('.tab-content');
 
-                shipment_tbody.append(tr);
-
-            });
-            shipment_tbody.append('<tr class="saveBtnRow newShipmentRow" shipment-id="-1" hidden><td colspan="7" class="text-right"><button class="btn btn-primary saveManualAllocate" btn-shipment-id="-1">Save</button><button class="btn btn-danger btnHideNewShipmentControl">Cancel</button></td></tr>');
-        }
-        SHIPMENT.delete_shipment = function(shipment_id) {
-            $.ajax({
-                url: SHIPMENT.API.remove_shipment,
-                type: 'get',
-                data: {
-                    shipment_id: shipment_id
-                },
-                success: function(data) {
-                    if (data.state) {
-                        SHIPMENT.notify("Delete success");
-                        SHIPMENT.get(order_no);
-                    } else {
-                        SHIPMENT.notify("Something went wrong, please contact administrator", "danger");
-                    }
-                }
-            });
-        }
-
-
-
-        $("#selOrder").change(function(event) {
-
-
-            SHIPMENT.get($(this).val());
-            $(".manually_allocate_td").hide();
-        });
-        $(".btnAddTracking").click(function() {
-            $shipment_id = $(this).attr('shipment-id');
-            //console.log(shipment_id);
-
-            $("#addTrackingModal modal-title").html('Add Tracking Number for Shipment No #' + shipment_id);
-            $("#addTrackingModal").modal('show');
-
-        });
-        $("#addShipmentManuallyBtn").click(function(event) {
-            $(".newShipmentRow").hide();
-            $(".saveBtnRow").hide();
-            $("input[name=packed_qty]").attr('readonly', true);
-            /* Act on the event */
-            $.ajax({
-                url: SHIPMENT.API.manual_get_exist_shipment,
-                type: 'get',
-                data: {
-                    'order_no': order_no,
-                },
-                success: function(data) {
-
-
-                    SHIPMENT.add_new_shipment_control(data.data);
-                    $(".manually_allocate_td").show();
-                    $(".saveBtnRow").show();
-
-                }
-            });
-
-            //$(".additional_packing").show();
-        });
-        $(document).on('click', '.saveEditShipment', function() {
-            var shipment_id = $(this).attr('btn-shipment-id');
-            SHIPMENT.edit_shipment(shipment_id);
-        });
-        $(document).on('click', '.btnHideNewShipmentControl', function() {
-            $(".newShipmentRow").remove();
-        });
-        $(document).on('click', '.editShipment', function() {
-            var shipment_id = $(this).attr('shipment-id');
-            $(".saveBtnRow").hide();
-            $(".newShipmentRow").hide();
-            $('tr[shipment-id="' + shipment_id + '"].saveBtnRow').show();
-            $('tr[shipment-id="' + shipment_id + '"] td input[name=packed_qty]').attr('readonly', false);
-        });
-        $(document).on('click', '.btnAddTracking', function() {
-            shipment_id = $(this).attr('shipment-id');
-            $("#inputShipmentId").val(shipment_id);
-            $("#addTrackingModal .modal-title").html('Add Tracking Number for Shipment No #' + shipment_id);
-            $("#addTrackingModal").modal('show');
-        });
-        $(document).on('click', '.btnEditTracking', function() {
-            var shipment_id = $(this).attr('shipment-id');
-            var tracking_number = $(this).attr('data-tracking-number');
-            //(shipment_id);
-            $("#inputShipmentId").val(shipment_id);
-            $("#inputTrackingNumber").val(tracking_number);
-            $("#selShippingMethod").val($(this).attr('shipping-method'));
-            $("#addTrackingModal .modal-title").html('Add Tracking Number for Shipment No #' + shipment_id);
-            $("#addTrackingModal").modal('show');
-        });
-        $(document).on('click', '.saveManualAllocate', function() {
-            var shipment_id = $(this).attr('btn-shipment-id');
-
-            SHIPMENT.manual_allocate(shipment_id, order_no);
-        });
-        $(document).on('submit', '#addTrackingForm', function(event) {
-            event.preventDefault();
-            var shipment_id = $("#inputShipmentId").val();
-            var tracking_number = $("#inputTrackingNumber").val();
-            var shipping_method = $("#selShippingMethod").val();
-
-            $("#addTrackingModal").modal('hide');
-            SHIPMENT.addTracking(shipment_id, tracking_number, shipping_method);
-
-        });
-        $(document).on('click', '.deleteShipment', function(e) {
-            var checkstr = confirm("Are you sure?");
-            var shipment_id = $(this).attr('shipment-id');
-            if (checkstr) {
-                SHIPMENT.delete_shipment(shipment_id);
-            }
-
-        });
-
-        $("#addShipmentAutoBtn").click(function() {
-            SHIPMENT.automatic_allocate(order_no);
-        });
-
-
-        $('#btnAddTab').click(function(e) {
-            var nextTab = $('#tabs li').size() + 1;
-
-            // create the tab
-            $('<li><a href="#tab' + nextTab + '" data-toggle="tab">Tab ' + nextTab + '</a></li>').appendTo('#tabs');
-
-            // create the tab content
-            $('<div class="tab-pane" id="tab' + nextTab + '">tab' + nextTab + ' content</div>').appendTo('.tab-content');
-
-            // make the new tab active
-            $('#tabs a:last').tab('show');
-        });
+    // make the new tab active
+    $('#tabs a:last').tab('show');
+});
