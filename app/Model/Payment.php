@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Payment extends Model
 {
 	protected $table = 'sale_orders_payment';
-  protected $appends = ['state_name','state_label'];
+  protected $appends = ['state_name','state_label','state_bootstrap_class'];
   /**
   * Update order table with invoice payment
   * @invoice_reference
@@ -39,7 +39,16 @@ class Payment extends Model
       return "Unknown";
     }
   }
-
+    public function getStateBootstrapClassAttribute(){
+        $status = $this->status;
+        if($status == 0){
+            return 'default';
+        }else if($status == 1){
+            return 'success';
+        }else{
+            return "danger";
+        }
+    }
   public function getAllPaymentByUserId($from, $to, $customer, $id){
       $from = DbDateFormat($from);
       $to = DbDateFormat($to);

@@ -797,7 +797,7 @@ class ItemController extends Controller
     }
     public function ajaxGetItem(Request $request){
         $stock_id = $request->stock_id;
-        $item = Item::where('stock_id',$stock_id)->first();
+        $item = Item::where('stock_id',$stock_id)->with('category')->first();
         if(!empty($item)){
             return response()->json(['state'=>true,'item'=>$item]);
         }
@@ -962,5 +962,13 @@ class ItemController extends Controller
             }
         }
         return back();
+    }
+    public function ajaxSearch(Request $request){
+        $string = $request->string;
+        $items = Item::where('description','like','%'.$string.'%')->get();
+        if($items->isEmpty()){
+            return response()->json(['state'=>false]);
+        }
+        return response()->json(['state'=>true,'items'=>$items]);
     }
 }

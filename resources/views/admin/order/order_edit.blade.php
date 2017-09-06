@@ -23,7 +23,7 @@
                                             </button>
                                             <ul class="dropdown-menu" role="menu">
                                                 <li><a href="#" class="label label-default" id="pending_status_btn">Pending</a></li>
-                                                <li><a href="#" class="label label-success" id="confirm_status_btn">Confirm</a></li>
+                                                <li><a href="#" class="label label-success" id="confirm_create_shipment">Confirm</a></li>
                                                 <li><a href="#" class="label label-danger" id="cancel_status_btn">Cancel</a></li>
                                             </ul>
                                         </div>
@@ -43,7 +43,7 @@
 
                         <div class="col-md-12">
                             <div class="box box-body">
-                                Order Created By NIT
+                                Order Created By <strong>{{$order->user->real_name}}</strong>
 
 
                             </div>
@@ -91,14 +91,27 @@
 @section('js')
     <script type="text/javascript">
         $(document).ready(function(){
-            $(".select2").select2();
+
+            function formatState (item) {
+                console.log(item);
+                if (!item.id) { return item.text; }
+                var $item = $(
+                    '<span>' + item.text + '</span>'
+                );
+                console.log($item);
+                return $item;
+            }
+
         });
+
+
+
         var DATE_FORMAT_TYPE = '{{Session::get('date_format_type')}}';
         var order_no = {{$order->order_no}};
         var exist_payments = {!! $order->payment_due !!};
         var exist_shipments = {!! count($order->shipments) !!};
         var order_status = {{$order->order_status}};
-        console.log(exist_payments);
+        //console.log(exist_payments);
     </script>
     <script type="text/javascript" src="{{asset('/dist/js/pages/shipment/manage-shipment.js')}}"></script>
     <script type="text/javascript" src="{{asset('/dist/js/pages/order/order-edit.js')}}"></script>

@@ -15,7 +15,7 @@ use DB;
 
 class OrderController extends Controller
 {
-    
+
     public function index()
     {
         $data['menu'] = 'sales';
@@ -25,7 +25,7 @@ class OrderController extends Controller
         //return response()->json($data['salesData']);
         //die;
         //var_dump($shipment->isEmpty());
-       return view('admin.salesOrder.orderList', $data);
+        return view('admin.salesOrder.orderList', $data);
     }
     public function create()
     {
@@ -34,8 +34,8 @@ class OrderController extends Controller
         $data['customers'] = Customer::all();
         $data['items'] = Item::all();
         $data['tax_types'] = DB::table('item_tax_types')->get();
-       // $orders = Order::with(['details','shipments'])->where('order_no',3)->first();
-    
+        // $orders = Order::with(['details','shipments'])->where('order_no',3)->first();
+
         return view("admin.order.order_add", $data);
     }
     public function getShippingCost(Request $request)
@@ -43,11 +43,11 @@ class OrderController extends Controller
         $weight = $request->weight;
         $shipping_method = $request->shipping_method;
         //$weight = 100;
-       // $shipping_method = "Registered";
+        // $shipping_method = "Registered";
         $shipping = DB::table('shipping_cost')->where('method', $shipping_method)->where('weight_to', '<=', $weight)
-                                            ->where('weight_from', '>=', $weight)->first();
-        
-       
+            ->where('weight_from', '>=', $weight)->first();
+
+
         if (!empty($shipping)) {
             return response()->json(['state'=>true,'cost'=>$shipping->cost]);
         }
@@ -88,7 +88,7 @@ class OrderController extends Controller
         $order->shipping_cost = $shipping_cost;
         $order->discount_amount = $discount_amount;
         $order->trans_type = SALESORDER;
-        
+
         $order->save();
         $order_no = $order->order_no;
 
@@ -118,46 +118,17 @@ class OrderController extends Controller
     public function update(Request $request)
     {
         $userId = \Auth::user()->id;
-        
-                $items = $request->items;
-                $order_no = $request->order_no;
-                $items = json_decode($items);
-                $shipping_cost = $request->shipping_cost;
-                $discount_amount = $request->discount_amount;
-                $total_fee = $request->total_fee;
-                $item_tax = $request->item_tax;
 
-                $order = Order::where('order_no', $order_no)->first();
-    
-                $order->person_id = $userId;
-                $order->ord_date = date('Y-m-d');
-                $order->total = $total_fee;
-                $order->item_tax = $item_tax;
-                $order->shipping_cost = $shipping_cost;
-                $order->discount_amount = $discount_amount;
-                $order->trans_type = SALESORDER;
-                
-                $order->save();
-                $order_no = $order->order_no;
-                DB::table('sales_order_details')->where('order_no', $order_no)->delete();
-        foreach ($items as $item) {
-            $orderDetail = new OrderDetail();
-            $orderDetail->order_no = $order_no;
-            $orderDetail->trans_type = SALESORDER;
-            $orderDetail->stock_id = $item->item_id;
-            $orderDetail->unit_price = $item->price;
-            $orderDetail->quantity = $item->qty;
-            $orderDetail->description = $item->name;
-            $orderDetail->save();
-        }
-    
-                return response()->json($order);
-    }
-    public function updateAddress(Request $request)
-    {
+        $items = $request->items;
         $order_no = $request->order_no;
+        $items = json_decode($items);
+        $shipping_cost = $request->shipping_cost;
+        $discount_amount = $request->discount_amount;
+        $total_fee = $request->total_fee;
+        $item_tax = $request->item_tax;
+
         $order = Order::where('order_no', $order_no)->first();
-        
+
         $order->billing_name = $request->billing_name;
         $order->billing_street = $request->billing_street;
         $order->billing_city = $request->billing_city;
@@ -171,7 +142,50 @@ class OrderController extends Controller
         $order->shipping_state = $request->shipping_state;
         $order->shipping_zip_code = $request->shipping_zip_code;
         $order->shipping_country_id = $request->shipping_country_id;
-        
+
+        $order->person_id = $userId;
+        $order->ord_date = date('Y-m-d');
+        $order->total = $total_fee;
+        $order->item_tax = $item_tax;
+        $order->shipping_cost = $shipping_cost;
+        $order->discount_amount = $discount_amount;
+        $order->trans_type = SALESORDER;
+
+        $order->save();
+        $order_no = $order->order_no;
+        DB::table('sales_order_details')->where('order_no', $order_no)->delete();
+        foreach ($items as $item) {
+            $orderDetail = new OrderDetail();
+            $orderDetail->order_no = $order_no;
+            $orderDetail->trans_type = SALESORDER;
+            $orderDetail->stock_id = $item->item_id;
+            $orderDetail->unit_price = $item->price;
+            $orderDetail->quantity = $item->qty;
+            $orderDetail->description = $item->name;
+            $orderDetail->save();
+        }
+
+        return response()->json($order);
+    }
+    public function updateAddress(Request $request)
+    {
+        $order_no = $request->order_no;
+        $order = Order::where('order_no', $order_no)->first();
+
+        $order->billing_name = $request->billing_name;
+        $order->billing_street = $request->billing_street;
+        $order->billing_city = $request->billing_city;
+        $order->billing_state = $request->billing_state;
+        $order->billing_zip_code = $request->billing_zip_code;
+        $order->billing_country_id = $request->billing_country_id;
+
+        $order->shipping_name= $request->shipping_name;
+        $order->shipping_street = $request->shipping_street;
+        $order->shipping_city= $request->shipping_city;
+        $order->shipping_state = $request->shipping_state;
+        $order->shipping_zip_code = $request->shipping_zip_code;
+        $order->shipping_country_id = $request->shipping_country_id;
+
         $order->update();
 
         return redirect('order/edit/'.$order->order_no);
@@ -234,10 +248,10 @@ class OrderController extends Controller
     }
     public function updateStatusPayment(Request $request)
     {
-       
+
         $status = $request->state;
         $payment_id = $request->payment_id;
-                  
+
         $payment = Payment::find($payment_id);
         $payment->status = $status;
         $payment->update();

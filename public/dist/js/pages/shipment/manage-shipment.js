@@ -39,7 +39,7 @@ SHIPMENT.get = function(order_no) {
             'order_no': order_no,
         },
         success: function(data) {
-            console.log(order_no);
+            //console.log(order_no);
             if (data.state) {
                 SHIPMENT.writeToTable(data.shipments);
             } else {
@@ -52,54 +52,56 @@ SHIPMENT.get = function(order_no) {
     });
 }
 SHIPMENT.writeToTable = function(data) {
-
     shipment_tbody.html("");
     shipment_tbody.hide();
-    var ready_to_ship_span = '<span class="label label-info">Ready to ship</span>'
-    var shipped_span = '<span class="label label-success">Shipped</span>';
+    var title_row = "<tr>" +
+        "<td><strong>Stock ID</strong></td>" +
+        "<td><strong>Description</strong></td>" +
+        "<td><strong>Stock on hand</strong></td>" +
+        "<td><strong>Order Quantity</strong></td>" +
+        "<td><strong>Quantity</strong></td>" +
+        "</tr>";
     //console.log(data.details);
     $.each(data.shipments, function(index, shipment) {
         var tr = $("<tr>");
         if (shipment.tracking_number == null) {
             shipment.tracking_number = "";
+            var state_label = '<span class=\"label label-info\">Ready to ship</span>';
             shipment.shipping_method = -1;
+        }else{
+            var state_label = '<span class="label label-success">Shipped</span>';
         }
         var btn_group = $("<div>").addClass('btn-group');
-        $('<td>').html("SHIPMENT NO:" + shipment.id).attr('rowspan', shipment.details.length + 1).css('vertical-align', 'middle').css('font-weight', 'bold').css('background-color', 'rgba(22,22,22,0.5)').css('color', '#fff').appendTo(tr);
+        $('<td>').html("SHIPMENT NO:" + shipment.id).css('font-weight', 'bold').appendTo(tr);
 
         $('<td>').html('Tracking Number: ' + shipment.tracking_number).attr('colspan', 2).appendTo(tr);
+        $('<td>').html('<strong>Status:</strong>'+state_label).appendTo(tr);
         var remove_btn = '<button class="btn btn-danger deleteShipment" shipment-id="' + shipment.id + '">Delete</button>';
         var edit_btn = '<button class="btn btn-info editShipment" shipment-id="' + shipment.id + '">Edit</button>';
         if (shipment.tracking_number == "") {
             btn_group.append('<button class="btn btn-success btnEditTracking" shipment-id="' + shipment.id + '">Tracking</button>' + remove_btn + edit_btn);
-            $('<td>').append(btn_group).addClass("text-right").attr('colspan', 4).appendTo(tr);
+            $('<td>').append(btn_group).addClass("text-right").attr('colspan', 2).appendTo(tr);
         } else {
-            btn_group.append('<button class="btn btn-primary btnEditTracking" shipment-id="' + shipment.id + '" data-tracking-number="' + shipment.tracking_number + '" shipping-method="' + shipment.shipping_method + '">Tracking and Shipment method</button>' + remove_btn);
-            $('<td>').append(btn_group).addClass("text-right").attr('colspan', 4).appendTo(tr);
+            btn_group.append('<button class="btn btn-primary btnEditTracking" shipment-id="' + shipment.id + '" data-tracking-number="' + shipment.tracking_number + '" shipping-method="' + shipment.shipping_method + '">Tracking</button>' + remove_btn);
+            $('<td>').append(btn_group).addClass("text-right").attr('colspan', 2).appendTo(tr);
         }
 
 
         shipment_tbody.append(tr);
+        shipment_tbody.append(title_row);
         $.each(shipment.details, function(index, detail) {
 
             var tr = $("<tr>").attr('shipment-detail-id', detail.id).attr('shipment-id', shipment.id);
-            // $('<td>').html('').appendTo(tr);	
-            //console.log(detail);
+
             var span = "";
-            if (detail.status == 1) {
-                span = shipped_span;
-            } else {
-                span = ready_to_ship_span;
-            }
+
             $('<td>').html(detail.stock_id).appendTo(tr);
             $('<td>').html(detail.item.description).appendTo(tr);
-            $('<td>').html(detail.item.stock_qty).appendTo(tr);
+            $('<td>').html(detail.item.stock_on_hand).appendTo(tr);
             $('<td>').html(detail.item.order_qty).appendTo(tr);
             $('<td>').html('<input type="number" name="packed_qty" value="' + detail.quantity + '" class="form-control" readonly>').appendTo(tr);
-            $('<td>').html(span).appendTo(tr);
 
 
-            //$('<td>').html('<input class="additional_packing" type="number" value="0"><span class="notice text-danger"></span>').css("display","none").addClass("manually_allocate_td").appendTo(tr);
 
 
             shipment_tbody.append(tr);
@@ -121,7 +123,7 @@ SHIPMENT.automatic_allocate = function(order_no) {
             'order_no': order_no
         },
         success: function(data) {
-            console.log(data);
+           // console.log(data);
             SHIPMENT.get(order_no);
             SHIPMENT.notify("Automatic allocate success!");
         }
@@ -156,7 +158,7 @@ SHIPMENT.manual_allocate = function(shipment_id, order_no) {
             'data': SHIPMENT.getManualAllocateDataFromTable(shipment_id)
         },
         success: function(data) {
-            console.log(data);
+          //  console.log(data);
             SHIPMENT.get(order_no);
             SHIPMENT.notify("Manual Allocate Success");
         }
@@ -279,7 +281,7 @@ SHIPMENT.delete_shipment = function(shipment_id) {
         success: function(data) {
             if (data.state) {
                 SHIPMENT.notify("Delete success");
-                SHIPMENT.get(order_no);
+                location.reload();
             } else {
                 SHIPMENT.notify("Something went wrong, please contact administrator", "danger");
             }

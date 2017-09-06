@@ -201,7 +201,7 @@
 			Route::post('/update-status-multi-payment','OrderController@updateStatusMultiPayment');
 			Route::post('/update-status-payment','OrderController@updateStatusPayment');
 			Route::post('/update-status','OrderController@updateStatus');
-			
+			Route::get('/ajax-item-search','ItemController@ajaxSearch');
 			Route::get('/printpdf','SalesOrderController@printPDF');
 		});
 		//Route::get('order/list','SalesOrderController@index');

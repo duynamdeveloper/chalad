@@ -22,23 +22,12 @@
 						</div>
 
 						<table class="table table-stripped" id="shipmentTable">
-							<thead>
-								<th></th>
-								<th>{{ trans('message.table.item_id') }}</th>
-								<th>{{ trans('message.table.description') }}</th>
-								<th>{{ trans('message.table.curr_stock') }}</th>
-								<th>Order Quantity</th>
-								<th>Quantity</th>
-								<th>Status</th>
-								
-								<th class="manually_allocate_td" hidden> {{ trans('message.table.additional_packing_qty') }}</th>
-							</thead>
+
 							<tbody></tbody>
 						</table>
 					</div>
 					<div class="panel-footer text-center">
-						<button class="btn btn-primary" id="addShipmentManuallyBtn">{{ trans('message.shipment.create_shipment_manually') }}</button>
-						<button class="btn btn-success" id="addShipmentAutoBtn">{{ trans('message.shipment.allocate_item_automaticly') }}</button>
+						<button class="btn btn-success" id="addShipmentAutoBtn">Create/Update Shipment</button>
 					</div>
 				</div>
 				<div id="addTrackingModal" class="modal fade" role="dialog">

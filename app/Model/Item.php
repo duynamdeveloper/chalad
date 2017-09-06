@@ -103,4 +103,7 @@ class Item extends Model
       ");
         return $dad;
     }
+    public function category(){
+        return $this->belongsTo('App\Model\Category','category_id','category_id');
+    }
 }

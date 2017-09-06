@@ -440,3 +440,39 @@ color:#3C8DBC;
     font-size: 15px;
     border-radius: 0px;
 }
+#livesearch{
+    position: absolute;
+    z-index: 9999;
+    background-color: #fff;
+    width: 245px;
+}
+#livesearch ul{
+    list-style: none;
+    font-weight: bold;
+    padding-left: 0px;
+    border: 1px solid #3c8dbc;
+    border-top: none;
+    z-index: 1000;
+
+}
+#livesearch li{
+    display: table;
+    vertical-align: middle;
+    padding: 10px;
+    width: 100%;
+    cursor: pointer;
+}
+#livesearch li:hover{
+    background-color: #e1e1e1;
+}
+#livesearch ul li span{
+    display: table-cell;
+    height: 100%;
+    margin-top: 18px;
+    font-size: 14px;
+}
+#livesearch ul li img{
+    display: table-cell;
+    width: 60px;
+    height: 60px;
+}

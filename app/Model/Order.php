@@ -114,7 +114,7 @@ class Order extends Model
         if(!$payments->isEmpty()){
             foreach($payments as $payment){
                 if($payment->status==1){
-                    $amount += $payment->amount; 
+                    $amount += $payment->amount;
                 }
             }
             if($amount >= $this->total){
@@ -175,4 +175,8 @@ class Order extends Model
         }
         return 0;
     }
+    public function user(){
+        return $this->hasOne('App\User','id','person_id');
+    }
+
 }

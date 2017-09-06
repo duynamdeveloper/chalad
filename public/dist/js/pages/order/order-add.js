@@ -283,7 +283,7 @@ $(document).ready(function () {
 
     $(document).on('click', '.removebtn', function () {
         var stock_id = $(this).attr('item-id');
-        7;
+
         var stock_name = $(this).closest('tr').find('td:first').html();
         $("#sel_product").append('<option value="' + stock_id + '">' + stock_name + '</option>');
         $(this).closest('tr').remove();

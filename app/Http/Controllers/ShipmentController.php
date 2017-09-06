@@ -26,15 +26,15 @@ class ShipmentController extends Controller
         StockMovement $stock_move
     ) {
 
-         /**
-     * Set the database connection. reference app\helper.php
-     */
+        /**
+         * Set the database connection. reference app\helper.php
+         */
         //selectDatabase();
-         $this->shipment = $shipment;
-         $this->email = $email;
-         $this->item = $item;
-         $this->order = $order;
-         $this->stock_move = $stock_move;
+        $this->shipment = $shipment;
+        $this->email = $email;
+        $this->item = $item;
+        $this->order = $order;
+        $this->stock_move = $stock_move;
     }
 
     public function index()
@@ -46,8 +46,8 @@ class ShipmentController extends Controller
     }
 
     /**
-    *Shipment filtering
-    */
+     *Shipment filtering
+     */
 
     public function shipmentFiltering()
     {
@@ -70,7 +70,7 @@ class ShipmentController extends Controller
         if (isset($_GET['to'])) {
             $data['to'] = $to = $_GET['to'];
         } else {
-             $data['to'] = $to = formatDate(date('d-m-Y'));
+            $data['to'] = $to = formatDate(date('d-m-Y'));
         }
 
 
@@ -87,9 +87,9 @@ class ShipmentController extends Controller
         $data['sub_menu'] = 'shipment/list';
         $data['taxType'] = $this->shipment->calculateTaxRow($orderNo);
         $data['orderInfo'] = DB::table('sales_orders')
-        ->leftjoin('cust_branch', 'cust_branch.branch_code', '=', 'sales_orders.branch_id')
-        ->where('order_no', '=', $orderNo)
-        ->first();
+            ->leftjoin('cust_branch', 'cust_branch.branch_code', '=', 'sales_orders.branch_id')
+            ->where('order_no', '=', $orderNo)
+            ->first();
         $data['invoicedItems'] = DB::table('stock_moves')->where(['order_no'=>$orderNo,'trans_type'=>SALESINVOICE])->groupBy('stock_id')->lists('stock_id');
         $data['shipmentItem'] = $this->shipment->getInvoicedItemsByOrderID($orderNo);
 
@@ -109,7 +109,7 @@ class ShipmentController extends Controller
     {
 
         $this->validate($request, [
-        'packed_date' => 'required',
+            'packed_date' => 'required',
         ]);
 
         $orderNo = $request->order_no;
@@ -149,9 +149,9 @@ class ShipmentController extends Controller
 
         if (count($shipmentQty)>0) {
             foreach ($shipmentQty as $itemInfo) {
-                 $previousShipmentQty = DB::table('sales_order_details')->where(['order_no'=>$orderNo,'trans_type'=>SALESORDER,'stock_id'=>$itemInfo['stock_id']])->sum('shipment_qty');
-                 $shipmentQuantity = ($previousShipmentQty + $itemInfo['shipment_qty']);
-                 DB::table('sales_order_details')->where(['order_no'=>$orderNo,'trans_type'=>SALESORDER,'stock_id'=>$itemInfo['stock_id']])->update(['shipment_qty'=>$shipmentQuantity]);
+                $previousShipmentQty = DB::table('sales_order_details')->where(['order_no'=>$orderNo,'trans_type'=>SALESORDER,'stock_id'=>$itemInfo['stock_id']])->sum('shipment_qty');
+                $shipmentQuantity = ($previousShipmentQty + $itemInfo['shipment_qty']);
+                DB::table('sales_order_details')->where(['order_no'=>$orderNo,'trans_type'=>SALESORDER,'stock_id'=>$itemInfo['stock_id']])->update(['shipment_qty'=>$shipmentQuantity]);
             }
         }
 
@@ -182,7 +182,7 @@ class ShipmentController extends Controller
             $shipmentQty[$key]['stock_id'] = $item->stock_id;
             $shipmentQty[$key]['shipment_qty'] = ((int)abs($item->item_invoiced)-$item->item_shipted);
 
-               // Array for shipmentHistory
+            // Array for shipmentHistory
             $shipmentHistory[$key]['shipment_id'] =  $shipmentId;
             $shipmentHistory[$key]['order_no'] =  $orderNo;
             $shipmentHistory[$key]['stock_id'] =  $item->stock_id;
@@ -212,58 +212,58 @@ class ShipmentController extends Controller
 
     public function StatusChange(Request $request)
     {
-          $data = array();
-          $data['status_no'] = 0;
+        $data = array();
+        $data['status_no'] = 0;
 
-          $shipment_id = $request['id'];
-          $updated = DB::table('shipment')->where('id', $shipment_id)->update(['status'=>1,'delivery_date'=>date('Y-m-d')]);
+        $shipment_id = $request['id'];
+        $updated = DB::table('shipment')->where('id', $shipment_id)->update(['status'=>1,'delivery_date'=>date('Y-m-d')]);
         if ($updated) {
             $data['status_no'] = 1;
         }
-          return $data;
+        return $data;
     }
 
     public function makeDelivery($order_no, $shipment_id)
     {
-          DB::table('shipment')->where('id', $shipment_id)->update(['status'=>1,'delivery_date'=>date('Y-m-d')]);
+        DB::table('shipment')->where('id', $shipment_id)->update(['status'=>1,'delivery_date'=>date('Y-m-d')]);
 
-          \Session::flash('success', trans('message.success.save_success'));
-          return redirect()->intended('shipment/view-details/'.$order_no.'/'.$shipment_id);
+        \Session::flash('success', trans('message.success.save_success'));
+        return redirect()->intended('shipment/view-details/'.$order_no.'/'.$shipment_id);
     }
 
     /**
-    * Delete shipment by shipment id
-    * @params shipment_id
-    */
+     * Delete shipment by shipment id
+     * @params shipment_id
+     */
     public function destroy($shipment_id)
     {
         $shipments = DB::table('shipment')
-        ->where('shipment.id', $shipment_id)
-        ->leftjoin('shipment_details', 'shipment_details.shipment_id', '=', 'shipment.id')
-        ->select('shipment_details.id', 'shipment_details.order_no', 'shipment_details.stock_id', 'shipment_details.quantity')
-        ->get();
+            ->where('shipment.id', $shipment_id)
+            ->leftjoin('shipment_details', 'shipment_details.shipment_id', '=', 'shipment.id')
+            ->select('shipment_details.id', 'shipment_details.order_no', 'shipment_details.stock_id', 'shipment_details.quantity')
+            ->get();
         foreach ($shipments as $key => $shipment) {
             $qty = DB::table('sales_order_details')
-            ->where(['order_no'=>$shipment->order_no,'stock_id'=>$shipment->stock_id])
-            ->sum('shipment_qty');
+                ->where(['order_no'=>$shipment->order_no,'stock_id'=>$shipment->stock_id])
+                ->sum('shipment_qty');
             $newQty = ($qty-$shipment->quantity);
             $updated = DB::table('sales_order_details')
-            ->where(['order_no'=>$shipment->order_no,'stock_id'=>$shipment->stock_id])
-            ->update(['shipment_qty'=>$newQty]);
-        
+                ->where(['order_no'=>$shipment->order_no,'stock_id'=>$shipment->stock_id])
+                ->update(['shipment_qty'=>$newQty]);
+
             DB::table('shipment_details')->where(['id'=>$shipment->id])->delete();
         }
 
         DB::table('shipment')->where(['id'=>$shipment_id])->delete();
-      
+
         \Session::flash('success', trans('message.success.delete_success'));
         return redirect()->intended('shipment/list');
     }
 
     /**
-    * Details shipment by shipment id
-    * @params shipment_id
-    */
+     * Details shipment by shipment id
+     * @params shipment_id
+     */
     public function shipmentDetails($order_no, $shipment_id)
     {
         $data = array();
@@ -271,50 +271,50 @@ class ShipmentController extends Controller
         $data['sub_menu'] = 'shipment/list';
         $data['taxInfo'] = $this->shipment->calculateTaxForDetail($shipment_id);
         $data['shipmentItem'] = DB::table('shipment')
-        ->where('shipment.id', $shipment_id)
-        ->leftjoin('shipment_details', 'shipment_details.shipment_id', '=', 'shipment.id')
-        ->leftjoin('item_code', 'shipment_details.stock_id', '=', 'item_code.stock_id')
-        ->leftjoin('item_tax_types', 'item_tax_types.id', '=', 'shipment_details.tax_type_id')
-        ->select('shipment_details.*', 'item_code.description', 'item_tax_types.tax_rate')
-        ->orderBy('shipment_details.quantity', 'DESC')
-        ->get();
+            ->where('shipment.id', $shipment_id)
+            ->leftjoin('shipment_details', 'shipment_details.shipment_id', '=', 'shipment.id')
+            ->leftjoin('item_code', 'shipment_details.stock_id', '=', 'item_code.stock_id')
+            ->leftjoin('item_tax_types', 'item_tax_types.id', '=', 'shipment_details.tax_type_id')
+            ->select('shipment_details.*', 'item_code.description', 'item_tax_types.tax_rate')
+            ->orderBy('shipment_details.quantity', 'DESC')
+            ->get();
         $data['customerInfo']  = DB::table('sales_orders')
-        ->where('sales_orders.order_no', $order_no)
-        ->leftjoin('debtors_master', 'debtors_master.debtor_no', '=', 'sales_orders.debtor_no')
-        ->leftjoin('cust_branch', 'cust_branch.branch_code', '=', 'sales_orders.branch_id')
-        ->leftjoin('countries', 'countries.id', '=', 'cust_branch.shipping_country_id')
-        ->select('debtors_master.name', 'debtors_master.phone', 'debtors_master.email', 'cust_branch.br_name', 'cust_branch.br_address', 'cust_branch.shipping_street', 'cust_branch.shipping_city', 'cust_branch.shipping_state', 'cust_branch.shipping_zip_code', 'countries.country', 'cust_branch.shipping_country_id')
-        ->first();
+            ->where('sales_orders.order_no', $order_no)
+            ->leftjoin('debtors_master', 'debtors_master.debtor_no', '=', 'sales_orders.debtor_no')
+            ->leftjoin('cust_branch', 'cust_branch.branch_code', '=', 'sales_orders.branch_id')
+            ->leftjoin('countries', 'countries.id', '=', 'cust_branch.shipping_country_id')
+            ->select('debtors_master.name', 'debtors_master.phone', 'debtors_master.email', 'cust_branch.br_name', 'cust_branch.br_address', 'cust_branch.shipping_street', 'cust_branch.shipping_city', 'cust_branch.shipping_state', 'cust_branch.shipping_zip_code', 'countries.country', 'cust_branch.shipping_country_id')
+            ->first();
         $data['shipment']   = DB::table('shipment')
-        ->where('id', $shipment_id)
-        ->first();
+            ->where('id', $shipment_id)
+            ->first();
 
-      // Right side info
+        // Right side info
         $data['orderInfo']  = DB::table('sales_orders')
-        ->leftjoin('location', 'location.loc_code', '=', 'sales_orders.from_stk_loc')
-        ->where('order_no', $order_no)
-        ->select('sales_orders.reference', 'sales_orders.order_no', 'location.location_name')
-        ->first();
+            ->leftjoin('location', 'location.loc_code', '=', 'sales_orders.from_stk_loc')
+            ->where('order_no', $order_no)
+            ->select('sales_orders.reference', 'sales_orders.order_no', 'location.location_name')
+            ->first();
         $data['invoiceList'] = DB::table('sales_orders')
-        ->where('order_reference', $data['orderInfo']->reference)
-        ->select('order_no', 'reference', 'order_reference', 'total', 'paid_amount')
-        ->orderBy('created_at', 'DESC')
-        ->get();
+            ->where('order_reference', $data['orderInfo']->reference)
+            ->select('order_no', 'reference', 'order_reference', 'total', 'paid_amount')
+            ->orderBy('created_at', 'DESC')
+            ->get();
         $data['invoiceQty'] = DB::table('stock_moves')->where(['order_no'=>$order_no,'trans_type'=>SALESINVOICE])->sum('qty');
         $data['orderQty'] = DB::table('sales_order_details')->where(['order_no'=>$order_no,'trans_type'=>SALESORDER])->sum('quantity');
 
         $data['paymentsList'] = DB::table('payment_history')
-        ->where(['order_reference'=>$data['orderInfo']->reference])
-        ->leftjoin('payment_terms', 'payment_terms.id', '=', 'payment_history.payment_type_id')
-        ->select('payment_history.*', 'payment_terms.name')
-        ->orderBy('payment_date', 'DESC')
-        ->get();
+            ->where(['order_reference'=>$data['orderInfo']->reference])
+            ->leftjoin('payment_terms', 'payment_terms.id', '=', 'payment_history.payment_type_id')
+            ->select('payment_history.*', 'payment_terms.name')
+            ->orderBy('payment_date', 'DESC')
+            ->get();
         $data['shipmentList'] = DB::table('shipment_details')
-        ->select('shipment_details.shipment_id', DB::raw('sum(quantity) as total'))->where(['order_no'=>$order_no])
-        ->groupBy('shipment_id')
-        ->orderBy('shipment_id', 'DESC')
-        ->get();
-      //d($data['orderInfo'],1);
+            ->select('shipment_details.shipment_id', DB::raw('sum(quantity) as total'))->where(['order_no'=>$order_no])
+            ->groupBy('shipment_id')
+            ->orderBy('shipment_id', 'DESC')
+            ->get();
+        //d($data['orderInfo'],1);
         $shipmentTotal = $this->shipment->getTotalShipmentByOrderNo($order_no);
 
         $invoicedTotal = $this->shipment->getTotalInvoicedByOrderNo($order_no);
@@ -322,7 +322,7 @@ class ShipmentController extends Controller
 
         $data['shipmentStatus'] = ($shipment>0) ? 'available' : 'notAvailable';
 
-      
+
         if ($data['shipment']->status == 0) {
             $temp_id = 6;
         } else {
@@ -331,7 +331,7 @@ class ShipmentController extends Controller
         $lang = Session::get('dflt_lang');
         $data['emailInfo'] = DB::table('email_temp_details')->where(['temp_id'=>$temp_id,'lang'=>$lang])->select('subject', 'body')->first();
 
-      //d($data['customerInfo'],1);
+        //d($data['customerInfo'],1);
         return view('admin.shipment.shipmentDetails', $data);
     }
 
@@ -340,20 +340,20 @@ class ShipmentController extends Controller
 
         $data['taxInfo'] = $this->shipment->calculateTaxForDetail($shipmentId);
         $data['shipmentItem'] = DB::table('shipment')
-        ->where('shipment.id', $shipmentId)
-        ->leftjoin('shipment_details', 'shipment_details.shipment_id', '=', 'shipment.id')
-        ->leftjoin('item_code', 'shipment_details.stock_id', '=', 'item_code.stock_id')
-        ->leftjoin('item_tax_types', 'item_tax_types.id', '=', 'shipment_details.tax_type_id')
-        ->select('shipment_details.*', 'item_code.description', 'item_tax_types.tax_rate')
-        ->orderBy('shipment_details.quantity', 'DESC')
-        ->get();
+            ->where('shipment.id', $shipmentId)
+            ->leftjoin('shipment_details', 'shipment_details.shipment_id', '=', 'shipment.id')
+            ->leftjoin('item_code', 'shipment_details.stock_id', '=', 'item_code.stock_id')
+            ->leftjoin('item_tax_types', 'item_tax_types.id', '=', 'shipment_details.tax_type_id')
+            ->select('shipment_details.*', 'item_code.description', 'item_tax_types.tax_rate')
+            ->orderBy('shipment_details.quantity', 'DESC')
+            ->get();
         $data['customerInfo']  = DB::table('sales_orders')
-        ->where('sales_orders.order_no', $orderNo)
-        ->leftjoin('debtors_master', 'debtors_master.debtor_no', '=', 'sales_orders.debtor_no')
-        ->leftjoin('cust_branch', 'cust_branch.branch_code', '=', 'sales_orders.branch_id')
-        ->leftjoin('countries', 'countries.id', '=', 'cust_branch.shipping_country_id')
-        ->select('debtors_master.name', 'debtors_master.phone', 'debtors_master.email', 'cust_branch.br_name', 'cust_branch.br_address', 'cust_branch.shipping_street', 'cust_branch.shipping_city', 'cust_branch.shipping_state', 'cust_branch.shipping_zip_code', 'countries.country', 'cust_branch.shipping_country_id')
-        ->first();
+            ->where('sales_orders.order_no', $orderNo)
+            ->leftjoin('debtors_master', 'debtors_master.debtor_no', '=', 'sales_orders.debtor_no')
+            ->leftjoin('cust_branch', 'cust_branch.branch_code', '=', 'sales_orders.branch_id')
+            ->leftjoin('countries', 'countries.id', '=', 'cust_branch.shipping_country_id')
+            ->select('debtors_master.name', 'debtors_master.phone', 'debtors_master.email', 'cust_branch.br_name', 'cust_branch.br_address', 'cust_branch.shipping_street', 'cust_branch.shipping_city', 'cust_branch.shipping_state', 'cust_branch.shipping_zip_code', 'countries.country', 'cust_branch.shipping_country_id')
+            ->first();
         $data['shipment']   = DB::table('shipment')->where('id', $shipmentId)->select('id', 'status', 'delivery_date')->first();
         $data['order_no']   = $orderNo;
 
@@ -364,32 +364,32 @@ class ShipmentController extends Controller
     }
 
     /**
-    * Print of shipment details
-    */
+     * Print of shipment details
+     */
 
     public function shipmentPrint($orderNo, $shipmentId)
     {
 
         $data['taxInfo'] = $this->shipment->calculateTaxForDetail($shipmentId);
         $data['shipmentItem'] = DB::table('shipment')
-        ->where('shipment.id', $shipmentId)
-        ->leftjoin('shipment_details', 'shipment_details.shipment_id', '=', 'shipment.id')
-        ->leftjoin('item_code', 'shipment_details.stock_id', '=', 'item_code.stock_id')
-        ->leftjoin('item_tax_types', 'item_tax_types.id', '=', 'shipment_details.tax_type_id')
-        ->select('shipment_details.*', 'item_code.description', 'item_tax_types.tax_rate')
-        ->orderBy('shipment_details.quantity', 'DESC')
-        ->get();
+            ->where('shipment.id', $shipmentId)
+            ->leftjoin('shipment_details', 'shipment_details.shipment_id', '=', 'shipment.id')
+            ->leftjoin('item_code', 'shipment_details.stock_id', '=', 'item_code.stock_id')
+            ->leftjoin('item_tax_types', 'item_tax_types.id', '=', 'shipment_details.tax_type_id')
+            ->select('shipment_details.*', 'item_code.description', 'item_tax_types.tax_rate')
+            ->orderBy('shipment_details.quantity', 'DESC')
+            ->get();
         $data['customerInfo']  = DB::table('sales_orders')
-        ->where('sales_orders.order_no', $orderNo)
-        ->leftjoin('debtors_master', 'debtors_master.debtor_no', '=', 'sales_orders.debtor_no')
-        ->leftjoin('cust_branch', 'cust_branch.branch_code', '=', 'sales_orders.branch_id')
-        ->leftjoin('countries', 'countries.id', '=', 'cust_branch.shipping_country_id')
-        ->select('debtors_master.name', 'debtors_master.phone', 'debtors_master.email', 'cust_branch.br_name', 'cust_branch.br_address', 'cust_branch.shipping_street', 'cust_branch.shipping_city', 'cust_branch.shipping_state', 'cust_branch.shipping_zip_code', 'countries.country', 'cust_branch.shipping_country_id')
-        ->first();
-      //d($data['customerInfo'],1);
+            ->where('sales_orders.order_no', $orderNo)
+            ->leftjoin('debtors_master', 'debtors_master.debtor_no', '=', 'sales_orders.debtor_no')
+            ->leftjoin('cust_branch', 'cust_branch.branch_code', '=', 'sales_orders.branch_id')
+            ->leftjoin('countries', 'countries.id', '=', 'cust_branch.shipping_country_id')
+            ->select('debtors_master.name', 'debtors_master.phone', 'debtors_master.email', 'cust_branch.br_name', 'cust_branch.br_address', 'cust_branch.shipping_street', 'cust_branch.shipping_city', 'cust_branch.shipping_state', 'cust_branch.shipping_zip_code', 'countries.country', 'cust_branch.shipping_country_id')
+            ->first();
+        //d($data['customerInfo'],1);
         $data['shipment']   = DB::table('shipment')->where('id', $shipmentId)->select('id', 'status', 'delivery_date')->first();
         $data['order_no']   = $orderNo;
-      //d($data['shipment'],1);
+        //d($data['shipment'],1);
         $pdf = PDF::loadView('admin.shipment.shipmentDetailPrint', $data);
         $pdf->setPaper('a4', 'landscape');
 
@@ -397,8 +397,8 @@ class ShipmentController extends Controller
     }
 
     /**
-    * Edit shipment by shipment_id
-    */
+     * Edit shipment by shipment_id
+     */
     public function edit($shipmentId)
     {
         $data['menu'] = 'sales';
@@ -406,23 +406,23 @@ class ShipmentController extends Controller
         $data['shipment_id'] = $shipmentId;
         $data['taxInfo'] = $this->shipment->calculateTaxForDetail($shipmentId);
         $data['shipmentItem'] = DB::table('shipment')
-        ->where('shipment.id', $shipmentId)
-        ->leftjoin('shipment_details', 'shipment_details.shipment_id', '=', 'shipment.id')
-        ->leftjoin('item_code', 'shipment_details.stock_id', '=', 'item_code.stock_id')
-        ->leftjoin('item_tax_types', 'item_tax_types.id', '=', 'shipment_details.tax_type_id')
-        ->select('shipment_details.*', 'item_code.description', 'item_code.id as item_id', 'item_tax_types.tax_rate')
-        ->orderBy('shipment_details.quantity', 'DESC')
-        ->get();
+            ->where('shipment.id', $shipmentId)
+            ->leftjoin('shipment_details', 'shipment_details.shipment_id', '=', 'shipment.id')
+            ->leftjoin('item_code', 'shipment_details.stock_id', '=', 'item_code.stock_id')
+            ->leftjoin('item_tax_types', 'item_tax_types.id', '=', 'shipment_details.tax_type_id')
+            ->select('shipment_details.*', 'item_code.description', 'item_code.id as item_id', 'item_tax_types.tax_rate')
+            ->orderBy('shipment_details.quantity', 'DESC')
+            ->get();
         $shipment = DB::table('shipment')
-        ->where('id', $shipmentId)
-        ->select('order_no')
-        ->first();
-      
+            ->where('id', $shipmentId)
+            ->select('order_no')
+            ->first();
+
         $data['orderInfo'] = DB::table('sales_orders')
-        ->leftjoin('cust_branch', 'cust_branch.branch_code', '=', 'sales_orders.branch_id')
-        ->where('order_no', '=', $shipment->order_no)
-        ->first();
-      //d($data['orderInfo'],1);
+            ->leftjoin('cust_branch', 'cust_branch.branch_code', '=', 'sales_orders.branch_id')
+            ->where('order_no', '=', $shipment->order_no)
+            ->first();
+        //d($data['orderInfo'],1);
         return view('admin.shipment.editShipment', $data);
     }
 
@@ -436,7 +436,7 @@ class ShipmentController extends Controller
         $stock_id = $request['stock_id'];
         $shifted_qty = $request['shifted_qty'];
         $new_qty = $request['new_qty'];
-      
+
         $invoicedItemQtyInfo = (int)abs(DB::table("stock_moves")->where(['order_no'=>$orderNo,'stock_id'=>$stock_id])->groupBy('order_no')->sum('qty'));
         $shipmentItemQtyInfo = DB::table("sales_order_details")->where(['order_no'=>$orderNo,'stock_id'=>$stock_id])->sum('shipment_qty');
         $availableQty = ($invoicedItemQtyInfo-$shipmentItemQtyInfo+$shifted_qty);
@@ -446,10 +446,10 @@ class ShipmentController extends Controller
         }
         return json_encode($data);
     }
-    
+
     /**
-    *Update shipment by shipment id
-    */
+     *Update shipment by shipment id
+     */
     public function update(Request $request)
     {
         $shipmentId = $request['shipment_id'];
@@ -481,8 +481,8 @@ class ShipmentController extends Controller
     }
 
     /**
-    * Send email to customer for shipment information
-    */
+     * Send email to customer for shipment information
+     */
     public function sendShipmentInformationByEmail(Request $request)
     {
         $this->email->sendEmail($request['email'], $request['subject'], $request['message']);
@@ -491,36 +491,38 @@ class ShipmentController extends Controller
     }
 
     /**
-    * Manage shipment module
-    * @author: Nam Nguyen (Email: duynam.dev223@gmail.com Skype: duynam.dev)
-    *
-    */
+     * Manage shipment module
+     * @author: Nam Nguyen (Email: duynam.dev223@gmail.com Skype: duynam.dev)
+     *
+     */
     public function manageShipment()
     {
         $data = array();
         $data['confirmedOrders'] = DB::table('sales_orders')->where('order_status', 1)->get();
-      
+
         $data['menu'] = 'sales';
         $data['sub_menu'] = 'shipment/list';
         return view('admin.shipment.manageShipment', $data);
     }
     /**
-    * Get shipment by order_no
-    * @author: Nam Nguyen
-    * @param: $order_no
-    * @return: $shipment
-    **/
+     * Get shipment by order_no
+     * @author: Nam Nguyen
+     * @param: $order_no
+     * @return: $shipment
+     **/
     public function getShipmentByOrderNo(Request $request)
     {
         $order_no = $request->order_no;
-      //$order_no = 3;
-        $shipments = $this->shipment->getShipmentByOrderNo($order_no, 'PL', true);
-     
+        //$order_no = 3;
+
+        //$shipments = Shipment::where('order_no',$order_no)->with('order')->with('details.item')->get();
+        $shipments = $this->shipment->getShipmentByOrderNo($order_no, 'PL');
+
         return response()->json(['state'=>true, 'shipments'=>$shipments]);
     }
     /**
-    * @author: Nam Nguyen
-    **/
+     * @author: Nam Nguyen
+     **/
 
     public function manualAllocate(Request $request)
     {
@@ -528,7 +530,7 @@ class ShipmentController extends Controller
         $data = $request->data;
         $order_no = $request->order_no;
         $shipment_id = $request->shipment_id;
-     //return response()->json(['data'=>$shipment_id]);
+        //return response()->json(['data'=>$shipment_id]);
         $location_id = "PL";
 
         if ($shipment_id==-1) {
@@ -537,29 +539,29 @@ class ShipmentController extends Controller
             $shipment->trans_type = DELIVERYORDER;
             $shipment->save();
             foreach ($data as $key => $detail) {
-                 $orderDetail = OrderDetail::where('order_no',$order_no)->where('stock_id',$detail[0])->first();
-                 if(!empty($orderDetail)){
+                $orderDetail = OrderDetail::where('order_no',$order_no)->where('stock_id',$detail[0])->first();
+                if(!empty($orderDetail)){
                     $pending_qty = $orderDetail->pending_quantity;
                     $item = Item::where('stock_id',$detail[0])->first();
                     $stock_on_hand = $item->stock_on_hand;
-                  
-                   if($detail[1]<=$pending_qty && $detail[1] <= $stock_on_hand){
-                       $quantity = $detail[1];
-                   }else{
-                       if($pending_qty <= $stock_on_hand){
-                           $quantity = $pending_qty;
-                       }else{
-                           $quantity = $stock_on_hand;
-                       }
-                   }
-                   $shipment_detail = new ShipmentDetail();
-                   $shipment_detail->shipment_id = $shipment->id;
-                   $shipment_detail->order_no = $order_no;
-                   $shipment_detail->stock_id = $detail[0];
-                   $shipment_detail->quantity = $quantity;
-                   $shipment_detail->save();
-                 }
-            
+
+                    if($detail[1]<=$pending_qty && $detail[1] <= $stock_on_hand){
+                        $quantity = $detail[1];
+                    }else{
+                        if($pending_qty <= $stock_on_hand){
+                            $quantity = $pending_qty;
+                        }else{
+                            $quantity = $stock_on_hand;
+                        }
+                    }
+                    $shipment_detail = new ShipmentDetail();
+                    $shipment_detail->shipment_id = $shipment->id;
+                    $shipment_detail->order_no = $order_no;
+                    $shipment_detail->stock_id = $detail[0];
+                    $shipment_detail->quantity = $quantity;
+                    $shipment_detail->save();
+                }
+
             }
             $this->stock_move->updateStockMoveWithShipment($shipment->id);
         }
@@ -567,11 +569,11 @@ class ShipmentController extends Controller
     }
     public function automaticAllocateShipment(Request $request)
     {
-         $order_no = $request->order_no;
-         //$order_no = 29;
-         $order = Order::find($order_no);
-         $details = $order->details;
-         $shipment = Shipment::where('order_no', $order_no)->where('tracking_number', null)->first();
+        $order_no = $request->order_no;
+        //$order_no = 29;
+        $order = Order::find($order_no);
+        $details = $order->details;
+        $shipment = Shipment::where('order_no', $order_no)->where('tracking_number', null)->first();
         if (empty($shipment) && !empty($details)) {
             $new_shipment = new Shipment();
             $new_shipment->order_no = $order_no;
@@ -586,9 +588,9 @@ class ShipmentController extends Controller
                 $shipment_detail->stock_id = $detail->stock_id;
                 $shipment_detail->unit_price = $detail->unit_price;
                 if($detail->pending_quantity > $item->stock_on_hand){
-                  $packed_qty = $item->stock_on_hand;
+                    $packed_qty = $item->stock_on_hand;
                 }else{
-                  $packed_qty = $detail->pending_quantity;
+                    $packed_qty = $detail->pending_quantity;
                 }
                 $shipment_detail->quantity = $packed_qty;
                 //var_dump($shipment_detail);
@@ -597,97 +599,62 @@ class ShipmentController extends Controller
             $this->stock_move->updateStockMoveWithShipment($new_shipment->id);
         } else {
             foreach($details as $detail){
-              $shipmentDetail = ShipmentDetail::where('stock_id',$detail->stock_id)->where('shipment_id',$shipment->id)->first();
-              $item = Item::where('stock_id',$detail->stock_id)->first();
-              if($detail->pending_quantity>0){
-                if(empty($shipmentDetail)){
-                  $shipmentDetail = new ShipmentDetail();
-                  $shipmentDetail->shipment_id = $shipment->id;
-                  $shipmentDetail->order_no = $order_no;
-                  $shipmentDetail->unit_price = $detail->unit_price;
-                  $shipmentDetail->stock_id = $detail->stock_id;
-                  if($detail->pending_quantity > $item->stock_on_hand){
-                    $packed_qty = $item->stock_on_hand;
-                  }else{
-                    $packed_qty = $detail->pending_quantity;
-                  }
-                  $shipmentDetail->quantity = $packed_qty;
-                  $shipmentDetail->save();
-                }else{
-                  if($detail->pending_quantity > $item->stock_on_hand){
-                    $packed_qty = $item->stock_on_hand;
-                  }else{
-                    $packed_qty = $detail->pending_quantity;
-                  }
-                  $shipmentDetail->quantity = $shipmentDetail->quantity + $packed_qty;
-                  $shipmentDetail->update();
+                $shipmentDetail = ShipmentDetail::where('stock_id',$detail->stock_id)->where('shipment_id',$shipment->id)->first();
+                $item = Item::where('stock_id',$detail->stock_id)->first();
+                if($detail->pending_quantity>0){
+                    if(empty($shipmentDetail)){
+                        $shipmentDetail = new ShipmentDetail();
+                        $shipmentDetail->shipment_id = $shipment->id;
+                        $shipmentDetail->order_no = $order_no;
+                        $shipmentDetail->unit_price = $detail->unit_price;
+                        $shipmentDetail->stock_id = $detail->stock_id;
+                        if($detail->pending_quantity >= $item->stock_on_hand){
+                            $packed_qty = $item->stock_on_hand;
+                        }else{
+                            $packed_qty = $detail->pending_quantity;
+                        }
+                        $shipmentDetail->quantity = $packed_qty;
+                        $shipmentDetail->save();
+                    }else{
+                        if($detail->pending_quantity >= $item->stock_on_hand){
+                            $packed_qty = $item->stock_on_hand;
+                        }else{
+                            $packed_qty = $detail->pending_quantity;
+                        }
+                        $shipmentDetail->quantity = $shipmentDetail->quantity + $packed_qty;
+                        $shipmentDetail->update();
+                    }
                 }
-              }
             }
             $this->stock_move->updateStockMoveWithShipment($shipment->id);
         }
         return response()->json(['state'=>true]);
     }
-    public function automaticAllocateShipment666(Request $request)
-    {
-         $order_no = $request->order_no;
-         $state = true;
-         $msg = "";
-
-           //$order_no = 3;
-         $location_id = "PL";
-         $orderDetails = DB::table('sales_order_details')->where('order_no', $order_no)->get();
-         $shipment = $this->shipment->getShipmentByOrderNo($order_no, $location_id, $unshippedState = true);
-        if ($shipment==null) {
-            $insertShipmentDetailsData = array();
-
-            if ($orderDetails!==null) {
-                foreach ($orderDetails as $key => $orderDetail) {
-                    $add_packed_qty = $this->order->calculateAdditionalPackedQuantity($order_no, $orderDetail->stock_id, $location_id);
-                    $data = array(
-                    'stock_id' =>$orderDetail->stock_id,
-                    'packed_qty' => $add_packed_qty
-                    );
-                       // var_dump($data);
-                    array_push($insertShipmentDetailsData, $data);
-                }
-            }
-            $this->shipment->createShipment($order_no, $insertShipmentDetailsData);
-        } else {
-             $shipment = $shipment['shipments'][0];
-            foreach ($shipment['details'] as $shipmentDetail) {
-                $add_packed_qty = $this->order->calculateAdditionalPackedQuantity($order_no, $shipmentDetail['stock_id'], $location_id);
-                DB::table('shipment_details')->where('id', $shipmentDetail['id'])->increment('packed_qty', $add_packed_qty);
-            }
-                $this->stock_move->updateStockMoveWithShipment($shipment['id']);
-        }
-         $this->shipment->updateOrderPackedShippedQty($order_no);
-    }
     public function validateAdditionalPackingQuantity(Request $request)
     {
-          $order_no = $request->order_no;
-          $stock_id = $request->stock_id;
-          $location_id = 'PL';
-          $unpacked_qty = $this->order->calculateAdditionalPackedQuantity($order_no, $stock_id, $location_id);
-          return response()->json(['quantity'=>$unpacked_qty]);
+        $order_no = $request->order_no;
+        $stock_id = $request->stock_id;
+        $location_id = 'PL';
+        $unpacked_qty = $this->order->calculateAdditionalPackedQuantity($order_no, $stock_id, $location_id);
+        return response()->json(['quantity'=>$unpacked_qty]);
     }
     public function addTrackingNumber(Request $request)
     {
-          $shipment_id = $request->shipment_id;
-          $tracking_number = $request->tracking_number;
-          $shipping_method = $request->shipping_method;
+        $shipment_id = $request->shipment_id;
+        $tracking_number = $request->tracking_number;
+        $shipping_method = $request->shipping_method;
         if ($tracking_number=="") {
             $tracking_number = null;
             $shipping_method = null;
         }
-          $this->shipment->addTrackingNumber($shipment_id, $tracking_number, $shipping_method);
-          return response()->json(['state'=>true]);
+        $this->shipment->addTrackingNumber($shipment_id, $tracking_number, $shipping_method);
+        return response()->json(['state'=>true]);
     }
     public function getDataForManualAllocate(Request $request)
     {
-          $order_no = $request->order_no;
-          $location_id = "PL";
-  
+        $order_no = $request->order_no;
+        $location_id = "PL";
+
         $fetchModeBefore = DB::getFetchMode();
         DB::setFetchMode(\PDO::FETCH_ASSOC);
         $data = DB::table('sales_order_details')->where('order_no', $order_no)->get();
@@ -705,15 +672,28 @@ class ShipmentController extends Controller
     public function removeShipment(Request $request)
     {
         $shipment_id = $request->shipment_id;
+        $shipment = Shipment::find($shipment_id);
+        $order_no = $shipment->order_no;
         $query_state = $this->shipment->removeShipment($shipment_id);
+
+        if(!empty($shipment)){
+            $order = Order::find($shipment->order_no);
+
+            if($order->shipments->isEmpty()){
+                $order->order_status = 2;
+                $order->update();
+            }
+        }
+
+
         return response()->json(['state'=>$query_state]);
     }
     public function editShipment(Request $request)
     {
-         $data = $request->data;
-         $order_no = $request->order_no;
-         $data = json_decode($data);
-         $shipment_id = $request->shipment_id;
+        $data = $request->data;
+        $order_no = $request->order_no;
+        $data = json_decode($data);
+        $shipment_id = $request->shipment_id;
         foreach ($data as $key => $detail) {
             $shipment_detail = ShipmentDetail::find($detail->shipment_detail_id);
             $orderDetail = OrderDetail::where('order_no',$order_no)->where('stock_id',$detail->stock_id)->first();
@@ -731,7 +711,7 @@ class ShipmentController extends Controller
             $shipment_detail->quantity = $new_packed_qty;
             $shipment_detail->update();
         }
-         $this->stock_move->updateStockMoveWithShipment($shipment_id);
-         return response()->json(['state'=>true]);
+        $this->stock_move->updateStockMoveWithShipment($shipment_id);
+        return response()->json(['state'=>true]);
     }
 }
