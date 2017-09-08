@@ -35,7 +35,7 @@
   </script>
   <link rel='shortcut icon' href="{{URL::to('/')}}/favicon.ico" type='image/x-icon'/ >
 </head>
-<body class="hold-transition skin-blue sidebar-mini">
+<body class="hold-transition skin-blue sidebar-mini sidebar-collapse">
 <div class="wrapper">
 
   @include('layouts.includes.header')

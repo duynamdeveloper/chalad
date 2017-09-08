@@ -12,6 +12,7 @@ use App\Model\Item;
 use App\Model\Payment;
 use App\Model\Shipment;
 use DB;
+use View;
 
 class OrderController extends Controller
 {
@@ -175,17 +176,27 @@ class OrderController extends Controller
         $order_no = $order->order_no;
         DB::table('sales_order_details')->where('order_no', $order_no)->delete();
         foreach ($items as $item) {
-            $orderDetail = new OrderDetail();
-            $orderDetail->order_no = $order_no;
-            $orderDetail->trans_type = SALESORDER;
-            $orderDetail->stock_id = $item->item_id;
-            $orderDetail->unit_price = $item->price;
-            $orderDetail->quantity = $item->qty;
-            $orderDetail->description = $item->name;
-            $orderDetail->save();
-        }
+            if(!is_null($item)){
+                $orderDetail = new OrderDetail();
+                $orderDetail->order_no = $order_no;
+                $orderDetail->trans_type = SALESORDER;
+                $orderDetail->stock_id = $item->item_id;
+                $orderDetail->unit_price = $item->price;
+                $orderDetail->quantity = $item->qty;
+                $orderDetail->description = $item->name;
+                $orderDetail->save();
+            }
 
-        return response()->json($order);
+        }
+        $data['order'] = Order::where('order_no', $order_no)->with(['details','payments','shipments','customer'])->first();
+        $data['menu'] = 'sales';
+        $data['sub_menu'] = 'order/list';
+        $data['countries'] = DB::table('countries')->get();
+        $data['items'] = Item::all();
+        $data['tax_types'] = DB::table('item_tax_types')->get();
+        $order_detail_view = View::make('admin.order.sub-partials.ajax_order_detail',$data);
+        $content = $order_detail_view->render();
+        return response()->json(['order_detail'=>$content]);
     }
     public function updateAddress(Request $request)
     {

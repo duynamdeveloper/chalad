@@ -82,8 +82,7 @@ ORDER.getStatus = function(){
         },
         success: function(data){
             if(data.state){
-                $("#state-btn-group").find('button.stateBtn').removeClass().addClass('btn stateBtn btn-'+data.order.state_bootstrap_class).html(data.order.state_name);
-                $("#state-btn-group").find('button.dropdownBtn').removeClass().addClass('btn dropdownBtn btn-'+data.order.state_bootstrap_class);
+                 $("#order_state_label").html(data.order.state_label);
                 $("#order_qty_span").html(data.order.order_quantity);
                 $("#ready_ship_span").html(data.order.ready_to_ship_quantity);
                 $("#shipped_span").html(data.order.shipped_quantity);
@@ -146,7 +145,7 @@ ORDER.getFormData = function() {
             item_id: $(row).attr('item-id'),
             price: $(row).find('input[name=price]').val(),
             qty: $(row).find('input[name=quantity]').val(),
-            name: $(row).find('td:first').html()
+            name: $(row).find('td:nth-child(2)').html()
         };
         itemArray.push(item);
 
@@ -157,10 +156,7 @@ ORDER.getFormData = function() {
 
 ORDER.save = function() {
 
-    var dialog = bootbox.dialog({
-        title: 'Sending data',
-        message: '<img src="' + SITE_URL + '/img/loader.gif" class="text-center">'
-    });
+
     var items = ORDER.getFormData();
     var address = ORDER.getAddress();
     address = JSON.stringify(address);
@@ -183,13 +179,7 @@ ORDER.save = function() {
             'order_no': order_no,
         },
         success: function(data) {
-            dialog.init(function() {
-                dialog.find('.modal-title').html('<h4 class="text-success">Success!</h4>');
-                dialog.find('.bootbox-body').html('<span class="text-center text-success" style="font-size:18px">Update Order Successfully</span><br><span style="font-size:16px">Redirecting...</span>');
-                window.setTimeout(function() {
-                    window.location.href = ORDER.API.edit + data.order_no;
-                }, 3000);
-            });
+            $("#order_detail_container").html(data.order_detail);
         }
     });
 };
@@ -384,15 +374,13 @@ PAYMENT.updateStatus = function(payment_id, status) {
                 $("#paymentTable").find('tr[payment-id="'+payment_id+'"]').find('button.stateBtn').removeClass().addClass('btn stateBtn btn-'+data.payment.state_bootstrap_class).html(data.payment.state_name);
                 $("#paymentTable").find('tr[payment-id="'+payment_id+'"]').find('button.dropDownBtn').removeClass().addClass('btn dropDownBtn dropdown-toggle btn-'+data.payment.state_bootstrap_class);
                 ORDER.getStatus();
+                console.log(data);
 
 
             } else {
                 PAGE.notify('Something went wrong! Cannot update the payment', 'danger');
             }
 
-        },
-        ajaxStop: function(){
-            console.log("stopped");
         }
     });
     return false;
@@ -421,13 +409,7 @@ PAGE.notify = function(msg, type = 'success') {
         allow_dismiss: true,
     });
 };
-PAGE.showTab = function(tabId){
-    $('.tab-content div.active').removeClass('active');
 
-    $("#navTab li.active").removeClass('active');
-    $('a[href="#'+tabId+'"]').closest('li').addClass('active');
-    $("#"+tabId).addClass('active in').show();
-}
 /* Action on events */
 $(document).ready(function() {
 
@@ -435,9 +417,7 @@ $(document).ready(function() {
         ORDER.disabledEdit(true);
     }
 
-    if(getParameterByName('tab')!==null){
-        PAGE.showTab(getParameterByName("tab"));
-    }
+
     ORDER.updateStatistic();
 
 
@@ -607,7 +587,7 @@ $(document).ready(function() {
             ORDER.updateStatus(1);
         }
     });
-    $(document).on('click', '#confirm_create_shipment', function() {
+    $(document).on('click', '.ready_to_ship_btn', function() {
         if (exist_payments > 0) {
             if (confirm(" Are you sure you want to confirm order? There is still payment due")) {
                 ORDER.updateStatus(1);
@@ -685,3 +665,88 @@ function getParameterByName(name, url) {
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
+/* STEP FORM */
+
+
+//jQuery time
+var current_fs, next_fs, previous_fs; //fieldsets
+var left, opacity, scale; //fieldset properties which we will animate
+var animating; //flag to prevent quick multi-click glitches
+
+$(".next").click(function(){
+    if(animating) return false;
+    animating = true;
+
+    current_fs = $(this).parent().parent().parent().parent();
+
+    next_fs = current_fs.next();
+
+    //activate next step on progressbar using the index of next_fs
+    $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
+
+    //show the next fieldset
+    next_fs.show();
+    //hide the current fieldset with style
+    current_fs.animate({opacity: 0}, {
+        step: function(now, mx) {
+            //as the opacity of current_fs reduces to 0 - stored in "now"
+            //1. scale current_fs down to 80%
+            scale = 1 - (1 - now) * 0.2;
+            //2. bring next_fs from the right(50%)
+            left = (now * 50)+"%";
+            //3. increase opacity of next_fs to 1 as it moves in
+            opacity = 1 - now;
+            current_fs.css({
+                'transform': 'scale('+scale+')',
+
+            });
+            next_fs.css({'left': left, 'opacity': opacity});
+        },
+        duration: 800,
+        complete: function(){
+            current_fs.hide();
+            animating = false;
+        },
+        //this comes from the custom easing plugin
+        easing: 'easeInOutBack'
+    });
+});
+
+$(".previous").click(function(){
+    if(animating) return false;
+    animating = true;
+
+    current_fs = $(this).parent().parent().parent().parent();
+    previous_fs = current_fs.prev();
+
+    //de-activate current step on progressbar
+    $("#progressbar li").eq($("fieldset").index(current_fs)).removeClass("active");
+
+    //show the previous fieldset
+    previous_fs.show();
+    //hide the current fieldset with style
+    current_fs.animate({opacity: 0}, {
+        step: function(now, mx) {
+            //as the opacity of current_fs reduces to 0 - stored in "now"
+            //1. scale previous_fs from 80% to 100%
+            scale = 0.8 + (1 - now) * 0.2;
+            //2. take current_fs to the right(50%) - from 0%
+            left = ((1-now) * 50)+"%";
+            //3. increase opacity of previous_fs to 1 as it moves in
+            opacity = 1 - now;
+            current_fs.css({'left': left});
+            previous_fs.css({'transform': 'scale('+scale+')', 'opacity': opacity});
+        },
+        duration: 800,
+        complete: function(){
+            current_fs.hide();
+            animating = false;
+        },
+        //this comes from the custom easing plugin
+        easing: 'easeInOutBack'
+    });
+});
+
+$(".submit").click(function(){
+    return false;
+})

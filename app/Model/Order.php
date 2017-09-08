@@ -40,13 +40,9 @@ class Order extends Model
         }else if($status==2){
                 return "Pending";
         }else if($status == 1){
-            if($this->existReadyToShipShipment()){
+
                 return "Ready to ship";
-            }else if($this->checkAllPaymentArePaid() && $this->checkAllShipmentHaveTracking()){
-                return "Complete";
-            }else if($this->checkAllShipmentHaveTracking()){
-                return "Shipped";
-            }
+
         }
         return "Unknown State";
     }
@@ -59,13 +55,9 @@ class Order extends Model
                 return '<span class="label label-default">Pending</span>';
 
         }else if($status == 1){
-            if($this->existReadyToShipShipment()){
+
                 return '<span class="label label-info">Ready to ship</span>';
-            }else if($this->checkAllPaymentArePaid() && $this->checkAllShipmentHaveTracking()){
-                return '<span class="label label-success">Complete</span>';
-            }else if($this->checkAllShipmentHaveTracking()){
-                return '<span class="label label-primary">Shipped</span>';
-            }
+
         }
         return '<span class="label label-danger">Unknown State</span>';
     }
@@ -78,13 +70,9 @@ class Order extends Model
                 return 'default';
 
         }else if($status == 1){
-            if($this->existReadyToShipShipment()){
+
                 return 'info';
-            }else if($this->checkAllPaymentArePaid() && $this->checkAllShipmentHaveTracking()){
-                return 'success';
-            }else if($this->checkAllShipmentHaveTracking()){
-                return 'primary';
-            }
+
         }
         return 'danger';
     }

@@ -16,7 +16,7 @@
                                 <div class="box-header text-center">
                                     <h4>ORDER No: #{{$order->order_no}} </h4>
                                     <div class="box-body text-center">
-									<div class="label label-default" id="pending_status_btn">Status : Pending</div>
+									<h4 id="order_state_label">{!! $order->label_state !!}</h4>
 
                                     </div>
                                 </div>
@@ -52,27 +52,32 @@
             {{--  End Right Panel  --}}
             {{--  Left Panel  --}}
             <div class="col-md-9">
-                <div class="box box-success col-md-12">
-				<ul class="list-inline">
-				<li class="active"><a data-toggle="tab" href="#orderTab" aria-expanded="true"><h3>Order</h3></a></li>
-				<li>></li>
-				<li><a data-toggle="tab" href="#paymentTab"><h3>Payment</h3></a></li>
-				<li>></li>
-				<li><a data-toggle="tab" href="#shipmentTab"><h3>Shipment</h3></a></li>
+                <div class="box box-success col-md-12 progressbar-container">
+				{{--<ul class="list-inline">--}}
+				{{--<li class="active"><a data-toggle="tab" href="#orderTab" aria-expanded="true"><h3>Order</h3></a></li>--}}
+				{{--<li>></li>--}}
+				{{--<li><a data-toggle="tab" href="#paymentTab"><h3>Payment</h3></a></li>--}}
+				{{--<li>></li>--}}
+				{{--<li><a data-toggle="tab" href="#shipmentTab"><h3>Shipment</h3></a></li>--}}
+                    {{--</ul>--}}
+                    <ul id="progressbar">
+                        <li class="active">Order</li>
+                        <li @if($order->order_status==1) class="active" @endif>Payment</li>
+                        <li @if($order->order_status==1) class="active" @endif>Shipment</li>
                     </ul>
                 </div>
 
 
-                <div class="tab-content">
-                    <div id="orderTab" class="tab-pane fade in active">
+                <div class="field-list">
+
                         @include('admin.order.partials.order_detail')
-                    </div>
-                    <div id="paymentTab" class="tab-pane fade">
+
+
                         @include('admin.order.partials.payment')
-                    </div>
-                    <div id="shipmentTab" class="tab-pane fade">
+
+
                         @include('admin.shipment.includes.manageShipmentPanel')
-                    </div>
+
 
                 </div>
             </div>
