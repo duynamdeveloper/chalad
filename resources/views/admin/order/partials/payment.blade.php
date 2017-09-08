@@ -1,8 +1,152 @@
+<h3>Payment Details</h3>
 
 <div class="box box-success">
-    <div class="box-header text-center"><h4>PAYMENT</h4></div>
     <div class="box-body">
-        <button class="btn btn-info" data-toggle="modal" data-target="#addPaymentModal">Add New Payment</button>
+
+                    <div class="form-group">
+							  <button class="btn btn-success pull-right" type="submit" id="btnSaveAddress">Ready to Ship</button>
+							  <button class="btn btn-success pull-left" type="submit" id="btnSaveAddress">Back</button>
+                    </div>
+           </div>
+		   </div>
+<!-- Payment Summary -->
+	<div class="box box-success">
+                            <div class="box-body">
+<div class="row">
+                        <div class="col-md-4">
+             <h5 class="text-info"><strong>Ship To</strong></h5>
+
+             <div class="form-group">
+              <p class="col-sm-12 text-left" for="inputEmail3">Name<br>
+			  Street Address, City<br>State ZIPCODE<br>COUNTRY<br><br>Phone: 0988251927
+			  </p>
+
+            </div>
+
+
+
+          </div>
+		  <div class="col-md-4">
+
+		  <h5 class="text-info"><strong>Bill To</strong></h5>
+
+             <div class="form-group">
+              <p class="col-sm-12 text-left" for="inputEmail3">Name<br>
+			  Street Address, City<br>State ZIPCODE<br>COUNTRY<br><br>Phone: 0988251927
+			  </p>
+
+            </div>
+
+
+
+          </div>
+
+		   <div class="col-md-4">
+
+		  <h4 class="text-info"><strong>Payment Due:</strong></h4>
+		  <h3>1000 Baht</h3>
+		   <button class="btn btn-info" data-toggle="modal" data-target="#addPaymentModal">Make New Payment</button>
+
+
+
+
+          </div>
+
+          <!--End Shippind Address Form-->
+
+
+
+
+            </div>
+
+</div>
+</div>
+
+
+
+<!--End Payment Summary -->
+
+<div class="box box-success">
+                            <div class="box-body">
+<div class="row">
+                        <div class="col-md-12">
+             <h5 class="text-info"><strong>Order Summary</strong></h5>
+                                <table class="table table-reponsive info" id="product_table" >
+                                    <thead>
+										<th></th>
+                                        <th>Name</th>
+                                        <th>Quantity</th>
+                                        <th>Price (B)</th>
+                                        <th>Amount (B)</th>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($order->details as $detail)
+                                            <tr class="item-row" item-id="{{$detail->stock_id}}">
+											<td><img width="50px" height="50px" src="{{asset('/public/uploads/itemPic/'.$detail->item->item_image)}}"></td>
+                                            <td>{{$detail->item->description}}</td>
+                                            <td>{{$detail->quantity}}</td>
+                                            <td>{{$detail->unit_price}}</td>
+                                            <td>{!! ($detail->unit_price)*($detail->quantity) !!} </td>
+                                            </tr>
+
+                                        @endforeach
+                                    </tbody>
+                                    <tfoot>
+                                    <tr class="static_rows">
+                                        <td colspan="4"><strong>Sub Total</strong></td>
+                                        <td colspan="2" id="subTotal"  class="text-left">1000</td>
+                                    </tr>
+
+                                        <tr class="static_rows">
+                                        <td colspan="4"><strong>Shipping Cost</strong></td>
+                                        <td class="text-left">
+                                           {{$order->shipping_cost}}
+                                        </td>
+                                    </tr>
+                                        <tr class="static_rows">
+                                        <td colspan="4"><strong>Discount Amount</strong></td>
+                                        <td  class="text-left">
+                                            {{$order->discount_amount}}
+                                        </td>
+                                    </tr>
+
+                                    <tr class="static_rows">
+                                        <td colspan="4"><strong>Tax Amount</strong></td>
+                                        <td class="text-left">
+                                            0
+                                        </td>
+                                    </tr>
+                                    <tr class="static_rows">
+                                        <td colspan="4"><strong>Grand Total</strong></td>
+                                        <td class="text-left">
+                                            1000
+                                        </td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+
+
+
+          </div>
+
+
+          <!--End Shippind Address Form-->
+
+
+
+
+            </div>
+
+</div>
+</div>
+
+
+
+<div class="box box-success">
+    <div class="col-md-12"><h5 class="text-info"><strong>Payment Summary</strong></h5>
+	</div>
+    <div class="box-body">
+
         <table class="table table-bordered" id="paymentTable">
             <thead>
             <tr class="text-center">
@@ -25,8 +169,8 @@
                         <td width="10%" class="text-center"><a href="{{ url('public/uploads/paymentPic/'.$payment->file) }}">{!! substr($payment->file,1,4)!!}</a></td>
                         <td width="10%" class="text-center">{{$payment->amount}}</td>
                         <td width="10%" class="text-center"><div class="btn-group" id="state-btn-group">
-                                <button type="button" class="btn btn-{{$payment->state_bootstrap_class}}">{{ $payment->state_name }}</button>
-                                <button type="button" class="btn btn-{{$payment->state_bootstrap_class}} dropdown-toggle" data-toggle="dropdown">
+                                <button type="button" class="btn btn-{{$payment->state_bootstrap_class}} stateBtn">{{ $payment->state_name }}</button>
+                                <button type="button" class="btn btn-{{$payment->state_bootstrap_class}} dropdown-toggle dropDownBtn" data-toggle="dropdown">
                                     <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
@@ -45,6 +189,17 @@
             </tbody>
         </table>
     </div>
+
+
+</div>
+<div class="box box-success">
+<div class="box-body">
+
+                    <div class="form-group">
+							  <button class="btn btn-success pull-right" type="submit" id="btnSaveAddress">Ready to Ship</button>
+							  <button class="btn btn-success pull-left" type="submit" id="btnSaveAddress">Back</button>
+                    </div>
+           </div>
 </div>
 
 

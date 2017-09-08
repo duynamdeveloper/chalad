@@ -1,9 +1,19 @@
 <!--Select Product-->
-<form class="form-horizontal" id="shipping_billing_form" method="post" action="{{url('/order/update')}}" >
+
+	<h3>Order Details</h3>
+
+	<div class="box box-default">
+            <div class="box-body">
+
+                    <div class="form-group">
+							  <button class="btn btn-success pull-right" type="submit" id="btnSaveAddress">Save & Next</button>
+                    </div>
+           </div>
+            </div>
 <div class="box box-success">
     <div class="box-body">
         <div class="row">
-
+                <form class="form-horizontal" id="shipping_billing_form" method="get" action="{{url('/order/updateaddress')}}" >
                 <input type="hidden" name="order_no" value="{{$order->order_no}}">
                 <div class="col-md-6">
                     <h4 class="text-info"><strong>{{ trans('message.invoice.shipping_address') }}</strong></h4>
@@ -64,7 +74,7 @@
                         <label class="col-sm-3 control-label " for="inputEmail3">Phone:</label>
 
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="shipping_zip_code" name="shipping_zip_code" value="{{ $order->phone }}" required>
+                            <input type="text" class="form-control" id="contact_phone" name="shipping_phone" value="{{ $order->contact_phone }}" required>
                         </div>
                     </div>
                 </div>
@@ -73,11 +83,11 @@
                 <!--Billing Address-->
                 <div id="different_billing_address_div" class="col-md-6">
                     <div class="form-title">
-                        <h4 class="text-info text-left" style="font-weight: bold;">Billing Address</h4><span class="text-info" style="font-size: 18px;"><input type="checkbox" name="billing_address_the_same_as_shipping_address" id="cbxBillingEqualShipping"> Different Billing Address?</span>
+            <h4 class="text-info text-left" style="font-weight: bold;">Billing Address</h4><span class="text-info" style="font-size: 18px;"><input type="checkbox" name="billing_address_the_same_as_shipping_address" id="cbxBillingEqualShipping"> Different Billing Address?</span>
 
 
                     </div>
-                    <div style="display:none;">
+         <div style="display:none;">
                         <div class="form-group">
                             <label class="col-sm-4 control-label " for="inputEmail3">{{ trans('message.invoice.name') }}</label>
                             <div class="col-sm-8">
@@ -137,12 +147,12 @@
 
 
 
-
+                 </form>
         </div>
 
     </div>
 </div>
-</form>
+
 <div class="box box-success">
     <div class="box-body">
 
@@ -150,19 +160,14 @@
         <div class="form-group">
 
             <div class="col-md-3">Search :</div>
-            <div class="col-md-4">
-
-                   <input class="form-control" id="inp_live_search">
-
-                <div id="livesearch" hidden>
-
-                    <ul>
-                        <li><img src="{{asset('public/img/loading-icon.gif')}}" width="50px" height="50px"> Loading...</li>
-                        {{--<li><img src="{{asset('/uploads/itemPic/hpprobook.jpg')}}"><span class="pull-right">HP Probook</span></li>--}}
-                        {{--<li><img src="{{asset('/uploads/itemPic/hpprobook.jpg')}}"><span class="pull-right">HP Probook</span></li>--}}
-
-                   </ul>
+									<div class="col-md-9"><select class="select2 form-control" id="sel_product" style="float: none; width: 200px">
+                                        <option value="-1">Select a product</option>
+                                        @foreach($items as $item)
+                                            <option value="{{$item->stock_id}}">{{$item->description}}</option>
+                                        @endforeach
+                                    </select>
                 </div>
+
             </div>
 
             <!-- End Select Product -->
@@ -175,7 +180,7 @@
                     <thead>
                     <th></th>
                     <th>Name</th>
-
+                                        <th>Stock On Hand</th>
                     <th>Quantity</th>
                     <th>Price (B)</th>
                     <th>Amount (B)</th>
@@ -186,7 +191,7 @@
                         <tr class="item-row" item-id="{{$detail->stock_id}}">
                             <td><img width="50px" height="50px" src="{{asset('/public/uploads/itemPic/'.$detail->item->item_image)}}"></td>
                             <td>{{$detail->item->description}}</td>
-
+                                            <td>{{$detail->item->stock_on_hand}}</td>
                             <td><input type="text" name="quantity" value="{{$detail->quantity}}" class="form-control text-center inp_qty"></td>
                             <td><input type="text" name="price" value="{{$detail->unit_price}}" class="form-control text-center inp_price"></td>
                             <td>
@@ -194,7 +199,7 @@
                             </td>
                             <td>
                                 <span class="glyphicon glyphicon-trash text-danger removebtn" item-id="{{$detail->stock_id}}" style="cursor:pointer; font-size:18px"></span>
-                                <span class="glyphicon glyphicon-info-sign text-info infobtn" item-id="{{$detail->stock_id}}" style="cursor:pointer; font-size:18px"></span>
+                                         <span class="glyphicon glyphicon-info-sign" item-id="{{$detail->stock_id}}" style="cursor:pointer; font-size:18px"></span>
 
                             </td>
                         </tr>
@@ -250,7 +255,7 @@
                     <tr class="static_rows">
                         <td colspan="5"><strong>Grand Total</strong></td>
                         <td>
-                            <input class="form-control" id="grand_total" type="text" name="grand_total" value="0" readonly>
+                                            <input class="form-control" id="grand_total" type="number" name="grand_total" value="0">
                         </td>
                     </tr>
                     </tfoot>
@@ -265,40 +270,7 @@
         <div class="box-body">
 
             <div class="form-group">
-                <button class="btn btn-success pull-right btnSave" type="submit" id="btnSaveOrder">Save</button>
-            </div>
+							  <button class="btn btn-success pull-right" type="submit" id="btnSaveAddress">Save & Next</button>
         </div>
-    </div>
-</div>
-
-<div id="itemInfoModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-    <div class="modal-content">
-        <div class="box box-widget widget-user-2">
-            <!-- Add the bg color to the header using any of the bg-* classes -->
-            <div class="widget-user-header bg-blue">
-                <div class="widget-user-image" id="item-modal-image">
-                    <img class="img-circle" src="../dist/img/user7-128x128.jpg" alt="Item Avatar">
-                </div>
-                <!-- /.widget-user-image -->
-                <h3 class="widget-user-username" id="item-modal-name"></h3>
-                <h5 class="widget-user-desc" id="item-modal-category"></h5>
-            </div>
-            <div class="box-footer no-padding">
-                <ul class="nav nav-stacked">
-                    <li><a href="#">Stock On Hand <span class="pull-right" id="item-modal-stock-on-hand">31</span></a></li>
-                    <li><a href="#">Weight <span class="pull-right" id="item-modal-weight">5</span></a></li>
-                    <li><a href="#">Quantity/Pack <span class="pull-right" id="item-modal-quantity-pack">12</span></a></li>
-
-                </ul>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-        </div>
-        </div>
-
     </div>
 </div>

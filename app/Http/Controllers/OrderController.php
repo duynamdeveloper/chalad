@@ -38,6 +38,14 @@ class OrderController extends Controller
 
         return view("admin.order.order_add", $data);
     }
+    public function ajaxGet(Request $request){
+        $order_no = $request->order_no;
+        $order = Order::find($order_no);
+        if(!is_null($order)){
+            return response()->json(['state'=>true,'order'=>$order]);
+        }
+        return response()->json(['state'=>false]);
+    }
     public function getShippingCost(Request $request)
     {
         $weight = $request->weight;
@@ -121,27 +129,39 @@ class OrderController extends Controller
 
         $items = $request->items;
         $order_no = $request->order_no;
+        $address = $request->address;
         $items = json_decode($items);
         $shipping_cost = $request->shipping_cost;
         $discount_amount = $request->discount_amount;
         $total_fee = $request->total_fee;
         $item_tax = $request->item_tax;
-
+        $address = json_decode($address);
         $order = Order::where('order_no', $order_no)->first();
 
-        $order->billing_name = $request->billing_name;
-        $order->billing_street = $request->billing_street;
-        $order->billing_city = $request->billing_city;
-        $order->billing_state = $request->billing_state;
-        $order->billing_zip_code = $request->billing_zip_code;
-        $order->billing_country_id = $request->billing_country_id;
+        $order->shipping_name= $address->shipping_name;
+        $order->shipping_street = $address->shipping_street;
+        $order->shipping_city= $address->shipping_city;
+        $order->shipping_state = $address->shipping_state;
+        $order->shipping_zip_code = $address->shipping_zip_code;
+        $order->shipping_country_id = $address->shipping_country_id;
 
-        $order->shipping_name= $request->shipping_name;
-        $order->shipping_street = $request->shipping_street;
-        $order->shipping_city= $request->shipping_city;
-        $order->shipping_state = $request->shipping_state;
-        $order->shipping_zip_code = $request->shipping_zip_code;
-        $order->shipping_country_id = $request->shipping_country_id;
+        if($address->different_billing_address){
+            $order->billing_name = $address->billing_name;
+            $order->billing_street = $address->billing_street;
+            $order->billing_city = $address->billing_city;
+            $order->billing_state = $address->billing_state;
+            $order->billing_zip_code = $address->billing_zip_code;
+            $order->billing_country_id = $address->billing_country_id;
+            $order->different_billing_address = 1;
+        }else{
+            $order->billing_name= $address->shipping_name;
+            $order->billing_street = $address->shipping_street;
+            $order->billing_city= $address->shipping_city;
+            $order->billing_state = $address->shipping_state;
+            $order->billing_zip_code = $address->shipping_zip_code;
+            $order->billing_country_id = $address->shipping_country_id;
+        }
+
 
         $order->person_id = $userId;
         $order->ord_date = date('Y-m-d');
@@ -256,7 +276,7 @@ class OrderController extends Controller
         $payment->status = $status;
         $payment->update();
 
-        return response()->json(['state'=>true]);
+        return response()->json(['state'=>true,'payment'=>$payment]);
     }
     public function updateStatus(Request $request){
         $order_no = $request->order_no;

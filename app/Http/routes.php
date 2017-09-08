@@ -203,6 +203,7 @@
 			Route::post('/update-status','OrderController@updateStatus');
 			Route::get('/ajax-item-search','ItemController@ajaxSearch');
 			Route::get('/printpdf','SalesOrderController@printPDF');
+			Route::get('/ajax-get','OrderController@ajaxGet');
 		});
 		//Route::get('order/list','SalesOrderController@index');
 	

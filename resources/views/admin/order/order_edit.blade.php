@@ -16,17 +16,7 @@
                                 <div class="box-header text-center">
                                     <h4>ORDER No: #{{$order->order_no}} </h4>
                                     <div class="box-body text-center">
-                                        <div class="btn-group" id="state-btn-group">
-                                            <button type="button" class="btn btn-{{$order->state_bootstrap_class}}">{{ $order->state_name }}</button>
-                                            <button type="button" class="btn btn-{{$order->state_bootstrap_class}} dropdown-toggle" data-toggle="dropdown">
-                                                <span class="caret"></span>
-                                            </button>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#" class="label label-default" id="pending_status_btn">Pending</a></li>
-                                                <li><a href="#" class="label label-success" id="confirm_create_shipment">Confirm</a></li>
-                                                <li><a href="#" class="label label-danger" id="cancel_status_btn">Cancel</a></li>
-                                            </ul>
-                                        </div>
+									<div class="label label-default" id="pending_status_btn">Status : Pending</div>
 
                                     </div>
                                 </div>
@@ -48,6 +38,11 @@
 
                             </div>
                         </div>
+						<div class="col-md-12">
+                            <div class="box box-body">
+							<button type="button" class="btn btn-block btn-danger">Cancel Order</button>
+                    </div>
+                </div>
                     </div>
                 </div>
 
@@ -57,12 +52,13 @@
             {{--  End Right Panel  --}}
             {{--  Left Panel  --}}
             <div class="col-md-9">
-                <div class="box box-success">
-                    <ul class="nav nav-tabs text-center" id="navTab" style="margin-bottom:0px;">
-                        <li class="active"><a data-toggle="tab" href="#orderTab" aria-expanded="true">Order<br><span style="font-size:12px;"><em>(Complete)</em></a></li>
-                        <li><a data-toggle="tab" href="#paymentTab">Payment<br><span style="font-size:12px;"><em>(Awaiting Confirmation)</em></a></li>
-                        <li><a data-toggle="tab" href="#shipmentTab">Shipment<br><span style="font-size:12px;"><em>(None)</em></a></li>
-
+                <div class="box box-success col-md-12">
+				<ul class="list-inline">
+				<li class="active"><a data-toggle="tab" href="#orderTab" aria-expanded="true"><h3>Order</h3></a></li>
+				<li>></li>
+				<li><a data-toggle="tab" href="#paymentTab"><h3>Payment</h3></a></li>
+				<li>></li>
+				<li><a data-toggle="tab" href="#shipmentTab"><h3>Shipment</h3></a></li>
                     </ul>
                 </div>
 
@@ -90,19 +86,7 @@
 @endsection
 @section('js')
     <script type="text/javascript">
-        $(document).ready(function(){
 
-            function formatState (item) {
-                console.log(item);
-                if (!item.id) { return item.text; }
-                var $item = $(
-                    '<span>' + item.text + '</span>'
-                );
-                console.log($item);
-                return $item;
-            }
-
-        });
 
 
 

@@ -10,7 +10,7 @@ class Order extends Model
 {
     protected $table = 'sales_orders';
     protected $primaryKey = 'order_no';
-    protected $appends = ['state_name','label_state','ready_to_ship_quantity','shipped_quantity','order_quantity','paid_amount','payment_due','state_bootstrap_class'];
+    protected $appends = ['state_name','label_state','pending_quantity','ready_to_ship_quantity','shipped_quantity','order_quantity','paid_amount','payment_due','state_bootstrap_class'];
     public function details()
     {
         return  $this->hasMany('App\Model\OrderDetail', 'order_no');
@@ -30,23 +30,22 @@ class Order extends Model
         $payments = Payment::where('order_no',$this->getKey())->where('status',0)->get();
         return count($payments);
     }
+    public function getPendingQuantityAttribute(){
+        return $this->order_quantity - $this->ready_to_ship_quantity - $this->shipped_quantity;
+    }
     public function getStateNameAttribute(){
         $status = $this->order_status;
         if($status == 0){
             return "Cancelled";
         }else if($status==2){
-            if($this->existPendingPayments()){
-                return "Awaiting Confirmation";
-            }else{
                 return "Pending";
-            }
         }else if($status == 1){
             if($this->existReadyToShipShipment()){
                 return "Ready to ship";
             }else if($this->checkAllPaymentArePaid() && $this->checkAllShipmentHaveTracking()){
                 return "Complete";
-            }else{
-                return "Processing";
+            }else if($this->checkAllShipmentHaveTracking()){
+                return "Shipped";
             }
         }
         return "Unknown State";
@@ -56,18 +55,16 @@ class Order extends Model
         if($status == 0){
             return '<span class="label label-danger">Cancelled</span>';
         }else if($status==2){
-            if($this->existPendingPayments()){
-                return '<span class="label label-warning">Awaiting Confirmation</span>';
-            }else{
+
                 return '<span class="label label-default">Pending</span>';
-            }
+
         }else if($status == 1){
             if($this->existReadyToShipShipment()){
                 return '<span class="label label-info">Ready to ship</span>';
             }else if($this->checkAllPaymentArePaid() && $this->checkAllShipmentHaveTracking()){
                 return '<span class="label label-success">Complete</span>';
-            }else{
-                return '<span class="label label-warning">Processing</span>';
+            }else if($this->checkAllShipmentHaveTracking()){
+                return '<span class="label label-primary">Shipped</span>';
             }
         }
         return '<span class="label label-danger">Unknown State</span>';
@@ -77,21 +74,19 @@ class Order extends Model
         if($status == 0){
             return "danger";
         }else if($status==2){
-            if($this->existPendingPayments()){
-                return 'warning';
-            }else{
+
                 return 'default';
-            }
+
         }else if($status == 1){
             if($this->existReadyToShipShipment()){
                 return 'info';
             }else if($this->checkAllPaymentArePaid() && $this->checkAllShipmentHaveTracking()){
                 return 'success';
-            }else{
-                return 'warning';
+            }else if($this->checkAllShipmentHaveTracking()){
+                return 'primary';
             }
         }
-        return '<span class="label label-danger">Unknown State</span>';
+        return 'danger';
     }
     public function existPendingPayments(){
         

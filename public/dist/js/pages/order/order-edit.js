@@ -1,4 +1,4 @@
-/* Define Object */
+
 "use strict";
 
 /* Bootbox Script */
@@ -25,7 +25,8 @@ ORDER = {
         update_status_multi_payment: SITE_URL + '/order/update-status-multi-payment',
         update_status_payment: SITE_URL + '/order/update-status-payment',
         edit: SITE_URL+'/order/edit/',
-        check_payment_state: SITE_URL + '/order/check-payment-sate'
+        check_payment_state: SITE_URL + '/order/check-payment-sate',
+        get: SITE_URL+'/order/ajax-get'
     }
 };
 
@@ -67,15 +68,30 @@ ORDER.updateStatus = function(status) {
         success: function(data) {
             if (data.state) {
                 PAGE.notify("Update status successfully!");
-                if(status==1){
-                    window.location.href = window.location.href.replace( /[\?#].*|$/, "?tab=shipmentTab" );
-                }else{
-                    window.location.href = window.location.href.replace( /[\?#].*|$/, "" );
-                }
+                ORDER.getStatus();
             }
         }
     });
 };
+ORDER.getStatus = function(){
+    $.ajax({
+        url: ORDER.API.get,
+        type:'get',
+        data:{
+            'order_no':order_no
+        },
+        success: function(data){
+            if(data.state){
+                $("#state-btn-group").find('button.stateBtn').removeClass().addClass('btn stateBtn btn-'+data.order.state_bootstrap_class).html(data.order.state_name);
+                $("#state-btn-group").find('button.dropdownBtn').removeClass().addClass('btn dropdownBtn btn-'+data.order.state_bootstrap_class);
+                $("#order_qty_span").html(data.order.order_quantity);
+                $("#ready_ship_span").html(data.order.ready_to_ship_quantity);
+                $("#shipped_span").html(data.order.shipped_quantity);
+                $("#pending_span").html(data.order.pending_quantity);
+            }
+        }
+    });
+}
 ORDER.updateShippingCost = function() {
     var weight = ITEM.calculateTotalWeight();
     var shipping_method = $("#sel_shipping_method").val();
@@ -105,9 +121,7 @@ ORDER.updateAmount = function(item_id) {
 
     row.find("input[name=amount]").val(amount);
 };
-ORDER.checkPaymentState = function() {
 
-};
 ORDER.getShippingCost = function(shipping_method, weight) {
     $.ajax({
         url: ORDER.API.getShippingCost,
@@ -148,6 +162,8 @@ ORDER.save = function() {
         message: '<img src="' + SITE_URL + '/img/loader.gif" class="text-center">'
     });
     var items = ORDER.getFormData();
+    var address = ORDER.getAddress();
+    address = JSON.stringify(address);
     items = JSON.stringify(items);
 
     var shipping_cost = $("#shipping_cost").val();
@@ -158,6 +174,7 @@ ORDER.save = function() {
         url: ORDER.API.update,
         type: 'post',
         data: {
+            'address': address,
             'items': items,
             'shipping_cost': shipping_cost,
             'discount_amount': discount_amount,
@@ -176,7 +193,33 @@ ORDER.save = function() {
         }
     });
 };
+ORDER.getAddress = function(){
+    var address = {};
+    var different_billing = true;
+    if($("#cbxBillingEqualShipping").is(':checked')){
+        different_billing = true;
+    }else{
+        different_billing = false;
+    }
+    address= {
+        shipping_name: $("#shipping_name").val(),
+        shipping_street: $("#shipping_street").val(),
+        shipping_city: $("#shipping_city").val(),
+        shipping_state: $("#shipping_state").val(),
+        shipping_zip_code: $("#shipping_zip_code").val(),
+        shipping_country_id: $("#shipping_country_id").val(),
+        contact_phone: $("#contact_phone").val(),
+        billing_name: $("#billing_name").val(),
+        billing_street: $("#billing_street").val(),
+        billing_city: $("#billing_city").val(),
+        billing_state: $("#billing_state").val(),
+        billing_zip_code: $("#billing_zip_code").val(),
+        billing_country_id: $("#billing_country_id").val(),
+        different_billing_address: different_billing
+    };
 
+    return address;
+}
 /* Define Customer Object */
 CUSTOMER = {
     API: {
@@ -257,7 +300,7 @@ ITEM.search = function(string){
                 var ul = $("<ul>");
                 $.each(data.items, function (i, item) {
 
-                    $("<li>").attr('item-id',item.stock_id).addClass('search-result').html('<img src="' + SITE_URL + '/uploads/itemPic/' + item.item_image + '">'+'<span class="pull-right">'+item.description+'</span>').appendTo(ul);
+                    $("<li>").attr('item-id',item.stock_id).addClass('search-result').html('<img src="' + SITE_URL + '/public/uploads/itemPic/' + item.item_image + '">'+'<span class="pull-right">'+item.description+'</span>').appendTo(ul);
                     //$("<li>").attr('item-id',item.stock_id).addClass('search-result').html('<img src="' + SITE_URL + '/uploads/itemPic/' + item.item_image + '">'+'<span class="pull-right">'+item.description+'</span>').appendTo(ul);
                 });
                 $("#livesearch").html(ul);
@@ -310,25 +353,7 @@ CUSTOMER.get = function(debtor_no) {
         }
     });
 };
-CUSTOMER.writeToForm = function(customer) {
-    $("#inp_customer_name").val(customer.name);
-    $("#inp_customer_phone").val(customer.phone);
-    $("#inp_customer_email").val(customer.email);
-    $("#inp_customer_channel").val(customer.channel_name);
-    $("#sel_channel_id").val(customer.channel_id);
-    $(".customer-form").prop('disabled', true);
-};
-CUSTOMER.getFormData = function() {
-    var customer = {
-        id: $("#sel_customer").val(),
-        name: $("#inp_customer_name").val(),
-        phone: $("#inp_customer_phone").val(),
-        email: $("#inp_customer_email").val(),
-        channel_name: $("#inp_customer_channel").val(),
-        channel_id: $("#sel_channel_id").val(),
-    };
-    return customer;
-};
+
 PAYMENT.delete = function(payment_id) {
     $.ajax({
         url: ORDER.API.delete_payment,
@@ -346,8 +371,6 @@ PAYMENT.delete = function(payment_id) {
 };
 
 PAYMENT.updateStatus = function(payment_id, status) {
-
-
     $.ajax({
         url: ORDER.API.update_status_payment,
         type: 'post',
@@ -358,8 +381,9 @@ PAYMENT.updateStatus = function(payment_id, status) {
         success: function(data) {
             if (data.state) {
                 PAGE.notify('Update payment status successfully!');
-                window.location.href = window.location.href.replace( /[\?#].*|$/, "?tab=paymentTab" );
-
+                $("#paymentTable").find('tr[payment-id="'+payment_id+'"]').find('button.stateBtn').removeClass().addClass('btn stateBtn btn-'+data.payment.state_bootstrap_class).html(data.payment.state_name);
+                $("#paymentTable").find('tr[payment-id="'+payment_id+'"]').find('button.dropDownBtn').removeClass().addClass('btn dropDownBtn dropdown-toggle btn-'+data.payment.state_bootstrap_class);
+                ORDER.getStatus();
 
 
             } else {
@@ -406,6 +430,7 @@ PAGE.showTab = function(tabId){
 }
 /* Action on events */
 $(document).ready(function() {
+
     if (order_status === 1) {
         ORDER.disabledEdit(true);
     }
@@ -437,7 +462,7 @@ $(document).ready(function() {
         ITEM.search($(this).val());
     });
     $(document).on('focusout','#inp_live_search', function(){
-   //     $("#livesearch").hide();
+        //     $("#livesearch").hide();
     });
     $(document).on('click',function(event) {
         if(!$(event.target).closest('#livesearch').length) {
@@ -502,7 +527,13 @@ $(document).ready(function() {
             checkboxes.prop('checked', false);
         }
     });
-
+    $(document).on('click','#cbxBillingEqualShipping', function(){
+        if($(this).is(':checked')){
+            $("#billing_form").show();
+        }else{
+            $("#billing_form").hide();
+        }
+    });
     $(document).on('click', '.pending_payment', function() {
         var payment_id = $(this).attr('payment-id');
         var status = 0;
@@ -602,23 +633,23 @@ $(document).ready(function() {
 
 /* Action on events */
 
-$("#cbxBillingEqualShipping").change(function() {
-
-    if (this.checked) {
-        $("#billing_country_id").val($("#shipping_country_id").val()).trigger('change');
-        $("#billing_name").val($("#shipping_name").val());
-        $("#billing_street").val($("#shipping_street").val());
-        $("#billing_city").val($("#shipping_city").val());
-        $("#billing_state").val($("#shipping_state").val());
-        $("#billing_zip_code").val($("#shipping_zip_code").val());
-        $("#hidden_billing_country_id").val($("#shipping_country_id").val());
-        changeBillingInputState(true);
-
-    } else {
-        changeBillingInputState(false);
-    }
-
-});
+// $("#cbxBillingEqualShipping").change(function() {
+//
+//     if (this.checked) {
+//         $("#billing_country_id").val($("#shipping_country_id").val()).trigger('change');
+//         $("#billing_name").val($("#shipping_name").val());
+//         $("#billing_street").val($("#shipping_street").val());
+//         $("#billing_city").val($("#shipping_city").val());
+//         $("#billing_state").val($("#shipping_state").val());
+//         $("#billing_zip_code").val($("#shipping_zip_code").val());
+//         $("#hidden_billing_country_id").val($("#shipping_country_id").val());
+//         changeBillingInputState(true);
+//
+//     } else {
+//         changeBillingInputState(false);
+//     }
+//
+// });
 
 
 

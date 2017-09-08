@@ -40,8 +40,9 @@ SHIPMENT.get = function(order_no) {
         },
         success: function(data) {
             //console.log(order_no);
-            if (data.state) {
+            if (data.shipments!==null) {
                 SHIPMENT.writeToTable(data.shipments);
+                ORDER.getStatus();
             } else {
 
                 shipmentTable.children('tbody').html('<tr><td colspan="8" class="text-center"><h4 class="text-danger">' + MSG.shipment_not_found + '</h4></td></tr>');
@@ -240,6 +241,7 @@ SHIPMENT.addTracking = function(shipment_id, tracking_number, shipping_method) {
         success: function(data) {
             SHIPMENT.notify('Tracking number updated!');
             SHIPMENT.get(order_no);
+            ORDER.getStatus();
         }
     });
 }
@@ -281,7 +283,8 @@ SHIPMENT.delete_shipment = function(shipment_id) {
         success: function(data) {
             if (data.state) {
                 SHIPMENT.notify("Delete success");
-                location.reload();
+                SHIPMENT.get(order_no);
+                ORDER.getStatus();
             } else {
                 SHIPMENT.notify("Something went wrong, please contact administrator", "danger");
             }
