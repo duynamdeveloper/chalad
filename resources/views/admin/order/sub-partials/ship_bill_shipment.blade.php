@@ -42,7 +42,7 @@
                 <h4 class="text-info"><strong>Shipment Due:</strong></h4>
                 <h3>{{$order->pending_quantity}} Items</h3>
                 <button class="btn btn-success" id="addShipmentAutoBtn">Create/Update Shipment</button>
-                <button class="btn btn-warning" id="addShipmentAutoBtn">View Payment History</button>
+                <button class="btn btn-warning"  data-toggle="modal" data-target="#paymentHistoryModal" id="addShipmentAutoBtn">View Payment History</button>
 
 
 

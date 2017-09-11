@@ -1,4 +1,4 @@
-<fieldset @if($order->order_status==1) style="display: block" @endif>
+<fieldset @if($order->order_status==1) style="display: block" @endif id="shipment_field">
 
 	<div class="box box-success">
 		<div class="box-header text-center"><h3>Shipment Details</h3></div>

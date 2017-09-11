@@ -39,8 +39,15 @@
                             </div>
                         </div>
 						<div class="col-md-12">
-                            <div class="box box-body">
-							<button type="button" class="btn btn-block btn-danger">Cancel Order</button>
+                            <div class="box box-body" id="cancelBtnContainer">
+                     
+                            @if($order->order_status ==0)
+                                 <button type="button" class="btn btn-block btn-danger" id="btnRemoveCancel">Remove Cancel</button>
+                            @elseif($order->order_status ==2 )
+                                <button type="button" class="btn btn-block btn-danger" id="btnCancel" >Cancel Order</button>
+                            @else
+                             <button type="button" class="btn btn-block btn-danger btnCancel" disabled data-toggle="tooltip" title="The shipment already created! Cannot cancel order">Cancel Order</button>
+                            @endif
                     </div>
                 </div>
                     </div>
@@ -82,7 +89,7 @@
                 </div>
             </div>
         </div>
-
+@include('admin.order.sub-partials.payment_history_modal');
         {{--  End Page Body  --}}
     </section>
 

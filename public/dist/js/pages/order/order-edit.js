@@ -1,9 +1,10 @@
-
 "use strict";
 
 /* Bootbox Script */
 
-
+var current_fs, next_fs, previous_fs; //fieldsets
+var left, opacity, scale; //fieldset properties which we will animate
+var animating;
 
 
 /* Define Object */
@@ -24,9 +25,9 @@ ORDER = {
         delete_multi_payment: SITE_URL + '/order/deletemultipayment',
         update_status_multi_payment: SITE_URL + '/order/update-status-multi-payment',
         update_status_payment: SITE_URL + '/order/update-status-payment',
-        edit: SITE_URL+'/order/edit/',
+        edit: SITE_URL + '/order/edit/',
         check_payment_state: SITE_URL + '/order/check-payment-sate',
-        get: SITE_URL+'/order/ajax-get'
+        get: SITE_URL + '/order/ajax-get'
     }
 };
 
@@ -73,20 +74,31 @@ ORDER.updateStatus = function(status) {
         }
     });
 };
-ORDER.getStatus = function(){
+ORDER.getStatus = function() {
     $.ajax({
         url: ORDER.API.get,
-        type:'get',
-        data:{
-            'order_no':order_no
+        type: 'get',
+        data: {
+            'order_no': order_no
         },
-        success: function(data){
-            if(data.state){
-                 $("#order_state_label").html(data.order.state_label);
+        success: function(data) {
+            if (data.state) {
+
+                $("#order_state_label").html(data.order.label_state);
                 $("#order_qty_span").html(data.order.order_quantity);
                 $("#ready_ship_span").html(data.order.ready_to_ship_quantity);
                 $("#shipped_span").html(data.order.shipped_quantity);
                 $("#pending_span").html(data.order.pending_quantity);
+                if (data.order.order_status == 0) {
+                    $("#cancelBtnContainer").html('<button type="button" class="btn btn-block btn-danger" id="btnRemoveCancel">Remove Cancel</button>');
+                    ORDER.disabledEdit(true);
+                } else if (data.order.order_status == 1) {
+                    $("#cancelBtnContainer").html('<button type="button" class="btn btn-block btn-danger btnCancel" disabled data-toggle="tooltip" title="The shipment already created! Cannot cancel order">Cancel Order</button>');
+                    ORDER.disabledEdit(false);
+                } else {
+                    $("#cancelBtnContainer").html('<button type="button" class="btn btn-block btn-danger" id="btnCancel" >Cancel Order</button>');
+                    ORDER.disabledEdit(false);
+                }
             }
         }
     });
@@ -183,34 +195,34 @@ ORDER.save = function() {
         }
     });
 };
-ORDER.getAddress = function(){
-    var address = {};
-    var different_billing = true;
-    if($("#cbxBillingEqualShipping").is(':checked')){
-        different_billing = true;
-    }else{
-        different_billing = false;
-    }
-    address= {
-        shipping_name: $("#shipping_name").val(),
-        shipping_street: $("#shipping_street").val(),
-        shipping_city: $("#shipping_city").val(),
-        shipping_state: $("#shipping_state").val(),
-        shipping_zip_code: $("#shipping_zip_code").val(),
-        shipping_country_id: $("#shipping_country_id").val(),
-        contact_phone: $("#contact_phone").val(),
-        billing_name: $("#billing_name").val(),
-        billing_street: $("#billing_street").val(),
-        billing_city: $("#billing_city").val(),
-        billing_state: $("#billing_state").val(),
-        billing_zip_code: $("#billing_zip_code").val(),
-        billing_country_id: $("#billing_country_id").val(),
-        different_billing_address: different_billing
-    };
+ORDER.getAddress = function() {
+        var address = {};
+        var different_billing = true;
+        if ($("#cbxBillingEqualShipping").is(':checked')) {
+            different_billing = true;
+        } else {
+            different_billing = false;
+        }
+        address = {
+            shipping_name: $("#shipping_name").val(),
+            shipping_street: $("#shipping_street").val(),
+            shipping_city: $("#shipping_city").val(),
+            shipping_state: $("#shipping_state").val(),
+            shipping_zip_code: $("#shipping_zip_code").val(),
+            shipping_country_id: $("#shipping_country_id").val(),
+            contact_phone: $("#contact_phone").val(),
+            billing_name: $("#billing_name").val(),
+            billing_street: $("#billing_street").val(),
+            billing_city: $("#billing_city").val(),
+            billing_state: $("#billing_state").val(),
+            billing_zip_code: $("#billing_zip_code").val(),
+            billing_country_id: $("#billing_country_id").val(),
+            different_billing_address: different_billing
+        };
 
-    return address;
-}
-/* Define Customer Object */
+        return address;
+    }
+    /* Define Customer Object */
 CUSTOMER = {
     API: {
         get: SITE_URL + '/customer/ajax/get-customer',
@@ -273,24 +285,24 @@ ITEM.getInfo = function(stock_id) {
         }
     });
 };
-ITEM.search = function(string){
+ITEM.search = function(string) {
     $.ajax({
         url: ITEM.API.search,
-        type:'get',
-        data:{
+        type: 'get',
+        data: {
             string: string
         },
-        error: function(){
+        error: function() {
             $("#livesearch").html('<ul><li class="text-center">No item found!</li></ul>');
         },
-        success: function(data){
+        success: function(data) {
             if (!data.state) {
                 $("#livesearch").html('<ul><li class="text-center">No item found!</li></ul>');
             } else {
                 var ul = $("<ul>");
-                $.each(data.items, function (i, item) {
+                $.each(data.items, function(i, item) {
 
-                    $("<li>").attr('item-id',item.stock_id).addClass('search-result').html('<img src="' + SITE_URL + '/public/uploads/itemPic/' + item.item_image + '">'+'<span class="pull-right">'+item.description+'</span>').appendTo(ul);
+                    $("<li>").attr('item-id', item.stock_id).addClass('search-result').html('<img src="' + SITE_URL + '/public/uploads/itemPic/' + item.item_image + '">' + '<span class="pull-right">' + item.description + '</span>').appendTo(ul);
                     //$("<li>").attr('item-id',item.stock_id).addClass('search-result').html('<img src="' + SITE_URL + '/uploads/itemPic/' + item.item_image + '">'+'<span class="pull-right">'+item.description+'</span>').appendTo(ul);
                 });
                 $("#livesearch").html(ul);
@@ -309,7 +321,7 @@ ITEM.writeToTable = function(item) {
     $("<td>").html('<input type="text" name="quantity" value="1" class="form-control text-center inp_qty">').appendTo(tr);
     $("<td>").html('<input type="text" name="price" value="' + item.special_price + '" class="form-control text-center inp_price">').appendTo(tr);
     $("<td>").html('<input type="text" name="amount" value="' + item.special_price + '" class="form-control text-center" readonly><input type="hidden" name="item_weight" value="' + item.weight + '">').appendTo(tr);
-    $("<td>").html('<span class="glyphicon glyphicon-trash text-danger removebtn" item-id="' + item.stock_id + '" style="cursor:pointer; font-size:18px"></span>'+'<span class="glyphicon glyphicon-info-sign text-info infobtn" item-id="' + item.stock_id + '" style="cursor:pointer; font-size:18px"></span>').appendTo(tr);
+    $("<td>").html('<span class="glyphicon glyphicon-trash text-danger removebtn" item-id="' + item.stock_id + '" style="cursor:pointer; font-size:18px"></span>' + '<span class="glyphicon glyphicon-info-sign text-info infobtn" item-id="' + item.stock_id + '" style="cursor:pointer; font-size:18px"></span>').appendTo(tr);
     tbody.append(tr);
     $("#product_table > tfoot").show();
     ORDER.updateStatistic();
@@ -352,7 +364,7 @@ PAYMENT.delete = function(payment_id) {
             'payment_id': payment_id
         },
         success: function(data) {
-            $("#paymentTable").find('tr[payment-id="' + payment_id + '"]').fadeOut(1000, function () {
+            $("#paymentTable").find('tr[payment-id="' + payment_id + '"]').fadeOut(1000, function() {
                 $(this).remove();
             });
             PAGE.notify('Delete payment successfully');
@@ -371,8 +383,8 @@ PAYMENT.updateStatus = function(payment_id, status) {
         success: function(data) {
             if (data.state) {
                 PAGE.notify('Update payment status successfully!');
-                $("#paymentTable").find('tr[payment-id="'+payment_id+'"]').find('button.stateBtn').removeClass().addClass('btn stateBtn btn-'+data.payment.state_bootstrap_class).html(data.payment.state_name);
-                $("#paymentTable").find('tr[payment-id="'+payment_id+'"]').find('button.dropDownBtn').removeClass().addClass('btn dropDownBtn dropdown-toggle btn-'+data.payment.state_bootstrap_class);
+                $("#paymentTable").find('tr[payment-id="' + payment_id + '"]').find('button.stateBtn').removeClass().addClass('btn stateBtn btn-' + data.payment.state_bootstrap_class).html(data.payment.state_name);
+                $("#paymentTable").find('tr[payment-id="' + payment_id + '"]').find('button.dropDownBtn').removeClass().addClass('btn dropDownBtn dropdown-toggle btn-' + data.payment.state_bootstrap_class);
                 ORDER.getStatus();
                 console.log(data);
 
@@ -413,7 +425,7 @@ PAGE.notify = function(msg, type = 'success') {
 /* Action on events */
 $(document).ready(function() {
 
-    if (order_status === 1) {
+    if (order_status === 1 || order_status === 0) {
         ORDER.disabledEdit(true);
     }
 
@@ -421,7 +433,7 @@ $(document).ready(function() {
     ORDER.updateStatistic();
 
 
-    $(document).on('click','.search-result',function(){
+    $(document).on('click', '.search-result', function() {
         console.log('test');
         var stock_id = $(this).attr('item-id');
         $("#livesearch").hide();
@@ -436,17 +448,17 @@ $(document).ready(function() {
         }
 
     });
-    $(document).on('keyup','#inp_live_search', function(){
+    $(document).on('keyup', '#inp_live_search', function() {
 
         $("#livesearch").show();
         ITEM.search($(this).val());
     });
-    $(document).on('focusout','#inp_live_search', function(){
+    $(document).on('focusout', '#inp_live_search', function() {
         //     $("#livesearch").hide();
     });
-    $(document).on('click',function(event) {
-        if(!$(event.target).closest('#livesearch').length) {
-            if($('#livesearch').is(":visible")) {
+    $(document).on('click', function(event) {
+        if (!$(event.target).closest('#livesearch').length) {
+            if ($('#livesearch').is(":visible")) {
                 $('#livesearch').hide();
             }
         }
@@ -507,10 +519,10 @@ $(document).ready(function() {
             checkboxes.prop('checked', false);
         }
     });
-    $(document).on('click','#cbxBillingEqualShipping', function(){
-        if($(this).is(':checked')){
+    $(document).on('click', '#cbxBillingEqualShipping', function() {
+        if ($(this).is(':checked')) {
             $("#billing_form").show();
-        }else{
+        } else {
             $("#billing_form").hide();
         }
     });
@@ -528,8 +540,8 @@ $(document).ready(function() {
                     label: '<i class="fa fa-check"></i> Confirm'
                 }
             },
-            callback: function (result) {
-                if(result){
+            callback: function(result) {
+                if (result) {
                     PAYMENT.updateStatus(payment_id, status);
                 }
             }
@@ -550,8 +562,8 @@ $(document).ready(function() {
                     label: '<i class="fa fa-check"></i> Confirm'
                 }
             },
-            callback: function (result) {
-                if(result){
+            callback: function(result) {
+                if (result) {
                     PAYMENT.updateStatus(payment_id, status);
                 }
             }
@@ -583,28 +595,127 @@ $(document).ready(function() {
             if (confirm(" Are you sure you want to confirm order? There is still payment due")) {
                 ORDER.updateStatus(1);
             }
-        }else{
+        } else {
             ORDER.updateStatus(1);
         }
     });
     $(document).on('click', '.ready_to_ship_btn', function() {
         if (exist_payments > 0) {
-            if (confirm(" Are you sure you want to confirm order? There is still payment due")) {
-                ORDER.updateStatus(1);
-                SHIPMENT.automatic_allocate(order_no);
+            bootbox.dialog({
+                title: 'Alert',
+                message: 'Please finalize payment before proceeding to ready to ship'
+            });
 
-            }
         } else {
-            ORDER.updateStatus(1);
-            SHIPMENT.automatic_allocate(order_no);
+            bootbox.confirm({
+                title: "Ready to ship?",
+                message: "Confirm you are ready to ship?",
+                buttons: {
+                    cancel: {
+                        label: '<i class="fa fa-times"></i> Cancel'
+                    },
+                    confirm: {
+                        label: '<i class="fa fa-check"></i> Confirm'
+                    }
+                },
+                callback: function(result) {
+                    if (result) {
+                        ORDER.updateStatus(1);
+                        SHIPMENT.automatic_allocate(order_no);
+                        animating = false;
+                        if (animating) return false;
+
+                        animating = true;
+
+                        current_fs = $("#payment_field");
+                        console.log(current_fs);
+                        next_fs = current_fs.next();
+
+                        $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
+
+                        //show the next fieldset
+                        next_fs.show();
+                        //hide the current fieldset with style
+                        current_fs.animate({ opacity: 0 }, {
+                            step: function(now, mx) {
+                                //as the opacity of current_fs reduces to 0 - stored in "now"
+                                //1. scale current_fs down to 80%
+                                scale = 1 - (1 - now) * 0.2;
+                                //2. bring next_fs from the right(50%)
+                                left = (now * 50) + "%";
+                                //3. increase opacity of next_fs to 1 as it moves in
+                                opacity = 1 - now;
+                                current_fs.css({
+                                    'transform': 'scale(' + scale + ')',
+
+                                });
+                                next_fs.css({ 'left': left, 'opacity': opacity });
+                            },
+                            duration: 800,
+                            complete: function() {
+                                current_fs.hide();
+                                animating = false;
+                            },
+                            //this comes from the custom easing plugin
+                            easing: 'easeInOutBack'
+                        });
+
+                    }
+                }
+            });
+
         }
     });
-    $(document).on('click','.infobtn', function(){
+    $(document).on('click', '.infobtn', function() {
         var stock_id = $(this).attr('item-id');
         ITEM.getInfo(stock_id);
     });
-    $(document).on('click','#btnSaveOrder', function(){
-        ORDER.save();
+    $(document).on('click', '#btnSaveOrder', function() {
+        if (!checkAddressForm()) {
+            nextToPayment();
+            ORDER.save();
+        } else {
+            PAGE.notify("Please fill out all inputs", 'warning');
+        }
+
+    });
+    $(document).on('click', '#btnCancel', function() {
+        bootbox.confirm({
+            title: "Cancel order?",
+            message: "Do you want cancel this order?",
+            buttons: {
+                cancel: {
+                    label: '<i class="fa fa-times"></i> Cancel'
+                },
+                confirm: {
+                    label: '<i class="fa fa-check"></i> Confirm'
+                }
+            },
+            callback: function(result) {
+                if (result) {
+                    ORDER.updateStatus(0);
+                }
+            }
+        });
+    });
+    $(document).on('click', '#btnRemoveCancel', function() {
+        bootbox.confirm({
+            title: "Remove Cancel?",
+            message: "Do you want to remove cancel this order?",
+            buttons: {
+                cancel: {
+                    label: '<i class="fa fa-times"></i> Cancel'
+                },
+                confirm: {
+                    label: '<i class="fa fa-check"></i> Confirm'
+                }
+            },
+            callback: function(result) {
+                if (result) {
+                    ORDER.updateStatus(2);
+                }
+            }
+        });
     });
 });
 
@@ -640,6 +751,8 @@ function changeShippingInputState(state) {
     $("#shipping_state").prop('readonly', state);
     $("#shipping_zip_code").prop('readonly', state);
     $("#shipping_country_id").attr('disabled', state);
+    $("#contact_phone").attr('disabled', state);
+    $(".next").attr('disabled', state);
 }
 /**
  * Change billing input state
@@ -656,6 +769,17 @@ function changeBillingInputState(state) {
     $("#hidden_billing_country_id").attr('disabled', !state);
 
 }
+
+function checkAddressForm() {
+    var state = false;
+    var someEmpty = $('#orderForm input').filter(function() {
+        return $.trim(this.value).length === 0;
+    }).length > 0;
+    return someEmpty;
+
+
+}
+
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, "\\$&");
@@ -669,51 +793,52 @@ function getParameterByName(name, url) {
 
 
 //jQuery time
-var current_fs, next_fs, previous_fs; //fieldsets
-var left, opacity, scale; //fieldset properties which we will animate
-var animating; //flag to prevent quick multi-click glitches
+//flag to prevent quick multi-click glitches
 
-$(".next").click(function(){
-    if(animating) return false;
+function nextToPayment() {
+    animating = false;
+    if (animating) return false;
     animating = true;
 
-    current_fs = $(this).parent().parent().parent().parent();
+    current_fs = $("#order_field");
 
     next_fs = current_fs.next();
+    if (next_fs[0].id !== "shipment_field") {
+        $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
 
+        //show the next fieldset
+        next_fs.show();
+        //hide the current fieldset with style
+        current_fs.animate({ opacity: 0 }, {
+            step: function(now, mx) {
+                //as the opacity of current_fs reduces to 0 - stored in "now"
+                //1. scale current_fs down to 80%
+                scale = 1 - (1 - now) * 0.2;
+                //2. bring next_fs from the right(50%)
+                left = (now * 50) + "%";
+                //3. increase opacity of next_fs to 1 as it moves in
+                opacity = 1 - now;
+                current_fs.css({
+                    'transform': 'scale(' + scale + ')',
+
+                });
+                next_fs.css({ 'left': left, 'opacity': opacity });
+            },
+            duration: 800,
+            complete: function() {
+                current_fs.hide();
+                animating = false;
+            },
+            //this comes from the custom easing plugin
+            easing: 'easeInOutBack'
+        });
+    }
     //activate next step on progressbar using the index of next_fs
-    $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
 
-    //show the next fieldset
-    next_fs.show();
-    //hide the current fieldset with style
-    current_fs.animate({opacity: 0}, {
-        step: function(now, mx) {
-            //as the opacity of current_fs reduces to 0 - stored in "now"
-            //1. scale current_fs down to 80%
-            scale = 1 - (1 - now) * 0.2;
-            //2. bring next_fs from the right(50%)
-            left = (now * 50)+"%";
-            //3. increase opacity of next_fs to 1 as it moves in
-            opacity = 1 - now;
-            current_fs.css({
-                'transform': 'scale('+scale+')',
+}
 
-            });
-            next_fs.css({'left': left, 'opacity': opacity});
-        },
-        duration: 800,
-        complete: function(){
-            current_fs.hide();
-            animating = false;
-        },
-        //this comes from the custom easing plugin
-        easing: 'easeInOutBack'
-    });
-});
-
-$(".previous").click(function(){
-    if(animating) return false;
+$(".previous").click(function() {
+    if (animating) return false;
     animating = true;
 
     current_fs = $(this).parent().parent().parent().parent();
@@ -725,20 +850,20 @@ $(".previous").click(function(){
     //show the previous fieldset
     previous_fs.show();
     //hide the current fieldset with style
-    current_fs.animate({opacity: 0}, {
+    current_fs.animate({ opacity: 0 }, {
         step: function(now, mx) {
             //as the opacity of current_fs reduces to 0 - stored in "now"
             //1. scale previous_fs from 80% to 100%
             scale = 0.8 + (1 - now) * 0.2;
             //2. take current_fs to the right(50%) - from 0%
-            left = ((1-now) * 50)+"%";
+            left = ((1 - now) * 50) + "%";
             //3. increase opacity of previous_fs to 1 as it moves in
             opacity = 1 - now;
-            current_fs.css({'left': left});
-            previous_fs.css({'transform': 'scale('+scale+')', 'opacity': opacity});
+            current_fs.css({ 'left': left });
+            previous_fs.css({ 'transform': 'scale(' + scale + ')', 'opacity': opacity });
         },
         duration: 800,
-        complete: function(){
+        complete: function() {
             current_fs.hide();
             animating = false;
         },
@@ -747,6 +872,6 @@ $(".previous").click(function(){
     });
 });
 
-$(".submit").click(function(){
+$(".submit").click(function() {
     return false;
 })

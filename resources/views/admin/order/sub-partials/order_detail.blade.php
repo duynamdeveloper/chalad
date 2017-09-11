@@ -1,4 +1,4 @@
-<div class="box box-success">
+<div class="box box-success" id="orderForm">
     <div class="box-body">
         <div class="row">
             <form class="form-horizontal" id="shipping_billing_form" method="get" action="{{url('/order/updateaddress')}}" >
@@ -126,7 +126,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <input type="hidden" name="billing_country_id" id="hidden_billing_country_id" disabled>
+                            
                         </div>
                     </div>
                 </div>

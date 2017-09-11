@@ -40,7 +40,7 @@ SHIPMENT.get = function(order_no) {
         },
         success: function(data) {
             //console.log(order_no);
-            if (data.shipments!==null) {
+            if (data.shipments !== null) {
                 SHIPMENT.writeToTable(data.shipments);
                 ORDER.getStatus();
             } else {
@@ -69,14 +69,14 @@ SHIPMENT.writeToTable = function(data) {
             shipment.tracking_number = "";
             var state_label = '<span class=\"label label-info\">Ready to ship</span>';
             shipment.shipping_method = -1;
-        }else{
+        } else {
             var state_label = '<span class="label label-success">Shipped</span>';
         }
         var btn_group = $("<div>").addClass('btn-group');
         $('<td>').html("SHIPMENT NO:" + shipment.id).css('font-weight', 'bold').appendTo(tr);
 
         $('<td>').html('Tracking Number: ' + shipment.tracking_number).attr('colspan', 2).appendTo(tr);
-        $('<td>').html('<strong>Status:</strong>'+state_label).appendTo(tr);
+        $('<td>').html('<strong>Status:</strong>' + state_label).appendTo(tr);
         var remove_btn = '<button class="btn btn-danger deleteShipment" shipment-id="' + shipment.id + '">Delete</button>';
         var edit_btn = '<button class="btn btn-info editShipment" shipment-id="' + shipment.id + '">Edit</button>';
         if (shipment.tracking_number == "") {
@@ -124,7 +124,7 @@ SHIPMENT.automatic_allocate = function(order_no) {
             'order_no': order_no
         },
         success: function(data) {
-           // console.log(data);
+            // console.log(data);
             SHIPMENT.get(order_no);
             SHIPMENT.notify("Automatic allocate success!");
         }
@@ -159,7 +159,7 @@ SHIPMENT.manual_allocate = function(shipment_id, order_no) {
             'data': SHIPMENT.getManualAllocateDataFromTable(shipment_id)
         },
         success: function(data) {
-          //  console.log(data);
+            //  console.log(data);
             SHIPMENT.get(order_no);
             SHIPMENT.notify("Manual Allocate Success");
         }
@@ -285,6 +285,7 @@ SHIPMENT.delete_shipment = function(shipment_id) {
                 SHIPMENT.notify("Delete success");
                 SHIPMENT.get(order_no);
                 ORDER.getStatus();
+                location.reload();
             } else {
                 SHIPMENT.notify("Something went wrong, please contact administrator", "danger");
             }

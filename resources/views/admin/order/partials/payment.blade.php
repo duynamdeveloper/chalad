@@ -1,4 +1,4 @@
-<fieldset>
+<fieldset id="payment_field">
 
 
     <div class="box box-success">
