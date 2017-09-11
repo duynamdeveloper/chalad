@@ -192,6 +192,9 @@ ORDER.save = function() {
         },
         success: function(data) {
             $("#order_detail_container").html(data.order_detail);
+            $(".order_summary_container").html(data.order_summary);
+            $("#ship_bill_payment").html(data.ship_bill_payment);
+            $("#ship_bill_shipment").html(data.ship_bill_shipment);
         }
     });
 };
@@ -589,82 +592,84 @@ $(document).ready(function() {
         e.preventDefault();
         ORDER.updateStatus(0);
     });
-    $(document).on('click', '#confirm_status_btn', function(e) {
-        e.preventDefault();
-        if (exist_payments > 0) {
-            if (confirm(" Are you sure you want to confirm order? There is still payment due")) {
-                ORDER.updateStatus(1);
-            }
-        } else {
-            ORDER.updateStatus(1);
-        }
-    });
+
     $(document).on('click', '.ready_to_ship_btn', function() {
-        if (exist_payments > 0) {
-            bootbox.dialog({
-                title: 'Alert',
-                message: 'Please finalize payment before proceeding to ready to ship'
-            });
-
-        } else {
-            bootbox.confirm({
-                title: "Ready to ship?",
-                message: "Confirm you are ready to ship?",
-                buttons: {
-                    cancel: {
-                        label: '<i class="fa fa-times"></i> Cancel'
-                    },
-                    confirm: {
-                        label: '<i class="fa fa-check"></i> Confirm'
-                    }
-                },
-                callback: function(result) {
-                    if (result) {
-                        ORDER.updateStatus(1);
-                        SHIPMENT.automatic_allocate(order_no);
-                        animating = false;
-                        if (animating) return false;
-
-                        animating = true;
-
-                        current_fs = $("#payment_field");
-                        console.log(current_fs);
-                        next_fs = current_fs.next();
-
-                        $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
-
-                        //show the next fieldset
-                        next_fs.show();
-                        //hide the current fieldset with style
-                        current_fs.animate({ opacity: 0 }, {
-                            step: function(now, mx) {
-                                //as the opacity of current_fs reduces to 0 - stored in "now"
-                                //1. scale current_fs down to 80%
-                                scale = 1 - (1 - now) * 0.2;
-                                //2. bring next_fs from the right(50%)
-                                left = (now * 50) + "%";
-                                //3. increase opacity of next_fs to 1 as it moves in
-                                opacity = 1 - now;
-                                current_fs.css({
-                                    'transform': 'scale(' + scale + ')',
-
-                                });
-                                next_fs.css({ 'left': left, 'opacity': opacity });
+        $.ajax({
+            url: ORDER.API.get,
+            type: 'get',
+            data:{
+                'order_no': order_no
+            },
+            success: function(data){
+                var exist_payments = data.order.payment_due;
+                if (exist_payments > 0) {
+                    bootbox.dialog({
+                        title: 'Alert',
+                        message: 'Please finalize payment before proceeding to ready to ship'
+                    });
+        
+                } else {
+                    bootbox.confirm({
+                        title: "Ready to ship?",
+                        message: "Confirm you are ready to ship?",
+                        buttons: {
+                            cancel: {
+                                label: '<i class="fa fa-times"></i> Cancel'
                             },
-                            duration: 800,
-                            complete: function() {
-                                current_fs.hide();
+                            confirm: {
+                                label: '<i class="fa fa-check"></i> Confirm'
+                            }
+                        },
+                        callback: function(result) {
+                            if (result) {
+                                ORDER.updateStatus(1);
+                                SHIPMENT.automatic_allocate(order_no);
                                 animating = false;
-                            },
-                            //this comes from the custom easing plugin
-                            easing: 'easeInOutBack'
-                        });
-
-                    }
+                                if (animating) return false;
+        
+                                animating = true;
+        
+                                current_fs = $("#payment_field");
+                                console.log(current_fs);
+                                next_fs = current_fs.next();
+        
+                                $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
+        
+                                //show the next fieldset
+                                next_fs.show();
+                                //hide the current fieldset with style
+                                current_fs.animate({ opacity: 0 }, {
+                                    step: function(now, mx) {
+                                        //as the opacity of current_fs reduces to 0 - stored in "now"
+                                        //1. scale current_fs down to 80%
+                                        scale = 1 - (1 - now) * 0.2;
+                                        //2. bring next_fs from the right(50%)
+                                        left = (now * 50) + "%";
+                                        //3. increase opacity of next_fs to 1 as it moves in
+                                        opacity = 1 - now;
+                                        current_fs.css({
+                                            'transform': 'scale(' + scale + ')',
+        
+                                        });
+                                        next_fs.css({ 'left': left, 'opacity': opacity });
+                                    },
+                                    duration: 800,
+                                    complete: function() {
+                                        current_fs.hide();
+                                        animating = false;
+                                    },
+                                    //this comes from the custom easing plugin
+                                    easing: 'easeInOutBack'
+                                });
+        
+                            }
+                        }
+                    });
+        
                 }
-            });
+            }
+        });
 
-        }
     });
     $(document).on('click', '.infobtn', function() {
         var stock_id = $(this).attr('item-id');

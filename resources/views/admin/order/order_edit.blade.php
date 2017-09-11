@@ -104,9 +104,9 @@
 
         var DATE_FORMAT_TYPE = '{{Session::get('date_format_type')}}';
         var order_no = {{$order->order_no}};
-        var exist_payments = {!! $order->payment_due !!};
-        var exist_shipments = {!! count($order->shipments) !!};
-        var order_status = {{$order->order_status}};
+       
+            var exist_shipments = {!! count($order->shipments) !!};
+            var order_status = {{$order->order_status}};
         //console.log(exist_payments);
     </script>
     <script type="text/javascript" src="{{asset('/dist/js/pages/shipment/manage-shipment.js')}}"></script>

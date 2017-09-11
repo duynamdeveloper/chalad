@@ -62,7 +62,7 @@
                         <label class="col-sm-3 control-label " for="inputEmail3">Phone:</label>
 
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="contact_phone" name="shipping_phone" value="{{ $order->contact_phone }}" required>
+                            <input type="text" class="form-control" id="contact_phone" name="contact_phone" value="{{ $order->contact_phone }}" required>
                         </div>
                     </div>
                 </div>

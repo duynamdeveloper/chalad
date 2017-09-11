@@ -12,12 +12,13 @@
         </div>
     </div>
     <!-- Payment Summary -->
+    <div id="ship_bill_payment">
     @include('admin.order.sub-partials.ship_bill_payment')
-
-
+</div>
+<div class="order_summary_container">
     @include('admin.order.sub-partials.order_summary')
     <!--End Payment Summary -->
-
+</div>
 
 
 

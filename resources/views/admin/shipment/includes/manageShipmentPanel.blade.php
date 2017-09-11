@@ -3,14 +3,15 @@
 	<div class="box box-success">
 		<div class="box-header text-center"><h3>Shipment Details</h3></div>
 	</div>
+	<div id="ship_bill_shipment">
 @include('admin.order.sub-partials.ship_bill_shipment')
 
-
+</div>
 
 <!--End Payment Summary -->
-
+<div class="order_summary_container">
 @include('admin.order.sub-partials.order_summary')
-
+</div>
 
 		<div class="box box-success">
 			<div class="col-md-12">

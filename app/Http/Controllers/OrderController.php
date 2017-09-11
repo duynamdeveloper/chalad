@@ -163,7 +163,7 @@ class OrderController extends Controller
             $order->billing_country_id = $address->shipping_country_id;
         }
 
-
+        $order->contact_phone = $address->contact_phone;
         $order->person_id = $userId;
         $order->ord_date = date('Y-m-d');
         $order->total = $total_fee;
@@ -194,9 +194,15 @@ class OrderController extends Controller
         $data['countries'] = DB::table('countries')->get();
         $data['items'] = Item::all();
         $data['tax_types'] = DB::table('item_tax_types')->get();
-        $order_detail_view = View::make('admin.order.sub-partials.ajax_order_detail',$data);
+        $order_detail_view = View::make('admin.order.sub-partials.order_detail',$data);
+        $order_summary_view = View::make('admin.order.sub-partials.order_summary', $data);
+        $ship_bill_payment_view = View::make('admin.order.sub-partials.ship_bill_payment',$data);
+        $ship_bill_shipment_view = View::make('admin.order.sub-partials.ship_bill_shipment',$data);
+        $order_summary_content = $order_summary_view->render();
+        $ship_bill_payment_content = $ship_bill_payment_view->render();
+        $ship_bill_shipment_content = $ship_bill_shipment_view->render();
         $content = $order_detail_view->render();
-        return response()->json(['order_detail'=>$content]);
+        return response()->json(['order_detail'=>$content,'order_summary'=>$order_summary_content,'ship_bill_payment'=>$ship_bill_payment_content,'ship_bill_shipment'=>$ship_bill_shipment_content]);
     }
     public function updateAddress(Request $request)
     {
