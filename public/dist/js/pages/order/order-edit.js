@@ -594,14 +594,6 @@ $(document).ready(function() {
     });
 
     $(document).on('click', '.ready_to_ship_btn', function() {
-        $.ajax({
-            url: ORDER.API.get,
-            type: 'get',
-            data:{
-                'order_no': order_no
-            },
-            success: function(data){
-                var exist_payments = data.order.payment_due;
                 if (exist_payments > 0) {
                     bootbox.dialog({
                         title: 'Alert',
