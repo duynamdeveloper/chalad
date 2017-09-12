@@ -27,8 +27,8 @@ class Order extends Model
         return $this->belongsTo('App\Model\Customer','debtor_no','debtor_no');
     }
     public function getPaymentDueAttribute(){
-        $payments = Payment::where('order_no',$this->getKey())->where('status',0)->get();
-        return count($payments);
+        $payment_due = $this->total - $this->paid_amount;
+        return $payment_due;
     }
     public function getPendingQuantityAttribute(){
         return $this->order_quantity - $this->ready_to_ship_quantity - $this->shipped_quantity;
@@ -41,7 +41,13 @@ class Order extends Model
                 return "Pending";
         }else if($status == 1){
 
-                return "Ready to ship";
+                if($this->shipped_quantity >= $this->order_quantity && $this->payment_due = 0){
+                    return "Completed";
+                }else if($this->shipped_quantity >= $this->order_quantity){
+                    return "Shipped";
+                }else{
+                    return "Ready to ship";
+                }
 
         }
         return "Unknown State";

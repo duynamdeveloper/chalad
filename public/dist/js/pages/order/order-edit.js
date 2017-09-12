@@ -32,30 +32,49 @@ ORDER = {
 };
 
 ORDER.updateStatistic = function() {
-    ORDER.updateShippingCost();
-    var amounts = $("input[name=amount]");
-    var sub_total = 0;
-    var total = 0;
-    var grand_total = 0;
-    $.each(amounts, function(i, amount) {
-        sub_total += parseFloat($(amount).val());
+
+    var weight = ITEM.calculateTotalWeight();
+    var shipping_method = $("#sel_shipping_method").val();
+
+    $.ajax({
+        url: ORDER.API.getShippingCost,
+        type: 'get',
+        data: {
+            'weight': weight,
+            'shipping_method': shipping_method
+        },
+        success: function(data) {
+
+            $("#shipping_cost").val(data.cost);
+            var amounts = $("input[name=amount]");
+            var sub_total = 0;
+            var total = 0;
+            var grand_total = 0;
+            $.each(amounts, function(i, amount) {
+                sub_total += parseFloat($(amount).val());
+            });
+            $("#subTotal").html(parseInt(sub_total));
+            var tax_rate = $("#sel_tax").val();
+            if (parseFloat(tax_rate) < 0) {
+                tax_rate = 0;
+            }
+            var shipping_cost = $("#shipping_cost").val();
+
+            var discount_amount = $("#discount_amount").val();
+            discount_amount = parseFloat(discount_amount);
+            if (isNaN(discount_amount)) {
+                discount_amount = 0;
+            }
+            total = parseFloat(sub_total) + parseFloat(shipping_cost) - parseFloat(discount_amount);
+            var tax_amount = total * (parseFloat(tax_rate) / 100);
+            $("#tax_amount").val(tax_amount);
+            grand_total = total + tax_amount;
+            $("#grand_total").val(grand_total);
+
+        }
+
     });
-    $("#subTotal").html(parseInt(sub_total));
-    var tax_rate = $("#sel_tax").val();
-    if (parseFloat(tax_rate) < 0) {
-        tax_rate = 0;
-    }
-    var shipping_cost = $("#shipping_cost").val();
-    var discount_amount = $("#discount_amount").val();
-    discount_amount = parseFloat(discount_amount);
-    if (isNaN(discount_amount)) {
-        discount_amount = 0;
-    }
-    total = parseFloat(sub_total) + parseFloat(shipping_cost) - parseFloat(discount_amount);
-    var tax_amount = total * (parseFloat(tax_rate) / 100);
-    $("#tax_amount").val(tax_amount);
-    grand_total = total + tax_amount;
-    $("#grand_total").val(grand_total);
+
 
 };
 ORDER.updateStatus = function(status) {
@@ -81,18 +100,20 @@ ORDER.getStatus = function() {
         data: {
             'order_no': order_no
         },
-        success: function(data) {
-            if (data.state) {
+        success: function(received) {
+            console.log(received);
+            if (received.state) {
 
-                $("#order_state_label").html(data.order.label_state);
-                $("#order_qty_span").html(data.order.order_quantity);
-                $("#ready_ship_span").html(data.order.ready_to_ship_quantity);
-                $("#shipped_span").html(data.order.shipped_quantity);
-                $("#pending_span").html(data.order.pending_quantity);
-                if (data.order.order_status == 0) {
+                $("#ship_bill_payment").html(received.ship_bill_payment);
+                $("#order_state_label").html(received.order.label_state);
+                $("#order_qty_span").html(received.order.order_quantity);
+                $("#ready_ship_span").html(received.order.ready_to_ship_quantity);
+                $("#shipped_span").html(received.order.shipped_quantity);
+                $("#pending_span").html(received.order.pending_quantity);
+                if (received.order.order_status == 0) {
                     $("#cancelBtnContainer").html('<button type="button" class="btn btn-block btn-danger" id="btnRemoveCancel">Remove Cancel</button>');
                     ORDER.disabledEdit(true);
-                } else if (data.order.order_status == 1) {
+                } else if (received.order.order_status == 1) {
                     $("#cancelBtnContainer").html('<button type="button" class="btn btn-block btn-danger btnCancel" disabled data-toggle="tooltip" title="The shipment already created! Cannot cancel order">Cancel Order</button>');
                     ORDER.disabledEdit(false);
                 } else {
@@ -106,6 +127,7 @@ ORDER.getStatus = function() {
 ORDER.updateShippingCost = function() {
     var weight = ITEM.calculateTotalWeight();
     var shipping_method = $("#sel_shipping_method").val();
+
     ORDER.getShippingCost(shipping_method, weight);
 };
 ORDER.disabledEdit = function(state) {
@@ -142,7 +164,10 @@ ORDER.getShippingCost = function(shipping_method, weight) {
             'shipping_method': shipping_method
         },
         success: function(data) {
+
             $("#shipping_cost").val(data.cost);
+            ORDER.updateStatistic();
+
         }
 
     });
@@ -389,7 +414,7 @@ PAYMENT.updateStatus = function(payment_id, status) {
                 $("#paymentTable").find('tr[payment-id="' + payment_id + '"]').find('button.stateBtn').removeClass().addClass('btn stateBtn btn-' + data.payment.state_bootstrap_class).html(data.payment.state_name);
                 $("#paymentTable").find('tr[payment-id="' + payment_id + '"]').find('button.dropDownBtn').removeClass().addClass('btn dropDownBtn dropdown-toggle btn-' + data.payment.state_bootstrap_class);
                 ORDER.getStatus();
-                console.log(data);
+
 
 
             } else {
@@ -437,7 +462,7 @@ $(document).ready(function() {
 
 
     $(document).on('click', '.search-result', function() {
-        console.log('test');
+
         var stock_id = $(this).attr('item-id');
         $("#livesearch").hide();
 
@@ -484,6 +509,7 @@ $(document).ready(function() {
     });
 
     $(document).on('change', '#sel_shipping_method', function() {
+        ORDER.updateShippingCost();
         ORDER.updateStatistic();
     });
 
@@ -594,12 +620,20 @@ $(document).ready(function() {
     });
 
     $(document).on('click', '.ready_to_ship_btn', function() {
+        $.ajax({
+            url: ORDER.API.get,
+            type: 'get',
+            data: {
+                'order_no': order_no,
+            },
+            success: function(data) {
+                var exist_payments = data.order.payment_due;
                 if (exist_payments > 0) {
                     bootbox.dialog({
                         title: 'Alert',
                         message: 'Please finalize payment before proceeding to ready to ship'
                     });
-        
+
                 } else {
                     bootbox.confirm({
                         title: "Ready to ship?",
@@ -616,53 +650,18 @@ $(document).ready(function() {
                             if (result) {
                                 ORDER.updateStatus(1);
                                 SHIPMENT.automatic_allocate(order_no);
-                                animating = false;
-                                if (animating) return false;
-        
-                                animating = true;
-        
-                                current_fs = $("#payment_field");
-                                console.log(current_fs);
-                                next_fs = current_fs.next();
-        
-                                $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
-        
-                                //show the next fieldset
-                                next_fs.show();
-                                //hide the current fieldset with style
-                                current_fs.animate({ opacity: 0 }, {
-                                    step: function(now, mx) {
-                                        //as the opacity of current_fs reduces to 0 - stored in "now"
-                                        //1. scale current_fs down to 80%
-                                        scale = 1 - (1 - now) * 0.2;
-                                        //2. bring next_fs from the right(50%)
-                                        left = (now * 50) + "%";
-                                        //3. increase opacity of next_fs to 1 as it moves in
-                                        opacity = 1 - now;
-                                        current_fs.css({
-                                            'transform': 'scale(' + scale + ')',
-        
-                                        });
-                                        next_fs.css({ 'left': left, 'opacity': opacity });
-                                    },
-                                    duration: 800,
-                                    complete: function() {
-                                        current_fs.hide();
-                                        animating = false;
-                                    },
-                                    //this comes from the custom easing plugin
-                                    easing: 'easeInOutBack'
-                                });
-        
+                                nextToShipment();
                             }
                         }
                     });
-        
+
                 }
             }
         });
 
     });
+
+
     $(document).on('click', '.infobtn', function() {
         var stock_id = $(this).attr('item-id');
         ITEM.getInfo(stock_id);
@@ -770,7 +769,7 @@ function changeBillingInputState(state) {
 function checkAddressForm() {
     var state = false;
     var someEmpty = $('#orderForm input').filter(function() {
-        return $.trim(this.value).length === 0;
+        return ($.trim(this.value).length === 0 && $(this).parent().parent().parent().is(':visible'));
     }).length > 0;
     return someEmpty;
 
@@ -791,6 +790,46 @@ function getParameterByName(name, url) {
 
 //jQuery time
 //flag to prevent quick multi-click glitches
+function nextToShipment() {
+    animating = false;
+    if (animating) return false;
+
+    animating = true;
+
+    current_fs = $("#payment_field");
+
+    next_fs = current_fs.next();
+
+    $("#progressbar li").eq($("fieldset").index(next_fs)).addClass("active");
+
+    //show the next fieldset
+    next_fs.show();
+    //hide the current fieldset with style
+    current_fs.animate({ opacity: 0 }, {
+        step: function(now, mx) {
+            //as the opacity of current_fs reduces to 0 - stored in "now"
+            //1. scale current_fs down to 80%
+            scale = 1 - (1 - now) * 0.2;
+            //2. bring next_fs from the right(50%)
+            left = (now * 50) + "%";
+            //3. increase opacity of next_fs to 1 as it moves in
+            opacity = 1 - now;
+            current_fs.css({
+                'transform': 'scale(' + scale + ')',
+
+            });
+            next_fs.css({ 'left': left, 'opacity': opacity });
+        },
+        duration: 800,
+        complete: function() {
+            current_fs.hide();
+            animating = false;
+        },
+        //this comes from the custom easing plugin
+        easing: 'easeInOutBack'
+    });
+
+}
 
 function nextToPayment() {
     animating = false;

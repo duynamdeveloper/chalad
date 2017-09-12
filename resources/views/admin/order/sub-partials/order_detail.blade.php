@@ -71,11 +71,12 @@
                 <!--Billing Address-->
                 <div id="different_billing_address_div" class="col-md-6">
                     <div class="form-title">
-                        <h4 class="text-info text-left" style="font-weight: bold;">Billing Address</h4><span class="text-info" style="font-size: 18px;"><input type="checkbox" name="billing_address_the_same_as_shipping_address" id="cbxBillingEqualShipping"> Different Billing Address?</span>
+                        <h4 class="text-info text-left" style="font-weight: bold;">Billing Address</h4><span class="text-info" style="font-size: 18px;"><input type="checkbox" name="billing_address_the_same_as_shipping_address" id="cbxBillingEqualShipping" @if($order->different_billing_address == 1) checked @endif > Different Billing Address?</span>
 
 
                     </div>
-                    <div @if($order->different_billing_address==0) hidden @endif id="billing_form">
+                    <div id="billing_form" @if($order->different_billing_address == 0) hidden @endif >
+                
                         <div class="form-group">
                             <label class="col-sm-4 control-label " for="inputEmail3">{{ trans('message.invoice.name') }}</label>
                             <div class="col-sm-8">
@@ -250,7 +251,7 @@
                 <tr class="static_rows">
                     <td colspan="5"><strong>Grand Total</strong></td>
                     <td>
-                        <input class="form-control" id="grand_total" type="number" name="grand_total" value="0">
+                        <input class="form-control" id="grand_total" type="number" name="grand_total" value="{{$order->total}}">
                     </td>
                 </tr>
                 </tfoot>

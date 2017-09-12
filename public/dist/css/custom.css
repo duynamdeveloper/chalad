@@ -435,51 +435,61 @@ color:#3C8DBC;
     margin-right: 20px;
     font-size: 18px;
 }
-#state-btn-group li a{
+
+#state-btn-group li a {
     height: 30px;
     font-size: 15px;
     border-radius: 0px;
 }
-#livesearch{
+
+#livesearch {
     position: absolute;
     z-index: 9999;
     background-color: #fff;
     width: 245px;
 }
-#livesearch ul{
+
+#livesearch ul {
     list-style: none;
     font-weight: bold;
     padding-left: 0px;
     border: 1px solid #3c8dbc;
     border-top: none;
     z-index: 1000;
-
 }
-#livesearch li{
+
+#livesearch li {
     display: table;
     vertical-align: middle;
     padding: 10px;
     width: 100%;
     cursor: pointer;
 }
-#livesearch li:hover{
+
+#livesearch li:hover {
     background-color: #e1e1e1;
 }
-#livesearch ul li span{
+
+#livesearch ul li span {
     display: table-cell;
     height: 100%;
     margin-top: 18px;
     font-size: 14px;
 }
-#livesearch ul li img{
+
+#livesearch ul li img {
     display: table-cell;
     width: 60px;
     height: 60px;
 }
-.text-bold{
+
+.text-bold {
     font-weight: bold;
 }
+
+
 /*progressbar*/
+
 #progressbar {
     margin-top: 10px;
     margin-bottom: 0px;
@@ -488,15 +498,17 @@ color:#3C8DBC;
     counter-reset: step;
     text-align: center;
 }
+
 #progressbar li {
     list-style-type: none;
-    color:#31708F;
+    color: #31708F;
     text-transform: uppercase;
     font-size: 12px;
     width: 33.33%;
     float: left;
     position: relative;
 }
+
 #progressbar li:before {
     content: counter(step);
     counter-increment: step;
@@ -509,7 +521,10 @@ color:#3C8DBC;
     border-radius: 3px;
     margin: 0 auto 5px auto;
 }
+
+
 /*progressbar connectors*/
+
 #progressbar li:after {
     content: '';
     width: 100%;
@@ -518,32 +533,47 @@ color:#3C8DBC;
     position: absolute;
     left: -50%;
     top: 9px;
-    z-index: -1; /*put it behind the numbers*/
+    z-index: -1;
+    /*put it behind the numbers*/
 }
+
 #progressbar li:first-child:after {
     /*connector not needed before the first step*/
     content: none;
 }
+
+
 /*marking active/completed steps green*/
+
+
 /*The number of the step and the connector before it = green*/
-#progressbar li.active:before, #progressbar li.active:after {
+
+#progressbar li.active:before,
+#progressbar li.active:after {
     background: #27AE60;
     color: white;
 }
-.progressbar-container{
+
+.progressbar-container {
     z-index: 0;
     height: 100px;
     padding: 20px 20px;
 }
 
 .field-list fieldset {
-
     height: 100%;
     width: 100%;
     /*stacking fieldsets above each other*/
     position: relative;
 }
+
+
 /*Hide all except first fieldset*/
+
 .field-list fieldset:not(:first-of-type) {
     display: none;
+}
+
+.toggleOrderSummary {
+    cursor: pointer;
 }

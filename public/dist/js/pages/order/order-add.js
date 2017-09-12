@@ -1,4 +1,3 @@
-
 /* Bootbox Script */
 
 
@@ -15,16 +14,17 @@ ORDER = {
         getShippingCost: SITE_URL + '/order/shipping-cost',
         save: SITE_URL + '/order/save',
         view: SITE_URL + '/order/view-order-details/',
+        edit: SITE_URL + '/order/edit/'
     }
 };
 
-ORDER.updateStatistic = function () {
+ORDER.updateStatistic = function() {
     ORDER.updateShippingCost();
     var amounts = $("input[name=amount]");
     var sub_total = 0;
     var total = 0;
     var grand_total = 0;
-    $.each(amounts, function (i, amount) {
+    $.each(amounts, function(i, amount) {
         sub_total += parseFloat($(amount).val());
     });
     $("#subTotal").html(parseInt(sub_total));
@@ -46,13 +46,13 @@ ORDER.updateStatistic = function () {
 
 };
 
-ORDER.updateShippingCost = function () {
+ORDER.updateShippingCost = function() {
     var weight = ITEM.calculateTotalWeight();
     var shipping_method = $("#sel_shipping_method").val();
     ORDER.getShippingCost(shipping_method, weight);
 };
 
-ORDER.updateAmount = function (item_id) {
+ORDER.updateAmount = function(item_id) {
     var row = $("#product_table > tbody").find('tr[item-id="' + item_id + '"]');
     var qty = row.find("input[name=quantity]").val();
     var price = row.find("input.inp_price").val();
@@ -68,7 +68,7 @@ ORDER.updateAmount = function (item_id) {
     row.find("input[name=amount]").val(amount);
 };
 
-ORDER.getShippingCost = function (shipping_method, weight) {
+ORDER.getShippingCost = function(shipping_method, weight) {
     $.ajax({
         url: ORDER.API.getShippingCost,
         type: 'get',
@@ -76,17 +76,17 @@ ORDER.getShippingCost = function (shipping_method, weight) {
             'weight': weight,
             'shipping_method': shipping_method
         },
-        success: function (data) {
+        success: function(data) {
             $("#shipping_cost").val(data.cost);
         }
 
     });
 };
-ORDER.getFormData = function () {
+ORDER.getFormData = function() {
     // var formData = $("form").serializeArray();
     var itemArray = [];
     var rows = $("#product_table > tbody").find("tr.item-row");
-    $.each(rows, function (i, row) {
+    $.each(rows, function(i, row) {
         var item = {};
         item = {
             item_id: $(row).attr('item-id'),
@@ -101,11 +101,11 @@ ORDER.getFormData = function () {
 
 };
 
-ORDER.save = function () {
-    
+ORDER.save = function() {
+
     var dialog = bootbox.dialog({
         title: 'Sending data',
-        message: '<img src="'+SITE_URL+'/public/img/loader.gif" class="text-center">'
+        message: '<img src="' + SITE_URL + '/public/img/loader.gif" class="text-center">'
     });
     var customer = CUSTOMER.getFormData();
     var items = ORDER.getFormData();
@@ -113,6 +113,7 @@ ORDER.save = function () {
     customer = JSON.stringify(customer);
     var shipping_cost = $("#shipping_cost").val();
     var discount_amount = $("#discount_amount").val();
+    var shipping_method = $("#shipping_method").val();
     var item_tax = $("#sel_tax").val();
     var total_fee = $("#grand_total").val();
     console.log(item_tax);
@@ -123,17 +124,18 @@ ORDER.save = function () {
             'items': items,
             'customer': customer,
             'shipping_cost': shipping_cost,
+            'shipping_method': shipping_method,
             'discount_amount': discount_amount,
-            'item_tax':item_tax,
+            'item_tax': item_tax,
             'total_fee': total_fee
         },
-        success: function (data) {
-            dialog.init(function(){
+        success: function(data) {
+            dialog.init(function() {
                 dialog.find('.modal-title').html('<h4 class="text-success">Success!</h4>');
                 dialog.find('.bootbox-body').html('<span class="text-center text-success" style="font-size:18px">Create Order Successfully</span><br><span style="font-size:16px">Redirecting...</span>');
-                window.setTimeout(function(){
-                    window.location.href = ORDER.API.view+data.order_no;
-                }, 3000);
+                window.setTimeout(function() {
+                    window.location.href = ORDER.API.edit + data.order_no;
+                }, 1500);
             });
         }
     });
@@ -154,7 +156,7 @@ ITEM = {
     }
 };
 
-ITEM.get = function (stock_id) {
+ITEM.get = function(stock_id) {
 
     $.ajax({
         url: ITEM.API.get,
@@ -162,19 +164,19 @@ ITEM.get = function (stock_id) {
         data: {
             'stock_id': stock_id
         },
-        success: function (data) {
+        success: function(data) {
             if (data.state) {
                 ITEM.writeToTable(data.item);
             }
             return false;
         },
-        complete: function () {
+        complete: function() {
 
         }
     });
 };
 
-ITEM.writeToTable = function (item) {
+ITEM.writeToTable = function(item) {
     var tbody = $("#product_table > tbody");
     var tr = $("<tr>").addClass("item-row").attr("item-id", item.stock_id);
     $("<td>").html(item.description).appendTo(tr);
@@ -189,10 +191,10 @@ ITEM.writeToTable = function (item) {
     ORDER.updateStatistic();
 };
 
-ITEM.calculateTotalWeight = function () {
+ITEM.calculateTotalWeight = function() {
     var rows = $("#product_table >tbody").find("tr.item-row");
     var total_weight = 0;
-    $.each(rows, function (i, row) {
+    $.each(rows, function(i, row) {
         var qty = $(row).find("input[name=quantity]").val();
         var weight = $(row).find("input[name=item_weight]").val();
         total_weight += parseInt(qty) * parseInt(weight);
@@ -200,14 +202,14 @@ ITEM.calculateTotalWeight = function () {
     return total_weight;
 };
 
-CUSTOMER.get = function (debtor_no) {
+CUSTOMER.get = function(debtor_no) {
     $.ajax({
         url: CUSTOMER.API.get,
         type: 'get',
         data: {
             'debtor_no': debtor_no,
         },
-        success: function (data) {
+        success: function(data) {
             if (data.state) {
                 CUSTOMER.writeToForm(data.customer);
             } else {
@@ -217,7 +219,7 @@ CUSTOMER.get = function (debtor_no) {
         }
     });
 };
-CUSTOMER.writeToForm = function (customer) {
+CUSTOMER.writeToForm = function(customer) {
     $("#inp_customer_name").val(customer.name);
     $("#inp_customer_phone").val(customer.phone);
     $("#inp_customer_email").val(customer.email);
@@ -225,12 +227,12 @@ CUSTOMER.writeToForm = function (customer) {
     $("#sel_channel_id").val(customer.channel_id);
     $(".customer-form").prop('disabled', true);
 };
-CUSTOMER.getFormData = function(){
+CUSTOMER.getFormData = function() {
     var customer = {
-        id : $("#sel_customer").val(),
-        name :$("#inp_customer_name").val(),
-        phone:$("#inp_customer_phone").val(),
-        email:$("#inp_customer_email").val(),
+        id: $("#sel_customer").val(),
+        name: $("#inp_customer_name").val(),
+        phone: $("#inp_customer_phone").val(),
+        email: $("#inp_customer_email").val(),
         channel_name: $("#inp_customer_channel").val(),
         channel_id: $("#sel_channel_id").val(),
     };
@@ -240,15 +242,15 @@ CUSTOMER.getFormData = function(){
 
 
 /* Action on events */
-$(document).ready(function () {
+$(document).ready(function() {
     $("form")[0].reset();
 
-    $("#sel_customer").change(function () {
+    $("#sel_customer").change(function() {
         var debtor_no = $(this).val();
         CUSTOMER.get(debtor_no);
     });
 
-    $("#sel_product").change(function () {
+    $("#sel_product").change(function() {
         var stock_id = $(this).val();
         $('#sel_product option[value="' + stock_id + '"]').remove();
         ITEM.get(stock_id);
@@ -257,31 +259,31 @@ $(document).ready(function () {
     });
 
 
-    $(document).on('keyup', '.inp_qty', function () {
+    $(document).on('keyup', '.inp_qty', function() {
         var item_id = $(this).closest('tr').attr('item-id');
         ORDER.updateAmount(item_id);
         ORDER.updateStatistic();
     });
 
-    $(document).on('keyup', '.inp_price', function () {
+    $(document).on('keyup', '.inp_price', function() {
         var item_id = $(this).closest('tr').attr('item-id');
         ORDER.updateAmount(item_id);
         ORDER.updateStatistic();
     });
 
-    $(document).on('keyup', '#discount_amount', function () {
+    $(document).on('keyup', '#discount_amount', function() {
         ORDER.updateStatistic();
     });
 
-    $(document).on('change', '#sel_shipping_method', function () {
+    $(document).on('change', '#sel_shipping_method', function() {
         ORDER.updateStatistic();
     });
 
-    $("#sel_tax").change(function () {
+    $("#sel_tax").change(function() {
         ORDER.updateStatistic();
     });
 
-    $(document).on('click', '.removebtn', function () {
+    $(document).on('click', '.removebtn', function() {
         var stock_id = $(this).attr('item-id');
 
         var stock_name = $(this).closest('tr').find('td:first').html();
@@ -291,8 +293,7 @@ $(document).ready(function () {
         ORDER.updateStatistic();
     });
 
-    $(document).on('click', '#submitBtn', function () {
+    $(document).on('click', '#submitBtn', function() {
         ORDER.save();
     });
 });
-

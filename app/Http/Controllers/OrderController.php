@@ -21,12 +21,31 @@ class OrderController extends Controller
     {
         $data['menu'] = 'sales';
         $data['sub_menu'] = 'order/list';
-        $data['orders'] = Order::all();
+        $orders = Order::with(['details','payments','shipments','customer'])->get();
+        $data['pending_orders'] = array();
+        $data['ready_to_ship_orders'] = array();
+        $data['shipped_orders'] = array();
+        $data['completed_orders'] = array();
+        $data['cancelled_orders'] = array();
+        foreach($orders as $order){
+            if($order->state_name == "Cancelled"){
+                array_push($data['cancelled_orders'],$order);
+            }else if($order->state_name == "Ready to ship"){
+                array_push($data['ready_to_ship_orders'],$order);
+            }else if($order->state_name == "Shipped"){
+                array_push($data['shipped_orders'],$order);
+            }else if($order->state_name == "Completed"){
+                array_push($data['complete_orders'],$order);
+            }else{
+                array_push($data['pending_orders'],$order);
+            }
+        }
         //$shipment = Shipment::where('order_no',10)->where('tracking_number',null)->get();
         //return response()->json($data['salesData']);
         //die;
         //var_dump($shipment->isEmpty());
-        return view('admin.salesOrder.orderList', $data);
+        //var_dump($data['ready_to_ship_orders']);
+        return view('admin.order.order_list', $data);
     }
     public function create()
     {
@@ -43,7 +62,21 @@ class OrderController extends Controller
         $order_no = $request->order_no;
         $order = Order::find($order_no);
         if(!is_null($order)){
-            return response()->json(['state'=>true,'order'=>$order]);
+            $data['order'] = Order::where('order_no', $order_no)->with(['details','payments','shipments','customer'])->first();
+            $data['menu'] = 'sales';
+            $data['sub_menu'] = 'order/list';
+            $data['countries'] = DB::table('countries')->get();
+            $data['items'] = Item::all();
+            $data['tax_types'] = DB::table('item_tax_types')->get();
+            $order_detail_view = View::make('admin.order.sub-partials.order_detail',$data);
+            $order_summary_view = View::make('admin.order.sub-partials.order_summary', $data);
+            $ship_bill_payment_view = View::make('admin.order.sub-partials.ship_bill_payment',$data);
+            $ship_bill_shipment_view = View::make('admin.order.sub-partials.ship_bill_shipment',$data);
+            $order_summary_content = $order_summary_view->render();
+            $ship_bill_payment_content = $ship_bill_payment_view->render();
+            $ship_bill_shipment_content = $ship_bill_shipment_view->render();
+            $content = $order_detail_view->render();
+            return response()->json(['state'=>true,'order'=>$order,'order_detail'=>$content,'order_summary'=>$order_summary_content,'ship_bill_payment'=>$ship_bill_payment_content,'ship_bill_shipment'=>$ship_bill_shipment_content]);
         }
         return response()->json(['state'=>false]);
     }
@@ -96,6 +129,7 @@ class OrderController extends Controller
         $order->item_tax = $item_tax;
         $order->shipping_cost = $shipping_cost;
         $order->discount_amount = $discount_amount;
+        $order->shipping_method = $request->shipping_method;
         $order->trans_type = SALESORDER;
 
         $order->save();
@@ -145,7 +179,7 @@ class OrderController extends Controller
         $order->shipping_state = $address->shipping_state;
         $order->shipping_zip_code = $address->shipping_zip_code;
         $order->shipping_country_id = $address->shipping_country_id;
-
+        $order->different_billing_address = $address->different_billing_address;
         if($address->different_billing_address){
             $order->billing_name = $address->billing_name;
             $order->billing_street = $address->billing_street;
