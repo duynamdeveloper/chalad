@@ -31,9 +31,9 @@
 	  <li>
         <a href='#shipped_tab' data-toggle="tab">Shipped ({!! count($shipped_orders) !!})</a>
       </li>
-	  <li>
+	  <!--<li>
         <a href='#completed_tab' data-toggle="tab">Complete ({!! count($completed_orders) !!})</a>
-      </li>
+      </li>-->
 	  <li>
         <a href='#cancelled_tab' data-toggle="tab">Cancelled ({!! count($cancelled_orders) !!})</a>
       </li>
@@ -45,19 +45,19 @@
     </ul>
     <div class="tab-content">
   <div id="pending_tab" class="tab-pane fade in active">
-    @include('admin.order.sub-partials.order_list_table',['orders'=>$pending_orders])
+    @include('admin.order.sub-partials.order_list_table')
   </div>
   <div id="ready_to_ship_tab" class="tab-pane fade">
-    @include('admin.order.sub-partials.order_list_table',['orders'=>$ready_to_ship_orders])
+    @include('admin.order.sub-partials.readytoship_list_table')
   </div>
   <div id="shipped_tab" class="tab-pane fade">
-     @include('admin.order.sub-partials.order_list_table',['orders'=>$shipped_orders])
+     @include('admin.order.sub-partials.shipped_list_table')
   </div>
   <div id="completed_tab" class="tab-pane fade">
-   @include('admin.order.sub-partials.order_list_table',['orders'=>$completed_orders])
+   @include('admin.order.sub-partials.completed_list_table')
   </div>
   <div id="cancelled_tab" class="tab-pane fade">
-     @include('admin.order.sub-partials.order_list_table',['orders'=>$cancelled_orders])
+     @include('admin.order.sub-partials.cancelled_list_table')
   </div>
 </div>
   </div>
@@ -74,8 +74,14 @@
 @endsection
 
 @section('js')
+<script src="{{asset('/public/plugins/bootstrap-table/bootstrap-table.js')}}"></script>
+<link rel="stylesheet" type="text/css" href="{{asset('/public/plugins/bootstrap-table/bootstrap-table.css')}}">
 <script type="text/javascript">
   $('.select2').select2({});
+  
+
+  
+  
   $('#from').datepicker({
     autoclose: true,
     todayHighlight: true,
@@ -91,5 +97,6 @@
   
 
 </script>
-<script src="{{asset('/dist/js/pages/order/order-list.js')}}"></script>
+<script src="{{asset('public/dist/js/pages/order/order-list.js')}}"></script>
+<script src="{{asset('/dist/js/pages/order/ready-to-ship-bstable-config.js')}}"></script>
 @endsection

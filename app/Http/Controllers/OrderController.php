@@ -80,6 +80,61 @@ class OrderController extends Controller
         }
         return response()->json(['state'=>false]);
     }
+    public function ajaxGetPendingOrders(){
+        $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',2)->get();
+       
+        return response()->json($orders);
+        
+       
+    }
+    public function ajaxGetCancelledOrders(){
+        $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',0)->get();
+       
+        return response()->json($orders);
+        
+       
+    }
+    public function ajaxGetReadyToShipOrders(){
+        $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',1)->get();
+        $response_orders = array();
+        foreach($orders as $order){
+            if($order->state_name=="Ready to ship"){
+                array_push($response_orders,$order);
+            }
+        }
+         return response()->json($response_orders);
+    }
+    public function ajaxGetCompletedOrders(){
+        $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',1)->get();
+        $response_orders = array();
+        foreach($orders as $order){
+            if($order->state_name=="Completed"){
+                array_push($response_orders,$order);
+            }
+        }
+         return response()->json($response_orders);
+    }
+    public function ajaxGetShippedOrders(){
+        $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',1)->get();
+        $response_orders = array();
+        foreach($orders as $order){
+            if($order->state_name=="Shipped"){
+                array_push($response_orders,$order);
+            }
+        }
+         return response()->json($response_orders);
+    }
+    public function ajaxGetOrderSummary(Request $request){
+        $order_no = $request->order_no;
+        $order = Order::find($order_no);
+        if(!is_null($order)){
+            $data['order'] = Order::where('order_no', $order_no)->with(['details','payments','shipments','customer'])->first();
+            $order_summary_view = View::make('admin.order.sub-partials.order_summary', $data);
+            $order_summary_content = $order_summary_view->render();
+            return response()->json(['state'=>true,'view'=>$order_summary_content]);
+        }
+        return response()->json(['state'=>false]);
+    }
     public function getShippingCost(Request $request)
     {
         $weight = $request->weight;

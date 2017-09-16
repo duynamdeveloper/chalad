@@ -169,6 +169,13 @@
 			Route::get('/add','OrderController@create');
 			Route::get('/shipping-cost','OrderController@getShippingCost');
 			Route::get('/list','OrderController@index');
+
+			Route::get('ajax/pending-order-list','OrderController@ajaxGetPendingOrders');
+			Route::get('ajax/get-order-summary','OrderController@ajaxGetOrderSummary');
+			Route::get('ajax/ready-ship-order-list','OrderController@ajaxGetReadyToShipOrders');
+			Route::get('ajax/cancelled-order-list','OrderController@ajaxGetCancelledOrders');
+			Route::get('ajax/completed-order-list','OrderController@ajaxGetCompletedOrders');
+			Route::get('ajax/shipped-order-list','OrderController@ajaxGetShippedOrders');
 			//Route::get('/add','SalesOrderController@create');
 			//Route::post('/save','SalesOrderController@store');
 			Route::get('/updateaddress','OrderController@updateAddress');
