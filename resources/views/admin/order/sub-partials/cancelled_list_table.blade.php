@@ -17,7 +17,7 @@
            data-url="{{url('order/ajax/cancelled-order-list')}}"
         >
       <thead>
-        <th data-field="state" data-checkbox="true" align="center" valign="middle"></th>
+        <th data-field="state" data-checkbox="true" data-align="center" data-valign="middle"></th>
          <th data-field="order_no" data-align="center" data-valign="middle" sortable="true" data-formatter="orderIdFormatter">Order No #</th>
          <th data-field="ord_date" data-align="right" data-valign="middle" sortable="true">Order Date</th>
          <th data-field="customer" data-align="left" data-valign="middle" sortable="true" data-formatter="customerNameFormatter">Customer</th>

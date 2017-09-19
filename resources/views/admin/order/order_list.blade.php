@@ -74,8 +74,8 @@
 @endsection
 
 @section('js')
-<script src="{{asset('/plugins/bootstrap-table/bootstrap-table.js')}}"></script>
-<link rel="stylesheet" type="text/css" href="{{asset('/plugins/bootstrap-table/bootstrap-table.css')}}">
+<script src="{{asset('public/plugins/bootstrap-table/bootstrap-table.js')}}"></script>
+<link rel="stylesheet" type="text/css" href="{{asset('public/plugins/bootstrap-table/bootstrap-table.css')}}">
 <script type="text/javascript">
   $('.select2').select2({});
   
@@ -97,6 +97,6 @@
   
 
 </script>
-<script src="{{asset('/dist/js/pages/order/order-list.js')}}"></script>
-<script src="{{asset('/dist/js/pages/order/ready-to-ship-bstable-config.js')}}"></script>
+<script src="{{asset('public/dist/js/pages/order/order-list.js')}}"></script>
+
 @endsection
