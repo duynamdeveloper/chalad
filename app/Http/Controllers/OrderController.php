@@ -54,7 +54,16 @@ class OrderController extends Controller
         $data['customers'] = Customer::all();
         $data['items'] = Item::all();
         $data['tax_types'] = DB::table('item_tax_types')->get();
-        // $orders = Order::with(['details','shipments'])->where('order_no',3)->first();
+        $order_count = DB::table('sales_orders')->where('trans_type', SALESORDER)->count();
+        
+            if ($order_count>0) {
+                $orderReference = DB::table('sales_orders')->where('trans_type', SALESORDER)->select('reference')->orderBy('order_no', 'DESC')->first();
+                $ref = explode("-", $orderReference->reference);
+                $data['order_count'] = (int) $ref[1];
+            } else {
+                $data['order_count'] = 0 ;
+            }
+      
 
         return view("admin.order.order_add", $data);
     }

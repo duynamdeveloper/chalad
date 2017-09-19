@@ -276,13 +276,13 @@ class Shipment extends Model
         if($tracking_number !== null){
 
             foreach($shipmentDetails as $detail){
-                DB::table('shipment_details')->where('id',$detail->id)->update(['packed_qty'=>0,'shipped_qty'=>$detail->packed_qty]);
+                DB::table('shipment_details')->where('id',$detail->id)->update(['status'=>1]);
 
             }
 
         }else{
             foreach($shipmentDetails as $detail){
-                DB::table('shipment_details')->where('id',$detail->id)->update(['packed_qty'=>$detail->shipped_qty,'shipped_qty'=>0]);
+                DB::table('shipment_details')->where('id',$detail->id)->update(['status'=>0]);
 
             }
         }

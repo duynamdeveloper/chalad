@@ -113,18 +113,18 @@ ORDER.save = function() {
     customer = JSON.stringify(customer);
     var shipping_cost = $("#shipping_cost").val();
     var discount_amount = $("#discount_amount").val();
-    var shipping_method = $("#shipping_method").val();
+    var shipping_method = $("#sel_shipping_method").val();
     var item_tax = $("#sel_tax").val();
     var total_fee = $("#grand_total").val();
-    console.log(item_tax);
+
     $.ajax({
         url: ORDER.API.save,
         type: 'post',
         data: {
             'items': items,
             'customer': customer,
-            'shipping_cost': shipping_cost,
             'shipping_method': shipping_method,
+            'shipping_cost': shipping_cost,
             'discount_amount': discount_amount,
             'item_tax': item_tax,
             'total_fee': total_fee

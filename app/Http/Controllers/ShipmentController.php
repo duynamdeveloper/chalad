@@ -572,63 +572,68 @@ class ShipmentController extends Controller
         $order_no = $request->order_no;
         //$order_no = 29;
         $order = Order::find($order_no);
-        $details = $order->details;
-        $shipment = Shipment::where('order_no', $order_no)->where('tracking_number', null)->first();
-        if (empty($shipment) && !empty($details)) {
-            $new_shipment = new Shipment();
-            $new_shipment->order_no = $order_no;
-            $new_shipment->trans_type =   DELIVERYORDER;
-            $new_shipment->save();
-            foreach ($details as $detail) {
-                $shipment_detail = new ShipmentDetail();
-                $item = Item::where('stock_id',$detail->stock_id)->first();
-
-                $shipment_detail->shipment_id = $new_shipment->id;
-                $shipment_detail->order_no = $order_no;
-                $shipment_detail->stock_id = $detail->stock_id;
-                $shipment_detail->unit_price = $detail->unit_price;
-                if($detail->pending_quantity > $item->stock_on_hand){
-                    $packed_qty = $item->stock_on_hand;
-                }else{
-                    $packed_qty = $detail->pending_quantity;
-                }
-                $shipment_detail->quantity = $packed_qty;
-                //var_dump($shipment_detail);
-                $shipment_detail->save();
-            }
-            $this->stock_move->updateStockMoveWithShipment($new_shipment->id);
-        } else {
-            foreach($details as $detail){
-                $shipmentDetail = ShipmentDetail::where('stock_id',$detail->stock_id)->where('shipment_id',$shipment->id)->first();
-                $item = Item::where('stock_id',$detail->stock_id)->first();
-                if($detail->pending_quantity>0){
-                    if(empty($shipmentDetail)){
-                        $shipmentDetail = new ShipmentDetail();
-                        $shipmentDetail->shipment_id = $shipment->id;
-                        $shipmentDetail->order_no = $order_no;
-                        $shipmentDetail->unit_price = $detail->unit_price;
-                        $shipmentDetail->stock_id = $detail->stock_id;
-                        if($detail->pending_quantity >= $item->stock_on_hand){
-                            $packed_qty = $item->stock_on_hand;
-                        }else{
-                            $packed_qty = $detail->pending_quantity;
-                        }
-                        $shipmentDetail->quantity = $packed_qty;
-                        $shipmentDetail->save();
+        if($order->pending_quantity>0){
+            $details = $order->details;
+            $shipment = Shipment::where('order_no', $order_no)->where('tracking_number', null)->first();
+            if (empty($shipment) && !empty($details)) {
+                $new_shipment = new Shipment();
+                $new_shipment->order_no = $order_no;
+                $new_shipment->trans_type =   DELIVERYORDER;
+                $new_shipment->save();
+                foreach ($details as $detail) {
+                    $shipment_detail = new ShipmentDetail();
+                    $item = Item::where('stock_id',$detail->stock_id)->first();
+    
+                    $shipment_detail->shipment_id = $new_shipment->id;
+                    $shipment_detail->order_no = $order_no;
+                    $shipment_detail->stock_id = $detail->stock_id;
+                    $shipment_detail->unit_price = $detail->unit_price;
+                    if($detail->pending_quantity > $item->stock_on_hand){
+                        $packed_qty = $item->stock_on_hand;
                     }else{
-                        if($detail->pending_quantity >= $item->stock_on_hand){
-                            $packed_qty = $item->stock_on_hand;
+                        $packed_qty = $detail->pending_quantity;
+                    }
+                    $shipment_detail->quantity = $packed_qty;
+                    //var_dump($shipment_detail);
+                    $shipment_detail->save();
+                }
+                $this->stock_move->updateStockMoveWithShipment($new_shipment->id);
+                return response()->json(['state'=>true]);
+            } else {
+                foreach($details as $detail){
+                    $shipmentDetail = ShipmentDetail::where('stock_id',$detail->stock_id)->where('shipment_id',$shipment->id)->first();
+                    $item = Item::where('stock_id',$detail->stock_id)->first();
+                    if($detail->pending_quantity>0){
+                        if(empty($shipmentDetail)){
+                            $shipmentDetail = new ShipmentDetail();
+                            $shipmentDetail->shipment_id = $shipment->id;
+                            $shipmentDetail->order_no = $order_no;
+                            $shipmentDetail->unit_price = $detail->unit_price;
+                            $shipmentDetail->stock_id = $detail->stock_id;
+                            if($detail->pending_quantity >= $item->stock_on_hand){
+                                $packed_qty = $item->stock_on_hand;
+                            }else{
+                                $packed_qty = $detail->pending_quantity;
+                            }
+                            $shipmentDetail->quantity = $packed_qty;
+                            $shipmentDetail->save();
                         }else{
-                            $packed_qty = $detail->pending_quantity;
+                            if($detail->pending_quantity >= $item->stock_on_hand){
+                                $packed_qty = $item->stock_on_hand;
+                            }else{
+                                $packed_qty = $detail->pending_quantity;
+                            }
+                            $shipmentDetail->quantity = $shipmentDetail->quantity + $packed_qty;
+                            $shipmentDetail->update();
                         }
-                        $shipmentDetail->quantity = $shipmentDetail->quantity + $packed_qty;
-                        $shipmentDetail->update();
                     }
                 }
+                $this->stock_move->updateStockMoveWithShipment($shipment->id);
+                return response()->json(['state'=>true]);
             }
-            $this->stock_move->updateStockMoveWithShipment($shipment->id);
         }
-        return response()->json(['state'=>true]);
+ 
+        return response()->json(['state'=>false]);
     }
     public function validateAdditionalPackingQuantity(Request $request)
     {

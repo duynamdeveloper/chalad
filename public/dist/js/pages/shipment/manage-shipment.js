@@ -127,6 +127,7 @@ SHIPMENT.automatic_allocate = function(order_no) {
             // console.log(data);
             SHIPMENT.get(order_no);
             SHIPMENT.notify("Automatic allocate success!");
+            ORDER.getStatus();
         }
     });
 }
@@ -144,6 +145,7 @@ SHIPMENT.edit_shipment = function(shipment_id) {
         success: function(data) {
             SHIPMENT.get(order_no);
             SHIPMENT.notify("Update success!");
+            ORDER.getStatus();
         }
     });
 }

@@ -105,6 +105,7 @@ ORDER.getStatus = function() {
             if (received.state) {
 
                 $("#ship_bill_payment").html(received.ship_bill_payment);
+                $("#ship_bill_shipment").html(received.ship_bill_shipment);
                 $("#order_state_label").html(received.order.label_state);
                 $("#order_qty_span").html(received.order.order_quantity);
                 $("#ready_ship_span").html(received.order.ready_to_ship_quantity);

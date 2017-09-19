@@ -12,6 +12,9 @@
 			<th class="sorting">Items #</th>
  <th class="sorting">{{ trans('message.table.total') }}</th>
  <th class="sorting">Channel</th>
+ 
+ <th class="sorting">Ship Ready #</th>
+ <th class="sorting">Ship Pending #</th>
            
 
             
@@ -33,7 +36,11 @@
 <td>{{$order->order_quantity}}</td>
 <td>{{$order->total }}</td>
 <td>{{$order->customer->channel_name}}</td>
-            <td>
+            <td>{{
+              $order->ready_to_ship_quantity
+            }}</td>
+<td>{{$order->pending_quantity}}</td>			
+			<td>
               {!! $order->label_state !!}
             </td>
            
