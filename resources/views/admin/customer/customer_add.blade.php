@@ -14,7 +14,7 @@
     </div> 
         
         <div class="box">
-                <!-- form start -->
+                <!-- form start --> 
                       <form action="{{ url('save-customer') }}" method="post" id="customerAdd" class="form-horizontal">
                       
                       <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">

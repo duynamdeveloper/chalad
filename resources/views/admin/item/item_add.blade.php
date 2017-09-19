@@ -16,22 +16,32 @@
           <!-- Custom Tabs -->
           <div class="nav-tabs-custom" id="tabs">
             <ul class="nav nav-tabs">
-              <li class="<?= ($tab=='item') ? 'active' :'disabled disabledTab' ?>"><a href="#tab_1" data-toggle="tab" aria-expanded="false">{{ trans('message.table.general_settings') }}</a></li>
-              <li class="<?= ($tab=='sale') ? 'active' :'disabled disabledTab' ?>"><a href="#tab_2" data-toggle="tab" aria-expanded="false">{{ trans('message.table.sales_pricing') }}</a></li>
-              <li class="<?= ($tab=='purchase') ? 'active' :'disabled disabledTab' ?>"><a href="#tab_3" data-toggle="tab" aria-expanded="true">{{ trans('message.table.purchase_pricing') }}</a></li>
+              <li class="<?= ($tab=='details') ? 'active' :'disabled disabledTab' ?>"><a href="#tab_1" data-toggle="tab" aria-expanded="false">Details</a></li>
+              <li class="<?= ($tab=='specification') ? 'active' :'disabled disabledTab' ?>"><a href="#tab_2" data-toggle="tab" aria-expanded="false">Specifications</a></li>
+              <li class="<?= ($tab=='transaction') ? 'active' :'disabled disabledTab' ?>"><a href="#tab_3" data-toggle="tab" aria-expanded="true">Transactions</a></li>
             </ul>
             <div class="tab-content">
-              <div class="tab-pane <?= ($tab=='item') ? 'active' :'' ?>" id="tab_1">
+              <div class="tab-pane <?= ($tab=='details') ? 'active' :'' ?>" id="tab_1">
                 <div class="row">
                 <div class="col-md-6">
                   <h4 class="text-info text-center">{{ trans('message.table.item_info') }}</h4>
                 <form action="{{ url('save-item') }}" method="post" id="itemAddForm" class="form-horizontal" enctype="multipart/form-data">
                   <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
                   <div class="box-body">
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.item_id') }}</label>
+                  <div class="form-group">
+                      <label class="col-sm-3 control-label require" for="inputEmail3">Type</label>
                       <div class="col-sm-9">
-                        <input type="text" placeholder="{{ trans('message.form.item_id') }}" class="form-control" name="stock_id" value="{{old('stock_id')}}">
+                        <select class="form-control" name="item_type">
+                        @foreach($item_types as $item_type)
+                          <option value="{{$item_type->id}}">{{$item_type->type_name}}</option>
+                        @endforeach
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-sm-3 control-label require" for="inputEmail3">Product Code</label>
+                      <div class="col-sm-9">
+                        <input type="text" placeholder="{{ trans('message.form.item_id') }}" class="form-control" name="stock_id" value="{{old('stock_id')}}" required>
                       </div>
                     </div>
 
@@ -39,7 +49,7 @@
                       <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.item_name') }}</label>
 
                       <div class="col-sm-9">
-                        <input type="text" placeholder="{{ trans('message.form.item_name') }}" class="form-control valdation_check" name="description" value="{{old('description')}}">
+                        <input type="text" placeholder="{{ trans('message.form.item_name') }}" class="form-control valdation_check" name="description" value="{{old('description')}}" required>
                       </div>
                     </div>
 
@@ -55,28 +65,7 @@
                       </div>
                     </div>
 
-                      <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.unit') }}</label>
-                      <div class="col-sm-9">
-                        <select class="form-control" name="units" id="unit">
-                        @foreach ($unitData as $data)
-                          <option value="{{$data->name}}">{{$data->name}}</option>
-                        @endforeach
-                        </select>
-                      </div>
-                    </div>
-                    
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label" for="inputEmail3">{{ trans('message.form.item_tax_type') }}</label>
-                      <div class="col-sm-9">
-                        <select class="form-control select2" name="tax_type_id">
-                       
-                        @foreach ($taxTypes as $taxType)
-                          <option value="{{$taxType->id}}" >{{$taxType->name}}</option>
-                        @endforeach
-                        </select>
-                      </div>
-                    </div>
+            
 
                    <!-- <div class="form-group">
                       <label class="col-sm-3 control-label" for="inputEmail3">{{ trans('message.form.item_des') }}</label>
@@ -87,30 +76,58 @@
                     
 
                     <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.weight') }}</label>
+                      <label class="col-sm-3 control-label require" for="inputEmail3">Price</label>
                       <div class="col-sm-9">
-                        <input type="text" placeholder="{{ trans('message.form.weight') }}" class="form-control" name="weight" value="{{old('weight')}}">
+                        <input type="text" placeholder="{{ trans('message.form.weight') }}" class="form-control" name="price" value="{{old('price')}}" required>
                       </div>
                     </div>
                     
                     <div class="form-group">
                       <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.special_price') }}</label>
                       <div class="col-sm-9">
-                        <input type="text" placeholder="{{ trans('message.form.special_price') }}" class="form-control" name="special_price" value="{{old('special_price')}}">
+                        <input type="text" placeholder="{{ trans('message.form.special_price') }}" class="form-control" name="special_price" value="{{old('special_price')}}" required>
                       </div>
                     </div>
+             
+                         
                     <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.qty_per_pack') }}</label>
+                      <label class="col-sm-3 control-label require" for="inputEmail3">Weight</label>
+
                       <div class="col-sm-9">
-                        <input type="text" placeholder="{{ trans('message.form.qty_per_pack') }}" class="form-control" name="qty_per_pack" value="{{old('qty_per_pack')}}">
+                        <input type="text" placeholder="weight" class="form-control" name="weight" value="{{old('weight')}}">
+                      
                       </div>
                     </div>
 
+                      <div class="form-group">
+                      <label class="col-sm-3 control-label require" for="inputEmail3">Pieces/Pack</label>
 
+                      <div class="col-sm-9">
+                        <input type="text" placeholder="Pieces/Pack" class="form-control" name="qty_per_pack" value="{{old('qty_per_pack')}}">
+                      
+                      </div>
+                    </div>
+                      <div class="form-group">
+                      <label class="col-sm-3 control-label require" for="inputEmail3">Cost Price</label>
+
+                      <div class="col-sm-9">
+                        <input type="text" placeholder="Cost Price" class="form-control" name="cost_price" value="{{old('cost_price')}}">
+                        <span id="price" style="color: red"></span>
+                      </div>
+                    </div>
                     <div class="form-group">
                       <label class="col-sm-3 control-label" for="inputEmail3">{{ trans('message.form.picture') }}</label>
                       <div class="col-sm-9">
                         <input type="file" class="form-control input-file-field" name="item_image">
+                      </div>
+                    </div>
+                     <div class="form-group">
+                      <label class="col-sm-3 control-label" for="inputEmail3">Status</label>
+                      <div class="col-sm-9">
+                        <select class="form-control" name="status">
+                          <option value="0">Active</option>
+                           <option value="1">Inactive</option>
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -125,40 +142,44 @@
               </div>
               </div>
               <!-- /.tab-pane -->
-              <div class="tab-pane <?= ($tab=='sale') ? 'active' :'' ?>" id="tab_2">
+              <div class="tab-pane <?= ($tab=='specification') ? 'active' :'' ?>" id="tab_2">
 
                 <div class="row">
                 <div class="col-md-6">
-                  <h4 class="text-info text-center">Sales Price Information</h4>
+                  <h4 class="text-info text-center">Specifications</h4>
                 <form action="{{ url('save-sale-price') }}" method="post" id="salesInfoForm" class="form-horizontal">
                   <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
                   <input type="hidden" value="<?= isset($stock_id) ? $stock_id : ''?>" name="stock_id" id="stock_id">
                   <input type="hidden" value="USD" name="curr_abrev" id="curr_abrev">
                   <div class="box-body">
                 
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.sales_type') }}</label>
-
-                      <div class="col-sm-9">
-                        <select class="form-control select2" name="sales_type_id">
-                        <option value="">{{ trans('message.form.select_one') }}</option>
-                        @foreach ($saleTypes as $saleType)
-                          <option value="{{$saleType->id}}" >{{$saleType->sales_type}}</option>
-                        @endforeach
-                        </select>
-                        
-                      </div>
-                    </div>
+                   
                     
                     <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.price') }}</label>
+                      <label class="col-sm-3 control-label require" for="inputEmail3">Weight</label>
 
                       <div class="col-sm-9">
-                        <input type="text" placeholder="{{ trans('message.form.price') }}" class="form-control valdation_check" id="price" name="price" value="{{old('price')}}">
+                        <input type="text" placeholder="weight" class="form-control" name="weight" value="{{old('weight')}}">
+                      
+                      </div>
+                    </div>
+
+                      <div class="form-group">
+                      <label class="col-sm-3 control-label require" for="inputEmail3">Pieces/Pack</label>
+
+                      <div class="col-sm-9">
+                        <input type="text" placeholder="Pieces/Pack" class="form-control" name="qty_per_pack" value="{{old('qty_per_pack')}}">
+                      
+                      </div>
+                    </div>
+                      <div class="form-group">
+                      <label class="col-sm-3 control-label require" for="inputEmail3">Cost Price</label>
+
+                      <div class="col-sm-9">
+                        <input type="text" placeholder="Cost Price" class="form-control" name="cost_price" value="{{old('cost_price')}}">
                         <span id="price" style="color: red"></span>
                       </div>
                     </div>
-
                   </div>
                   <!-- /.box-body -->
                   <div class="box-footer">
@@ -176,7 +197,7 @@
                 <div class="row">
                 <div class="col-md-6">
                   <h4 class="text-info text-center">Purchase Price Information</h4>
-                <form action="{{ url('save-purchase-price') }}" method="post" id="purchaseInfoForm" class="form-horizontal">
+                <form action="{{ url('save-specification') }}" method="post" id="purchaseInfoForm" class="form-horizontal">
                   <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
                   <input type="hidden" value="<?= isset($stock_id) ? $stock_id : ''?>" name="stock_id" id="stock_id">
                   

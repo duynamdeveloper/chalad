@@ -79,7 +79,7 @@ class ItemController extends Controller
         }
         
         $data['unit_name'] = $unit_name;
-
+        $data['item_types'] = DB::table('item_type')->get();
         $data['locData']      = DB::table('location')->get();
         $data['taxTypes']     = DB::table('item_tax_types')->get();
         $data['saleTypes']    = DB::table('sales_types')->get();
@@ -107,9 +107,9 @@ class ItemController extends Controller
     {
         $this->validate($request, [
             'stock_id' => 'required|unique:item_code,stock_id',
-            'description' => 'required',
-            'tax_type_id' => 'required',
-            'units' => 'required',
+            'description'=>'required',
+           
+            
             'weight' => 'required',
             'special_price' => 'required',
             'qty_per_pack' => 'required',
@@ -117,13 +117,17 @@ class ItemController extends Controller
         ]);
 
         $data['stock_id'] = strtoupper($request->stock_id);
+        $data['item_type_id'] = $request->item_type;
         $data['description'] = strtoupper($request->description);
         $data['category_id'] = $request->category_id;
         $data['created_at'] = date('Y-m-d H:i:s');
-        $data['weight'] = strtoupper($request->weight);
+     
         $data['special_price'] = strtoupper($request->special_price);
-        $data['qty_per_pack'] = strtoupper($request->qty_per_pack);
-
+        $data['price'] = strtoupper($request->price);
+        $data['inactive'] = $request->status;
+        $data['cost_price'] = $request->cost_price;
+        $data['weight'] = $request->weight;
+        $data['qty_per_pack'] = $request->qty_per_pack;
 
         $pic = $request->file('item_image');
 
@@ -142,36 +146,36 @@ class ItemController extends Controller
         $id = DB::table('item_code')->insertGetId($data);
 
         if (!empty($id)) {
-            Session::put('stock_id', strtoupper($request->stock_id));
+            // Session::put('stock_id', strtoupper($request->stock_id));
             
-            $data2['stock_id'] = strtoupper($request->stock_id);
-            $data2['description'] = $request->description;
-            $data2['long_description'] = $request->long_description;
-            $data2['units'] = $request->units;
-            $data2['tax_type_id'] = $request->tax_type_id;
-            $data2['category_id'] = $request->category_id;
-            $data2['created_at'] = date('Y-m-d H:i:s');
+            // $data2['stock_id'] = strtoupper($request->stock_id);
+            // $data2['description'] = $request->description;
+            // $data2['long_description'] = $request->long_description;
+            // $data2['units'] = $request->units;
+            // $data2['tax_type_id'] = $request->tax_type_id;
+            // $data2['category_id'] = $request->category_id;
+            // $data2['created_at'] = date('Y-m-d H:i:s');
 
-            DB::table('stock_master')->insert($data2);
+            // DB::table('stock_master')->insert($data2);
 
-            $data3[0]['stock_id'] = strtoupper($request->stock_id);
-            $data3[0]['sales_type_id'] = 1;
-            $data3[0]['price'] = 0;
-            $data3[0]['curr_abrev'] = 'USD';
+            // $data3[0]['stock_id'] = strtoupper($request->stock_id);
+            // $data3[0]['sales_type_id'] = 1;
+            // $data3[0]['price'] = 0;
+            // $data3[0]['curr_abrev'] = 'USD';
 
-            $data3[1]['stock_id'] = strtoupper($request->stock_id);
-            $data3[1]['sales_type_id'] = 2;
-            $data3[1]['price'] = 0;
-            $data3[1]['curr_abrev'] = 'USD';
+            // $data3[1]['stock_id'] = strtoupper($request->stock_id);
+            // $data3[1]['sales_type_id'] = 2;
+            // $data3[1]['price'] = 0;
+            // $data3[1]['curr_abrev'] = 'USD';
 
-            DB::table('sale_prices')->insert($data3);
+            // DB::table('sale_prices')->insert($data3);
 
-            $purchaseInfos['stock_id'] = strtoupper($request->stock_id);
-            $purchaseInfos['price'] = 0;
-            DB::table('purchase_prices')->insert($purchaseInfos);
+            // $purchaseInfos['stock_id'] = strtoupper($request->stock_id);
+            // $purchaseInfos['price'] = 0;
+            // DB::table('purchase_prices')->insert($purchaseInfos);
 
             //\Session::flash('success',trans('message.success.save_success'));
-            return redirect()->intended("edit-item/item-info/$id");
+            return redirect()->intended("item/add/specification");
 
         } else {
 

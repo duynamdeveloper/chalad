@@ -88,7 +88,39 @@ class CustomerController extends Controller
         }
     }
 	
-	
+	public function updateAddress(Request $request){
+        $customer_id = $request->debtor_no;
+        $address= $request->address;
+        $address = json_decode($address);
+        $customer = Customer::find($customer_id);
+        $customer->shipping_name= $address->shipping_name;
+        $customer->shipping_street = $address->shipping_street;
+        $customer->shipping_city= $address->shipping_city;
+        $customer->shipping_state = $address->shipping_state;
+        $customer->shipping_zip_code = $address->shipping_zip_code;
+        $customer->shipping_country_id = $address->shipping_country_id;
+        $customer->different_billing_address = $address->different_billing_address;
+        if($address->different_billing_address){
+            $customer->billing_name = $address->billing_name;
+            $customer->billing_street = $address->billing_street;
+            $customer->billing_city = $address->billing_city;
+            $customer->billing_state = $address->billing_state;
+            $customer->billing_zip_code = $address->billing_zip_code;
+            $customer->billing_country_id = $address->billing_country_id;
+            $customer->different_billing_address = 1;
+        }else{
+            $customer->billing_name= $address->shipping_name;
+            $customer->billing_street = $address->shipping_street;
+            $customer->billing_city= $address->shipping_city;
+            $customer->billing_state = $address->shipping_state;
+            $customer->billing_zip_code = $address->shipping_zip_code;
+            $customer->billing_country_id = $address->shipping_country_id;
+        }
+
+        $customer->contact_phone = $address->contact_phone;
+        $customer->update();
+        return response()->json($customer);
+    }
     /**
      * Display the specified Customer.
      *

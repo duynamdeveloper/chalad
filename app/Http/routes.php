@@ -104,6 +104,15 @@
 		Route::get('loc_code-valid','LocationController@validLocCode');
 
 		// Item
+		Route::group([
+			'as' => '.item',
+			'prefix'=>'item'
+		], function(){
+			Route::get('/','ItemController@index');
+			Route::get('/add/{tab}','ItemController@create');
+			Route::get('/save','ItemController@store');
+			Route::get('/save-specification','ItemController@saveSpecification');
+		});
 		Route::get('item','ItemController@index');
 		Route::get('create-item/{tab}','ItemController@create');
 		Route::post('save-item','ItemController@store');
@@ -169,6 +178,13 @@
 			Route::get('/add','OrderController@create');
 			Route::get('/shipping-cost','OrderController@getShippingCost');
 			Route::get('/list','OrderController@index');
+
+			Route::get('ajax/pending-order-list','OrderController@ajaxGetPendingOrders');
+			Route::get('ajax/get-order-summary','OrderController@ajaxGetOrderSummary');
+			Route::get('ajax/ready-ship-order-list','OrderController@ajaxGetReadyToShipOrders');
+			Route::get('ajax/cancelled-order-list','OrderController@ajaxGetCancelledOrders');
+			Route::get('ajax/completed-order-list','OrderController@ajaxGetCompletedOrders');
+			Route::get('ajax/shipped-order-list','OrderController@ajaxGetShippedOrders');
 			//Route::get('/add','SalesOrderController@create');
 			//Route::post('/save','SalesOrderController@store');
 			Route::get('/updateaddress','OrderController@updateAddress');
@@ -282,7 +298,7 @@
 			'prefix'   =>'customer',
 			'as'       =>'customer.'
 		], function(){
-
+	    Route::post('/updateaddress','CustomerController@updateAddress');
 		Route::get('/list','CustomerController@index');
 		Route::get('/create-customer','CustomerController@create');
 		Route::post('save-customer','CustomerController@store');

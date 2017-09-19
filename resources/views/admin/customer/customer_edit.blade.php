@@ -31,7 +31,7 @@
           <div class="nav-tabs-custom">
             <ul class="nav nav-tabs" id="tabs" style="font-size:12px">
               <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="false">{{ trans('message.table.general_settings') }}</a></li>
-              <li><a href="#tab_2" data-toggle="tab" aria-expanded="false">{{ trans('message.invoice.branch') }}</a></li>
+              <li><a href="#tab_2" data-toggle="tab" aria-expanded="false">Address</a></li>
               @if(!empty($customerData->password))
               <li><a href="#tab_3" data-toggle="tab" aria-expanded="false">{{ trans('message.form.update_password') }}</a></li>
               @else
@@ -124,60 +124,151 @@
               <!-- /.tab-pane -->
               <div class="tab-pane" id="tab_2">
 
-              <div class="row">
-                <div class="col-md-12">
-                  @if(!empty(Session::get('customer_edit')))
-				  
-                  <br>
-                  <button data-toggle="modal" data-target="#add-brunch" type="button" class="btn btn-default btn-flat btn-border-orange add_br">{{ trans('message.extra_text.add_new_branch') }}</button>
-                  <br>
-                  <br>
-				  <br>
-                  @endif
-                  <table id="example1" class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                      <th>{{ trans('message.invoice.branch') }}</th>
-                      
-                      <th>{{ trans('message.extra_text.billing_address') }}</th>
-                      <th>{{ trans('message.extra_text.shipping_address') }}</th>
-                      
-                      <th width="15%" class="text-center">{{ trans('message.table.action') }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                  @if(!empty($cusBranchData))
-                  
-                  @foreach($cusBranchData as $data)
-                    <tr>
-                      <td><a href="#" id="{{$data->branch_code}}" class="edit_br">{{ $data->br_name }}</a></td>
-                     
-                      <td>{{ $data->billing_street.', '.$data->billing_city.', '.$data->billing_state }}</td>
-                      <td>{{ $data->shipping_street.', '.$data->shipping_city.', '.$data->shipping_state }}</td>                      
+      <div class="box box-success" id="orderForm">
+    <div class="box-body">
+        <div class="row">
+            <form class="form-horizontal" id="shipping_billing_form" method="post" action="{{url('/customer/updateaddress')}}" >
+                <input type="hidden" id="hiddenDebtor_no" name="debtor_no" value="{{$customerData->debtor_no}}">
+                <div class="col-md-6">
+                    <h4 class="text-info"><strong>{{ trans('message.invoice.shipping_address') }}</strong></h4>
 
-                      <td class="text-center">
-                        @if(!empty(Session::get('customer_edit')))
-                          <button class="btn btn-xs btn-primary edit_br" id="{{$data->branch_code}}" type="button">
-                              <i class="glyphicon glyphicon-edit"></i> 
-                          </button>&nbsp;
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label " for="inputEmail3">{{ trans('message.form.name') }}</label>
 
-                          <form method="POST" action="{{ url("delete-branch/$data->branch_code") }}" accept-charset="UTF-8" style="display:inline">
-                              {!! csrf_field() !!}
-                              <button class="btn btn-xs btn-danger" type="button" data-toggle="modal" data-target="#confirmDelete" data-title="{{ trans('message.table.delete_branch_header') }}" data-message="{{ trans('message.table.delete_branch') }}">
-                                  <i class="glyphicon glyphicon-trash"></i> 
-                              </button>
-                          </form>
-                          @endif
-                      </td>
-                    </tr>
-                   @endforeach
-                   @endif
-                    </tfoot>
-                  </table>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="shipping_name" id="shipping_name" required value="{{$customerData->shipping_name}}">
+                        </div>
+                    </div>
 
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label " for="inputEmail3">{{ trans('message.invoice.street') }}</label>
+
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="shipping_street" name="shipping_street" value="{{$customerData->shipping_street}}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label " for="inputEmail3">{{ trans('message.invoice.city') }}</label>
+
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="shipping_city" name="shipping_city" value="{{$customerData->shipping_city}}" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label " for="inputEmail3">{{ trans('message.invoice.state') }}</label>
+
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="shipping_state" name="shipping_state" value="{{$customerData->shipping_state}}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label " for="inputEmail3">{{ trans('message.invoice.zipcode') }}</label>
+
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="shipping_zip_code" name="shipping_zip_code" value="{{$customerData->shipping_zip_code}}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label " for="inputEmail3">{{ trans('message.invoice.country') }}</label>
+
+                        <div class="col-sm-9">
+                            <select class="form-control select2" name="shipping_country_id" id="shipping_country_id">
+                                <option value="">{{ trans('message.form.select_one') }}</option>
+                                @foreach ($countries as $data)
+                                    
+                                    <option value="{{$data->code}}" @if($data->code == $customerData->shipping_country_id) selected="true" @endif>{{$data->country}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label " for="inputEmail3">Phone:</label>
+
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="contact_phone" name="contact_phone" value="{{$customerData->contact_phone}}" required>
+                        </div>
+                    </div>
                 </div>
-              </div>
 
+                <!--End Shippind Address Form-->
+                <!--Billing Address-->
+                <div id="different_billing_address_div" class="col-md-6">
+                    <div class="form-title">
+                        <h4 class="text-info text-left" style="font-weight: bold;">Billing Address</h4><span class="text-info" style="font-size: 18px;"><input type="checkbox" name="billing_address_the_same_as_shipping_address" id="cbxBillingEqualShipping" @if($customerData->different_billing_address == 1) checked @endif  > Different Billing Address?</span>
+
+
+                    </div>
+                    <div id="billing_form"  @if($customerData->different_billing_address == 0) hidden @endif>
+                
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label " for="inputEmail3">{{ trans('message.invoice.name') }}</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="billing_name"  id="billing_name" value="{{$customerData->billing_name}}" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label " for="inputEmail3">{{ trans('message.invoice.street') }}</label>
+
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="billing_street" id="billing_street" value="{{$customerData->billing_street}}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label " for="inputEmail3">{{ trans('message.invoice.city') }}</label>
+
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="billing_city"  id="billing_city" value="{{$customerData->billing_city}}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label " for="inputEmail3">{{ trans('message.invoice.state') }}</label>
+
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="billing_state"  id="billing_state" value="{{$customerData->billing_state}}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label " for="inputEmail3">{{ trans('message.invoice.zipcode') }}</label>
+
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="billing_zip_code" id="billing_zip_code" value="{{$customerData->billing_zip_code}}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label " for="inputEmail3">{{ trans('message.invoice.country') }}</label>
+
+                            <div class="col-sm-8">
+                                <select class="form-control select2" name="billing_country_id" id="billing_country_id">
+                                    <option value="">{{ trans('message.form.select_one') }}</option>
+                                    @foreach ($countries as $data)
+
+                                        <option value="{{$data->code}}" @if($data->code == $customerData->billing_country_id) selected="true" @endif>{{$data->country}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <!--End Billing Address -->
+
+
+
+          
+        </div>
+ <button class="btn btn-success pull-right" type="button" id="btnSaveUpdateAddress">Save</button>
+    </div>
+    
+     </form>
+</div>
               </div>
               <!-- /.tab-pane -->
               <!-- /.tab-pane -->
@@ -496,227 +587,8 @@
 
 
 @section('js')
+
     <script type="text/javascript">
-
-    $(function () {
-      $("#example1").DataTable({
-        "order": [],
-        "columnDefs": [{
-          "targets": 3,
-          "orderable": false
-          } ],
-
-          "language": '{{Session::get('language')}}'
-      });
-
-        var type = window.location.hash.substr(1);
-        console.log(type);
-
-    });
-
-
-    $('.edit_br').on('click', function() {
-        var id = $(this).attr("id");
-
-        $.ajax({
-            url: '{{ URL::to('edit-branch')}}',
-            data:{                  // data that will be sent
-                id:id
-            },
-            type: 'POST',
-            dataType: 'JSON',
-            success: function (data) {
-              console.log(data);
-                $('#br_name').val(data.br_name);
-                $('#br_contact').val(data.br_contact);
-                //$('#br_address').val(data.br_address);
-
-                $('#bill_street').val(data.billing_street);
-                $('#bill_city').val(data.billing_city);
-                $('#bill_state').val(data.billing_state);
-                $('#bill_zipCode').val(data.billing_zip_code);
-                $('#billing_country_id').val(data.billing_country_id);
-                
-                $('#ship_street').val(data.shipping_street);
-                $('#ship_city').val(data.shipping_city);
-                $('#ship_state').val(data.shipping_state);
-                $('#ship_zipCode').val(data.shipping_zip_code);
-                $('#shipping_country_id').val(data.shipping_country_id);
-                $('#br_id').val(data.br_id);
-
-                $('#edit-brunch').modal();
-            }
-        });
-
-    });
-
-    $('#updateBranch').submit(function (e) {
-        e.preventDefault();
-
-        var br_name = $("#br_name").val();
-        var br_contact = $("#br_contact").val();
-        //var br_address = $("#br_address").val();
-
-        var bill_street = $("#bill_street").val();
-        var bill_city = $("#bill_city").val();
-        var bill_state = $("#bill_state").val();
-        var bill_zipCode = $("#bill_zipCode").val();
-        var billing_country_id = $("#billing_country_id").val();
-
-        var ship_street = $("#ship_street").val();
-        var ship_city = $("#ship_city").val();
-        var ship_state = $("#ship_state").val();
-        var ship_zipCode = $("#ship_zipCode").val();
-        var shipping_country_id = $("#shipping_country_id").val();
-
-        var br_id = $("#br_id").val();
-        
-        $.ajax({
-            url: '{{ URL::to('update-branch')}}',
-            data:{                // data that will be sent
-                
-                br_name:br_name,
-                br_contact:br_contact,
-                //br_address:br_address,
-                bill_street:bill_street,
-                bill_city:bill_city,
-                bill_state:bill_state,
-                bill_zipCode:bill_zipCode,
-                billing_country_id:billing_country_id,
-                ship_street:ship_street,
-                ship_city:ship_city,
-                ship_state:ship_state,
-                ship_zipCode:ship_zipCode,
-                shipping_country_id:shipping_country_id,
-                br_id:br_id
-            },
-            
-            type: 'POST',
-            dataType: 'JSON',
-            success: function (data) {
-              if(data.success == 1) {
-                  
-                  $('#edit-brunch').modal('hide');
-                  location.reload();
-              }
-            }
-        });
-
-    });
-
-    $('#addBranch').validate({
-        rules: {
-            br_name: {
-                required: true
-            },
-
-            bill_street:{
-               required: true
-            },
-            bill_city:{
-               required: true
-            },
-            bill_state:{
-               required: true
-            },
-            bill_country_id:{
-               required: true
-            },
-            bill_zipCode:{
-               required: true
-            }                      
-        }
-    });
-
-    $('#password-form').validate({
-        rules: {
-            password: {
-                required: true,
-                minlength: 5
-            },
-            password_confirmation: {
-                required: true,
-                minlength: 5,
-                equalTo: "#password"
-            }
-        }
-    });
-
-
-    $('#addBranch').submit(function (e) {
-        e.preventDefault();
-
-        var br_name = $("#add_br_name").val();
-        var br_contact = $("#add_br_contact").val();
-       // var br_address = $("#add_br_address").val();
-
-        var bill_street = $("#add_bill_street").val();
-        var bill_city = $("#add_bill_city").val();
-        var bill_state = $("#add_bill_state").val();
-        var bill_zipCode = $("#add_bill_zipCode").val();
-        var bill_country_id = $("#bill_country_id").val();
-
-        var ship_street = $("#add_ship_street").val();
-        var ship_city = $("#add_ship_city").val();
-        var ship_state = $("#add_ship_state").val();
-        var ship_zipCode = $("#add_ship_zipCode").val();
-        var ship_country_id = $("#ship_country_id").val();
-        var cus_id = $("#cus_id").val();
-        
-        if(br_name && br_contact && bill_street && bill_city && bill_zipCode) {
-
-        $.ajax({
-            url: '{{ URL::to('save-branch')}}',
-            data:{                  // data that will be sent
-                
-                br_name:br_name,
-                br_contact:br_contact,
-               // br_address:br_address,
-                bill_street:bill_street,
-                bill_city:bill_city,
-                bill_state:bill_state,
-                bill_zipCode:bill_zipCode,
-                bill_country_id:bill_country_id,
-                ship_street:ship_street,
-                ship_city:ship_city,
-                ship_state:ship_state,
-                ship_zipCode:ship_zipCode,
-                ship_country_id:ship_country_id,
-                cus_id:cus_id
-            },
-            
-            type: 'POST',
-            dataType: 'JSON',
-            success: function (data) {
-              if(data.success == 1) {
-                  
-                $('#add-brunch').modal('hide');
-                location.reload();
-
-              }
-            }
-        });
-      }
-
-    });
-
-    $('#copy').on('click', function() {
-        $('#ship_street').val($('#bill_street').val());
-        $('#ship_city').val($('#bill_city').val());
-        $('#ship_state').val($('#bill_state').val());
-        $('#ship_zipCode').val($('#bill_zipCode').val());
-      
-        $("#shipping_country_id").val($('#billing_country_id').val());
-    });
-
-    $('#copyAddress').on('click', function() {
-        $('#add_ship_street').val($('#add_bill_street').val());
-        $('#add_ship_city').val($('#add_bill_city').val());
-        $('#add_ship_state').val($('#add_bill_state').val());
-        $('#add_ship_zipCode').val($('#add_bill_zipCode').val());
-      
-        $("#ship_country_id").val($('#bill_country_id').val());
-    });
 
 jQuery(function($) {
     var index = 'qpsstats-active-tab';
@@ -743,4 +615,6 @@ jQuery(function($) {
 
 
     </script>
+     <script src="{{asset('/public/dist/js/pages/customer/customer.js')}}"></script>
+    <script src="{{asset('/dist/js/pages/customer/customer.js')}}"></script>
 @endsection

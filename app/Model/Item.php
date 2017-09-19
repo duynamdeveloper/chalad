@@ -11,7 +11,7 @@ class Item extends Model
     protected $appends = ['stock_on_hand'];
     //protected $primaryKey = 'stock_id';
 
-    public $incrementing = false;
+   
 
     public function getStockOnHandAttribute(){
       $data = DB::table('stock_movements')

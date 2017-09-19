@@ -9,7 +9,7 @@ var animating;
 
 /* Define Object */
 
-var CUSTOMER = {};
+
 var ITEM = {};
 var ORDER = {};
 var PAYMENT = {};
@@ -199,7 +199,7 @@ ORDER.save = function() {
     var address = ORDER.getAddress();
     address = JSON.stringify(address);
     items = JSON.stringify(items);
-
+    var shipping_method = $("#sel_shipping_method").val();
     var shipping_cost = $("#shipping_cost").val();
     var discount_amount = $("#discount_amount").val();
     var item_tax = $("#sel_tax").val();
@@ -211,6 +211,7 @@ ORDER.save = function() {
             'address': address,
             'items': items,
             'shipping_cost': shipping_cost,
+            'shipping_method':shipping_method,
             'discount_amount': discount_amount,
             'item_tax': item_tax,
             'total_fee': total_fee,
@@ -252,12 +253,6 @@ ORDER.getAddress = function() {
         return address;
     }
     /* Define Customer Object */
-CUSTOMER = {
-    API: {
-        get: SITE_URL + '/customer/ajax/get-customer',
-
-    }
-};
 
 /* Define Item Object */
 
@@ -367,23 +362,6 @@ ITEM.calculateTotalWeight = function() {
     return total_weight;
 };
 
-CUSTOMER.get = function(debtor_no) {
-    $.ajax({
-        url: CUSTOMER.API.get,
-        type: 'get',
-        data: {
-            'debtor_no': debtor_no,
-        },
-        success: function(data) {
-            if (data.state) {
-                CUSTOMER.writeToForm(data.customer);
-            } else {
-                $(".customer-form").prop('disabled', false);
-            }
-
-        }
-    });
-};
 
 PAYMENT.delete = function(payment_id) {
     $.ajax({

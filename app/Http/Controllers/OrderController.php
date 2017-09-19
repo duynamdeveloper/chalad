@@ -54,6 +54,7 @@ class OrderController extends Controller
         $data['customers'] = Customer::all();
         $data['items'] = Item::all();
         $data['tax_types'] = DB::table('item_tax_types')->get();
+<<<<<<< HEAD
         $order_count = DB::table('sales_orders')->where('trans_type', SALESORDER)->count();
         
             if ($order_count>0) {
@@ -64,6 +65,10 @@ class OrderController extends Controller
                 $data['order_count'] = 0 ;
             }
       
+=======
+        $data['countries'] = DB::table('countries')->get();
+        // $orders = Order::with(['details','shipments'])->where('order_no',3)->first();
+>>>>>>> 35f51e18b78218e73b7b0166df26b2164bba40bb
 
         return view("admin.order.order_add", $data);
     }
@@ -89,6 +94,61 @@ class OrderController extends Controller
         }
         return response()->json(['state'=>false]);
     }
+    public function ajaxGetPendingOrders(){
+        $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',2)->get();
+       
+        return response()->json($orders);
+        
+       
+    }
+    public function ajaxGetCancelledOrders(){
+        $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',0)->get();
+       
+        return response()->json($orders);
+        
+       
+    }
+    public function ajaxGetReadyToShipOrders(){
+        $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',1)->get();
+        $response_orders = array();
+        foreach($orders as $order){
+            if($order->state_name=="Ready to ship"){
+                array_push($response_orders,$order);
+            }
+        }
+         return response()->json($response_orders);
+    }
+    public function ajaxGetCompletedOrders(){
+        $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',1)->get();
+        $response_orders = array();
+        foreach($orders as $order){
+            if($order->state_name=="Completed"){
+                array_push($response_orders,$order);
+            }
+        }
+         return response()->json($response_orders);
+    }
+    public function ajaxGetShippedOrders(){
+        $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',1)->get();
+        $response_orders = array();
+        foreach($orders as $order){
+            if($order->state_name=="Shipped"){
+                array_push($response_orders,$order);
+            }
+        }
+         return response()->json($response_orders);
+    }
+    public function ajaxGetOrderSummary(Request $request){
+        $order_no = $request->order_no;
+        $order = Order::find($order_no);
+        if(!is_null($order)){
+            $data['order'] = Order::where('order_no', $order_no)->with(['details','payments','shipments','customer'])->first();
+            $order_summary_view = View::make('admin.order.sub-partials.order_summary', $data);
+            $order_summary_content = $order_summary_view->render();
+            return response()->json(['state'=>true,'view'=>$order_summary_content]);
+        }
+        return response()->json(['state'=>false]);
+    }
     public function getShippingCost(Request $request)
     {
         $weight = $request->weight;
@@ -111,6 +171,9 @@ class OrderController extends Controller
 
         $items = $request->items;
         $items = json_decode($items);
+        $raw_address = $request->address;
+        $address = json_decode($raw_address);
+        //$address = json_decode($address);
         $customer = $request->customer;
         $customer = json_decode($customer);
         $shipping_cost = $request->shipping_cost;
@@ -131,7 +194,7 @@ class OrderController extends Controller
 
         $order = new Order();
         $order->debtor_no = $customer_id;
-        $order->branch_id = $customer_id;
+   
         $order->person_id = $userId;
         $order->ord_date = date('Y-m-d');
         $order->total = $total_fee;
@@ -141,6 +204,31 @@ class OrderController extends Controller
         $order->shipping_method = $request->shipping_method;
         $order->trans_type = SALESORDER;
 
+        $order->shipping_name= $address->shipping_name;
+        $order->shipping_street = $address->shipping_street;
+        $order->shipping_city= $address->shipping_city;
+        $order->shipping_state = $address->shipping_state;
+        $order->shipping_zip_code = $address->shipping_zip_code;
+        $order->shipping_country_id = $address->shipping_country_id;
+        $order->different_billing_address = $address->different_billing_address;
+        if($address->different_billing_address){
+            $order->billing_name = $address->billing_name;
+            $order->billing_street = $address->billing_street;
+            $order->billing_city = $address->billing_city;
+            $order->billing_state = $address->billing_state;
+            $order->billing_zip_code = $address->billing_zip_code;
+            $order->billing_country_id = $address->billing_country_id;
+            $order->different_billing_address = 1;
+        }else{
+            $order->billing_name= $address->shipping_name;
+            $order->billing_street = $address->shipping_street;
+            $order->billing_city= $address->shipping_city;
+            $order->billing_state = $address->shipping_state;
+            $order->billing_zip_code = $address->shipping_zip_code;
+            $order->billing_country_id = $address->shipping_country_id;
+        }
+
+        $order->contact_phone = $address->contact_phone;
         $order->save();
         $order_no = $order->order_no;
 
