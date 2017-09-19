@@ -104,6 +104,15 @@
 		Route::get('loc_code-valid','LocationController@validLocCode');
 
 		// Item
+		Route::group([
+			'as' => '.item',
+			'prefix'=>'item'
+		], function(){
+			Route::get('/','ItemController@index');
+			Route::get('/add/{tab}','ItemController@create');
+			Route::get('/save','ItemController@store');
+			Route::get('/save-specification','ItemController@saveSpecification');
+		});
 		Route::get('item','ItemController@index');
 		Route::get('create-item/{tab}','ItemController@create');
 		Route::post('save-item','ItemController@store');
@@ -289,7 +298,7 @@
 			'prefix'   =>'customer',
 			'as'       =>'customer.'
 		], function(){
-
+	    Route::post('/updateaddress','CustomerController@updateAddress');
 		Route::get('/list','CustomerController@index');
 		Route::get('/create-customer','CustomerController@create');
 		Route::post('save-customer','CustomerController@store');

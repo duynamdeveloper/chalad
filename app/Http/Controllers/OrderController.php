@@ -54,6 +54,7 @@ class OrderController extends Controller
         $data['customers'] = Customer::all();
         $data['items'] = Item::all();
         $data['tax_types'] = DB::table('item_tax_types')->get();
+        $data['countries'] = DB::table('countries')->get();
         // $orders = Order::with(['details','shipments'])->where('order_no',3)->first();
 
         return view("admin.order.order_add", $data);
@@ -157,6 +158,9 @@ class OrderController extends Controller
 
         $items = $request->items;
         $items = json_decode($items);
+        $raw_address = $request->address;
+        $address = json_decode($raw_address);
+        //$address = json_decode($address);
         $customer = $request->customer;
         $customer = json_decode($customer);
         $shipping_cost = $request->shipping_cost;
@@ -177,7 +181,7 @@ class OrderController extends Controller
 
         $order = new Order();
         $order->debtor_no = $customer_id;
-        $order->branch_id = $customer_id;
+   
         $order->person_id = $userId;
         $order->ord_date = date('Y-m-d');
         $order->total = $total_fee;
@@ -187,6 +191,31 @@ class OrderController extends Controller
         $order->shipping_method = $request->shipping_method;
         $order->trans_type = SALESORDER;
 
+        $order->shipping_name= $address->shipping_name;
+        $order->shipping_street = $address->shipping_street;
+        $order->shipping_city= $address->shipping_city;
+        $order->shipping_state = $address->shipping_state;
+        $order->shipping_zip_code = $address->shipping_zip_code;
+        $order->shipping_country_id = $address->shipping_country_id;
+        $order->different_billing_address = $address->different_billing_address;
+        if($address->different_billing_address){
+            $order->billing_name = $address->billing_name;
+            $order->billing_street = $address->billing_street;
+            $order->billing_city = $address->billing_city;
+            $order->billing_state = $address->billing_state;
+            $order->billing_zip_code = $address->billing_zip_code;
+            $order->billing_country_id = $address->billing_country_id;
+            $order->different_billing_address = 1;
+        }else{
+            $order->billing_name= $address->shipping_name;
+            $order->billing_street = $address->shipping_street;
+            $order->billing_city= $address->shipping_city;
+            $order->billing_state = $address->shipping_state;
+            $order->billing_zip_code = $address->shipping_zip_code;
+            $order->billing_country_id = $address->shipping_country_id;
+        }
+
+        $order->contact_phone = $address->contact_phone;
         $order->save();
         $order_no = $order->order_no;
 
