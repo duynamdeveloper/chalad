@@ -134,16 +134,7 @@
                 <form action="{{ url('item/save-grouped-product') }}" method="post" id="addGroupedProduct" class="form-horizontal" enctype="multipart/form-data">
                   <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
                   <div class="box-body">
-                  <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">Type</label>
-                      <div class="col-sm-9">
-                        <select class="form-control" name="item_type">
-                        @foreach($item_types as $item_type)
-                          <option value="{{$item_type->id}}">{{$item_type->type_name}}</option>
-                        @endforeach
-                        </select>
-                      </div>
-                    </div>
+             
                     <div class="form-group">
                       <label class="col-sm-3 control-label require" for="inputEmail3">Product Code</label>
                       <div class="col-sm-9">
@@ -391,5 +382,5 @@ $(document).ready(function () {
 });
 
     </script>
-    <script src="{{asset('/dist/js/pages/item/item-add.js')}}"></script>
+    <script src="{{asset('public/dist/js/pages/item/item-add.js')}}"></script>
 @endsection
