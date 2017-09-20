@@ -109,8 +109,9 @@
 			'prefix'=>'item'
 		], function(){
 			Route::get('/','ItemController@index');
-			Route::get('/add/{tab}','ItemController@create');
-			Route::get('/save','ItemController@store');
+			Route::get('/add','ItemController@create');
+			Route::post('/save-simple-product','ItemController@storeSimpleProduct');
+			Route::post('/save-grouped-product','ItemController@storeGroupedProduct');
 			Route::get('/save-specification','ItemController@saveSpecification');
 		});
 		Route::get('item','ItemController@index');

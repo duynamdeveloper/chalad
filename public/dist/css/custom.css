@@ -577,3 +577,7 @@ color:#3C8DBC;
 .toggleOrderSummary {
     cursor: pointer;
 }
+.removeProduct{
+    font-size: 18px;
+    cursor: pointer;
+}

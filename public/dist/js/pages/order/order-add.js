@@ -154,26 +154,15 @@ ORDER.save = function() {
     var shipping_cost = $("#shipping_cost").val();
     var shipping_method = $("#sel_shipping_method").val();
     var discount_amount = $("#discount_amount").val();
-<<<<<<< HEAD
-    var shipping_method = $("#sel_shipping_method").val();
     var item_tax = $("#sel_tax").val();
     var total_fee = $("#grand_total").val();
-
-=======
-    var item_tax = $("#sel_tax").val();
-    var total_fee = $("#grand_total").val();
->>>>>>> 35f51e18b78218e73b7b0166df26b2164bba40bb
     $.ajax({
         url: ORDER.API.save,
         type: 'post',
         data: {
             'address': address,
             'customer': customer,
-<<<<<<< HEAD
-            'shipping_method': shipping_method,
-=======
             'items': items,
->>>>>>> 35f51e18b78218e73b7b0166df26b2164bba40bb
             'shipping_cost': shipping_cost,
             'discount_amount': discount_amount,
             'item_tax': item_tax,

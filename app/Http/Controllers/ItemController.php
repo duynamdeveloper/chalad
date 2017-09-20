@@ -67,7 +67,7 @@ class ItemController extends Controller
      *
      * @return Item create page view
      */
-    public function create($tab)
+    public function create()
     {
         $item_stock_id = Session::get('stock_id');
         $data['menu'] = 'item';
@@ -92,7 +92,7 @@ class ItemController extends Controller
             $data['stock_id'] = strtoupper($item_stock_id);
         }
         
-        $data['tab'] = $tab;
+       
 
         return view('admin.item.item_add', $data);
     }
@@ -103,7 +103,7 @@ class ItemController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return redirection Item list page view
      */
-    public function store(Request $request)
+    public function storeSimpleProduct(Request $request)
     {
         $this->validate($request, [
             'stock_id' => 'required|unique:item_code,stock_id',
@@ -117,7 +117,7 @@ class ItemController extends Controller
         ]);
 
         $data['stock_id'] = strtoupper($request->stock_id);
-        $data['item_type_id'] = $request->item_type;
+        $data['item_type_id'] = 1;
         $data['description'] = strtoupper($request->description);
         $data['category_id'] = $request->category_id;
         $data['created_at'] = date('Y-m-d H:i:s');
@@ -182,7 +182,85 @@ class ItemController extends Controller
             return back()->withInput()->withErrors(['email' => "Invalid Request !"]);
         }
     }
+    public function storeGroupedProduct(Request $request)
+    {
+        // $this->validate($request, [
+        //     'stock_id' => 'required|unique:item_code,stock_id',
+        //     'description'=>'required',
+           
+            
+        //     'weight' => 'required',
+        //     'special_price' => 'required',
+        //     'qty_per_pack' => 'required',
+        //     'item_image' => 'mimes:jpeg,bmp,png'
+        // ]);
+       $data['list_items'] = $request->product_list;
+        
+        $data['stock_id'] = strtoupper($request->stock_id);
+        $data['item_type_id'] = 2;
+        $data['description'] = strtoupper($request->description);
+        $data['category_id'] = $request->category_id;
+        $data['created_at'] = date('Y-m-d H:i:s');
+     
+        $data['special_price'] = strtoupper($request->special_price);
+        $data['price'] = strtoupper($request->price);
+        $data['inactive'] = $request->status;
+       
+        $data['qty_per_pack'] = "";
 
+        $pic = $request->file('item_image');
+
+        if (isset($pic)) {
+          $destinationPath = public_path('/uploads/itemPic/');
+          $filename = $pic->getClientOriginalName();
+          $img = Image::make($request->file('item_image')->getRealPath());
+
+          $img->resize(400,400, function ($constraint) {
+                $constraint->aspectRatio();
+            })->save($destinationPath.'/'.$filename);
+          
+          $data['item_image'] = $filename;
+        }
+
+        $id = DB::table('item_code')->insertGetId($data);
+
+        if (!empty($id)) {
+            // Session::put('stock_id', strtoupper($request->stock_id));
+            
+            // $data2['stock_id'] = strtoupper($request->stock_id);
+            // $data2['description'] = $request->description;
+            // $data2['long_description'] = $request->long_description;
+            // $data2['units'] = $request->units;
+            // $data2['tax_type_id'] = $request->tax_type_id;
+            // $data2['category_id'] = $request->category_id;
+            // $data2['created_at'] = date('Y-m-d H:i:s');
+
+            // DB::table('stock_master')->insert($data2);
+
+            // $data3[0]['stock_id'] = strtoupper($request->stock_id);
+            // $data3[0]['sales_type_id'] = 1;
+            // $data3[0]['price'] = 0;
+            // $data3[0]['curr_abrev'] = 'USD';
+
+            // $data3[1]['stock_id'] = strtoupper($request->stock_id);
+            // $data3[1]['sales_type_id'] = 2;
+            // $data3[1]['price'] = 0;
+            // $data3[1]['curr_abrev'] = 'USD';
+
+            // DB::table('sale_prices')->insert($data3);
+
+            // $purchaseInfos['stock_id'] = strtoupper($request->stock_id);
+            // $purchaseInfos['price'] = 0;
+            // DB::table('purchase_prices')->insert($purchaseInfos);
+
+            //\Session::flash('success',trans('message.success.save_success'));
+            return redirect()->intended("item");
+
+        } else {
+
+            return back()->withInput()->withErrors(['email' => "Invalid Request !"]);
+        }
+    }
     /**
      * Store a newly created Item  sales price in storage.
      * @param  \Illuminate\Http\Request  $request
