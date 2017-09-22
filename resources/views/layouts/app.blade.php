@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="{{ asset('/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css') }}" type="text/css" />
   <link rel="stylesheet" href="{{ asset('/dist/css/custom.css') }}">
   <link rel="stylesheet" href="{{ asset('/dist/css/bootstrap-confirm-delete.css') }}">
-
+@yield('styles')
   <script type="text/javascript">
     var SITE_URL = "{{URL::to('/')}}";
   </script>

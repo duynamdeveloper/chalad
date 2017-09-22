@@ -103,110 +103,39 @@ class ItemController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return redirection Item list page view
      */
-    public function storeSimpleProduct(Request $request)
+    public function store(Request $request)
     {
         $this->validate($request, [
-            'stock_id' => 'required|unique:item_code,stock_id',
-            'description'=>'required',
+            'product_sku' => 'required|unique:item_code,stock_id',
+            'product_name'=>'required',
            
             
-            'weight' => 'required',
-            'special_price' => 'required',
-            'qty_per_pack' => 'required',
+          
             'item_image' => 'mimes:jpeg,bmp,png'
         ]);
-
-        $data['stock_id'] = strtoupper($request->stock_id);
-        $data['item_type_id'] = 1;
-        $data['description'] = strtoupper($request->description);
-        $data['category_id'] = $request->category_id;
-        $data['created_at'] = date('Y-m-d H:i:s');
-     
-        $data['special_price'] = strtoupper($request->special_price);
-        $data['price'] = strtoupper($request->price);
-        $data['inactive'] = $request->status;
-        $data['cost_price'] = $request->cost_price;
-        $data['weight'] = $request->weight;
-        $data['qty_per_pack'] = $request->qty_per_pack;
-
-        $pic = $request->file('item_image');
-
-        if (isset($pic)) {
-          $destinationPath = public_path('/uploads/itemPic/');
-          $filename = $pic->getClientOriginalName();
-          $img = Image::make($request->file('item_image')->getRealPath());
-
-          $img->resize(400,400, function ($constraint) {
-                $constraint->aspectRatio();
-            })->save($destinationPath.'/'.$filename);
-          
-          $data['item_image'] = $filename;
-        }
-
-        $id = DB::table('item_code')->insertGetId($data);
-
-        if (!empty($id)) {
-            // Session::put('stock_id', strtoupper($request->stock_id));
-            
-            // $data2['stock_id'] = strtoupper($request->stock_id);
-            // $data2['description'] = $request->description;
-            // $data2['long_description'] = $request->long_description;
-            // $data2['units'] = $request->units;
-            // $data2['tax_type_id'] = $request->tax_type_id;
-            // $data2['category_id'] = $request->category_id;
-            // $data2['created_at'] = date('Y-m-d H:i:s');
-
-            // DB::table('stock_master')->insert($data2);
-
-            // $data3[0]['stock_id'] = strtoupper($request->stock_id);
-            // $data3[0]['sales_type_id'] = 1;
-            // $data3[0]['price'] = 0;
-            // $data3[0]['curr_abrev'] = 'USD';
-
-            // $data3[1]['stock_id'] = strtoupper($request->stock_id);
-            // $data3[1]['sales_type_id'] = 2;
-            // $data3[1]['price'] = 0;
-            // $data3[1]['curr_abrev'] = 'USD';
-
-            // DB::table('sale_prices')->insert($data3);
-
-            // $purchaseInfos['stock_id'] = strtoupper($request->stock_id);
-            // $purchaseInfos['price'] = 0;
-            // DB::table('purchase_prices')->insert($purchaseInfos);
-
-            //\Session::flash('success',trans('message.success.save_success'));
-            return redirect()->intended("item/add/specification");
-
-        } else {
-
-            return back()->withInput()->withErrors(['email' => "Invalid Request !"]);
-        }
-    }
-    public function storeGroupedProduct(Request $request)
-    {
-        // $this->validate($request, [
-        //     'stock_id' => 'required|unique:item_code,stock_id',
-        //     'description'=>'required',
-           
-            
-        //     'weight' => 'required',
-        //     'special_price' => 'required',
-        //     'qty_per_pack' => 'required',
-        //     'item_image' => 'mimes:jpeg,bmp,png'
-        // ]);
-       $data['list_items'] = $request->product_list;
+        $item = new Item();
+        $item->stock_id = strtoupper($request->product_sku);
+        $item->item_type_id = $request->item_type;
+        $item->name = strtoupper($request->product_name);
+        $item->description = $request->description;
+        $item->short_description = $request->short_description;
+        $item->category_id = $request->category_id;
         
-        $data['stock_id'] = strtoupper($request->stock_id);
-        $data['item_type_id'] = 2;
-        $data['description'] = strtoupper($request->description);
-        $data['category_id'] = $request->category_id;
-        $data['created_at'] = date('Y-m-d H:i:s');
      
-        $data['special_price'] = strtoupper($request->special_price);
-        $data['price'] = strtoupper($request->price);
-        $data['inactive'] = $request->status;
+        $item->special_price = strtoupper($request->special_price);
+        $item->price = strtoupper($request->price);
+        $item->inactive = $request->status;
+        $item->price = $request->regular_price;
+        $item->special_price = $request->special_price;
        
-        $data['qty_per_pack'] = "";
+
+        if($item->item_type_id == 1){
+            $item->weight = $request->weight;
+            $item->qty_per_pack = $request->qty_per_pack;
+        }else{
+            $item->list_items = $request->product_list;
+        }
+        
 
         $pic = $request->file('item_image');
 
@@ -219,48 +148,23 @@ class ItemController extends Controller
                 $constraint->aspectRatio();
             })->save($destinationPath.'/'.$filename);
           
-          $data['item_image'] = $filename;
+          $item->item_image = $filename;
         }
 
-        $id = DB::table('item_code')->insertGetId($data);
+        $saved = $item->save();
 
-        if (!empty($id)) {
-            // Session::put('stock_id', strtoupper($request->stock_id));
-            
-            // $data2['stock_id'] = strtoupper($request->stock_id);
-            // $data2['description'] = $request->description;
-            // $data2['long_description'] = $request->long_description;
-            // $data2['units'] = $request->units;
-            // $data2['tax_type_id'] = $request->tax_type_id;
-            // $data2['category_id'] = $request->category_id;
-            // $data2['created_at'] = date('Y-m-d H:i:s');
+        if ($saved) {
+        
 
-            // DB::table('stock_master')->insert($data2);
-
-            // $data3[0]['stock_id'] = strtoupper($request->stock_id);
-            // $data3[0]['sales_type_id'] = 1;
-            // $data3[0]['price'] = 0;
-            // $data3[0]['curr_abrev'] = 'USD';
-
-            // $data3[1]['stock_id'] = strtoupper($request->stock_id);
-            // $data3[1]['sales_type_id'] = 2;
-            // $data3[1]['price'] = 0;
-            // $data3[1]['curr_abrev'] = 'USD';
-
-            // DB::table('sale_prices')->insert($data3);
-
-            // $purchaseInfos['stock_id'] = strtoupper($request->stock_id);
-            // $purchaseInfos['price'] = 0;
-            // DB::table('purchase_prices')->insert($purchaseInfos);
-
-            //\Session::flash('success',trans('message.success.save_success'));
-            return redirect()->intended("item");
+            \Session::flash('success',trans('message.success.save_success'));
+            return redirect('/item');
 
         } else {
 
             return back()->withInput()->withErrors(['email' => "Invalid Request !"]);
         }
     }
+
     /**
      * Store a newly created Item  sales price in storage.
      * @param  \Illuminate\Http\Request  $request
@@ -451,75 +355,162 @@ class ItemController extends Controller
         
         return view('admin.item.item_show', $data);
     }
+    public function update(Request $request){
+        $this->validate($request, [
+            'product_sku' => 'required',
+            'product_name'=>'required',
+           
+            
+          
+            'item_image' => 'mimes:jpeg,bmp,png'
+        ]);
+        $item = Item::find($request->id);
+        $item->stock_id = strtoupper($request->product_sku);
+        $item->item_type_id = $request->item_type;
+        $item->name = strtoupper($request->product_name);
+        $item->description = $request->description;
+        $item->short_description = $request->short_description;
+        $item->category_id = $request->category_id;
+        
+     
+        $item->special_price = strtoupper($request->special_price);
+        $item->price = strtoupper($request->price);
+        $item->inactive = $request->status;
+        $item->price = $request->regular_price;
+        $item->special_price = $request->special_price;
+       
 
+        if($item->item_type_id == 1){
+            $item->weight = $request->weight;
+            $item->qty_per_pack = $request->qty_per_pack;
+        }else{
+            $item->list_items = $request->product_list;
+        }
+        
+
+        $pic = $request->file('item_image');
+
+        if (isset($pic)) {
+          $destinationPath = public_path('/uploads/itemPic/');
+          $filename = $pic->getClientOriginalName();
+          $img = Image::make($request->file('item_image')->getRealPath());
+
+          $img->resize(400,400, function ($constraint) {
+                $constraint->aspectRatio();
+            })->save($destinationPath.'/'.$filename);
+          
+          $item->item_image = $filename;
+        }
+
+        $updated = $item->update();
+
+        if ($updated) {
+        
+
+            \Session::flash('success',trans('message.success.save_success'));
+            return redirect('/item');
+
+        } else {
+
+            return back()->withInput()->withErrors(['email' => "Invalid Request !"]);
+        }
+    }
     /**
      * Show the form for editing the specified Item.
      *
      * @param  int  $id
      * @return Item edit page view
      */
-    public function edit($tab,$id)
-    { 
+    // public function edit($tab,$id)
+    // { 
+    //     $data['menu'] = 'item';
+    //     $data['header'] = 'item';
+    //     $data['breadcrumb'] = 'additem';
+    //     $data['locData'] = DB::table('location')->get();
+    //     $data['taxTypes'] = DB::table('item_tax_types')->get();
+    //     $data['saleTypes'] = DB::table('sales_types')->get();
+    //     $data['categoryData'] = DB::table('stock_category')->get();
+    //     $data['unitData'] = DB::table('item_unit')->get();
+    //     $data['suppliers'] = DB::table('suppliers')->get();
+
+    //     $loc =  DB::table('location')->get();
+    //     $loc_name = array();
+    //     foreach ($loc as $value) {
+    //         $loc_name[$value->loc_code] = $value->location_name;
+    //     }
+        
+    //     $data['loc_name'] = $loc_name;
+
+
+    //     $salesTypeName = array();
+    //     foreach ($data['saleTypes'] as $value) {
+    //         $salesTypeName[$value->id] = $value->sales_type;
+    //     }
+        
+    //     $data['salesTypeName'] = $salesTypeName;
+
+    //     $data['itemInfo'] = DB::table('item_code')
+    //                       ->leftjoin('stock_master','stock_master.stock_id','=','item_code.stock_id')
+    //                       ->where('item_code.id',$id)
+    //                       ->select('item_code.*','stock_master.tax_type_id','stock_master.units','stock_master.long_description')
+    //                       ->first();
+        
+    //     $data['salesInfo'] = DB::table('sale_prices')
+    //                        ->where('stock_id',$data['itemInfo']->stock_id)
+    //                        ->first();
+    //     $data['purchaseInfo'] = DB::table('purchase_prices')
+    //                        ->where('stock_id',$data['itemInfo']->stock_id)
+    //                        ->first();
+    //     //d($data['purchaseInfo'],1);
+    //     $data['salePriceData'] = DB::table('sale_prices')->where('stock_id',$data['itemInfo']->stock_id)->get();
+
+    //     $data['itemQuantity'] = DB::table('stock_moves')
+    //                         ->select(DB::raw('SUM(qty) as total_item'), 'loc_code')
+    //                         ->where('stock_id',strtoupper($data['itemInfo']->stock_id))
+    //                         ->groupBy('loc_code')
+    //                         ->get();
+        
+    //     $data['tab'] = $tab;
+
+    //     $data['transations'] = DB::table('stock_moves')
+    //                           ->where('stock_moves.stock_id',$data['itemInfo']->stock_id)
+    //                           ->leftjoin('item_code','item_code.stock_id','=','stock_moves.stock_id')
+    //                           ->leftjoin('location','location.loc_code','=','stock_moves.loc_code')
+    //                           ->select('stock_moves.*','item_code.description','location.location_name')
+    //                           ->orderBy('stock_moves.tran_date','DESC')
+    //                           ->get();
+    //     //d($data['transations'],1);                 
+    //     return view('admin.item.item_edit', $data);
+    // }
+    public function edit($id){
+       
         $data['menu'] = 'item';
-        $data['header'] = 'item';
-        $data['breadcrumb'] = 'additem';
-        $data['locData'] = DB::table('location')->get();
-        $data['taxTypes'] = DB::table('item_tax_types')->get();
-        $data['saleTypes'] = DB::table('sales_types')->get();
+
+        $unit =  DB::table('item_unit')->get();
+        $unit_name = array();
+        foreach ($unit as $value) {
+            $unit_name[$value->id] = $value->name;
+        }
+        
+        $data['unit_name'] = $unit_name;
+        $data['item_types'] = DB::table('item_type')->get();
+        $data['locData']      = DB::table('location')->get();
+        $data['taxTypes']     = DB::table('item_tax_types')->get();
+        $data['saleTypes']    = DB::table('sales_types')->get();
         $data['categoryData'] = DB::table('stock_category')->get();
-        $data['unitData'] = DB::table('item_unit')->get();
-        $data['suppliers'] = DB::table('suppliers')->get();
+        $data['unitData']     = DB::table('item_unit')->get();
+        $data['item'] = Item::find($id);
+        $item = Item::find($id);
+       
+        if(!empty($item_stock_id)) {
 
-        $loc =  DB::table('location')->get();
-        $loc_name = array();
-        foreach ($loc as $value) {
-            $loc_name[$value->loc_code] = $value->location_name;
+            $data['stock_id'] = strtoupper($item_stock_id);
         }
         
-        $data['loc_name'] = $loc_name;
+       
 
-
-        $salesTypeName = array();
-        foreach ($data['saleTypes'] as $value) {
-            $salesTypeName[$value->id] = $value->sales_type;
-        }
-        
-        $data['salesTypeName'] = $salesTypeName;
-
-        $data['itemInfo'] = DB::table('item_code')
-                          ->leftjoin('stock_master','stock_master.stock_id','=','item_code.stock_id')
-                          ->where('item_code.id',$id)
-                          ->select('item_code.*','stock_master.tax_type_id','stock_master.units','stock_master.long_description')
-                          ->first();
-        
-        $data['salesInfo'] = DB::table('sale_prices')
-                           ->where('stock_id',$data['itemInfo']->stock_id)
-                           ->first();
-        $data['purchaseInfo'] = DB::table('purchase_prices')
-                           ->where('stock_id',$data['itemInfo']->stock_id)
-                           ->first();
-        //d($data['purchaseInfo'],1);
-        $data['salePriceData'] = DB::table('sale_prices')->where('stock_id',$data['itemInfo']->stock_id)->get();
-
-        $data['itemQuantity'] = DB::table('stock_moves')
-                            ->select(DB::raw('SUM(qty) as total_item'), 'loc_code')
-                            ->where('stock_id',strtoupper($data['itemInfo']->stock_id))
-                            ->groupBy('loc_code')
-                            ->get();
-        
-        $data['tab'] = $tab;
-
-        $data['transations'] = DB::table('stock_moves')
-                              ->where('stock_moves.stock_id',$data['itemInfo']->stock_id)
-                              ->leftjoin('item_code','item_code.stock_id','=','stock_moves.stock_id')
-                              ->leftjoin('location','location.loc_code','=','stock_moves.loc_code')
-                              ->select('stock_moves.*','item_code.description','location.location_name')
-                              ->orderBy('stock_moves.tran_date','DESC')
-                              ->get();
-        //d($data['transations'],1);                 
         return view('admin.item.item_edit', $data);
     }
-
     /**
      * Show the form for Copy the specified Item.
      *
@@ -1047,7 +1038,7 @@ class ItemController extends Controller
     }
     public function ajaxSearch(Request $request){
         $string = $request->string;
-        $items = Item::where('description','like','%'.$string.'%')->get();
+        $items = Item::where('name','like','%'.$string.'%')->get();
         if($items->isEmpty()){
             return response()->json(['state'=>false]);
         }

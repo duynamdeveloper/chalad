@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Item extends Model
 {
     protected $table = 'item_code';
-    protected $appends = ['stock_on_hand'];
+    protected $appends = ['stock_on_hand','linked_products'];
     //protected $primaryKey = 'stock_id';
 
    
@@ -24,6 +24,25 @@ class Item extends Model
       }
       return 0;
    
+    }
+    public function getLinkedProductsAttribute(){
+        if($this->item_type_id==2){
+            $list_products = array();
+            $linked_items_string_raw = $this->list_items;
+            if($linked_items_string_raw !== null && $linked_items_string_raw !== ""){
+                $lists_array = explode('|',$linked_items_string_raw);
+                foreach($lists_array as $stock_id){
+                    if($stock_id !== null && $stock_id !== ""){
+                        $item = self::where('stock_id',$stock_id)->first();
+                        if($item){
+                            array_push($list_products,$item);
+                        }
+                    }
+                }
+            }
+            return $list_products;
+        }
+        return null;
     }
     public function getAllItem()
     {
