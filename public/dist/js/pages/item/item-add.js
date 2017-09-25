@@ -21,7 +21,7 @@ ITEM.get = function(stock_id) {
                     $("<td>").html(item.stock_id).appendTo(tr);
                     $("<td>").html('<img src="' + SITE_URL + '/public/uploads/itemPic/' + item.item_image + '" width="80px" height="80px">').appendTo(tr);
                     $("<td>").html(item.name).appendTo(tr);
-                    $("<td>").html(item.stock_on_hand).appendTo(tr);
+                    $("<td>").html('<input type="text" class="form-control inp_item_qty text-center" name="item_quantity" value="1">').appendTo(tr);
                     $("<td>").html('<span class="glyphicon glyphicon-remove text-danger removeProduct"></span>').appendTo(tr);
                     table_body.append(tr);
                 }
@@ -63,8 +63,9 @@ function getAllProductList(){
     var rows = $("#list-products tbody").find('tr');
     var list = "";
     $.each(rows, function(i, row){
-        list = list+$(row).attr('item-id')+'|';
+        list = list+$(row).attr('item-id')+'&'+$(row).find('input[name="item_quantity"]').val()+'|';
     });
+    console.log(list);
     return list;
 }
 function readURL(input) {
@@ -105,7 +106,9 @@ $(document).ready(function(){
                         if (!$(event.target).closest('#livesearch').length) {
                             if ($('#livesearch').is(":visible")) {
                                 $('#livesearch').hide();
+                                console.log(getAllProductList());
                             }
+                            
                         }
                     });
     $(document).on('click','.removeProduct', function(){

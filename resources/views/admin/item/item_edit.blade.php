@@ -142,11 +142,12 @@
                                         <tbody>
                                         @if(!empty($item->linked_products))
                                         @foreach($item->linked_products as $linked_product)
-                                            <tr item-id="{{$linked_product->stock_id}}">
-                                                <td>{{$linked_product->stock_id}}</td>
-                                                <td><img src="{{asset('public/uploads/itemPic/'.$linked_product->item_image)}}" width="80px" height="80px"></td>
-                                                <td>{{$linked_product->name}}</td>
-                                                <td>{{$linked_product->stock_on_hand}}</td>
+                                            
+                                            <tr item-id="{{$linked_product['item']->stock_id}}">
+                                                <td>{{$linked_product['item']->stock_id}}</td>
+                                                <td><img src="{{asset('public/uploads/itemPic/'.$linked_product['item']->item_image)}}" width="80px" height="80px"></td>
+                                                <td>{{$linked_product['item']->name}}</td>
+                                                <td><input name="item_quantity" class="form-control inp_item_qty" value="{{$linked_product['quantity']}}"></td>
                                                 <td><span class="glyphicon glyphicon-remove text-danger removeProduct"></span></td>
 
                                             </tr>

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Item extends Model
 {
     protected $table = 'item_code';
-    protected $appends = ['stock_on_hand','linked_products'];
+    protected $appends = ['stock_on_hand','linked_products','state_label','item_type'];
     //protected $primaryKey = 'stock_id';
 
    
@@ -31,18 +31,42 @@ class Item extends Model
             $linked_items_string_raw = $this->list_items;
             if($linked_items_string_raw !== null && $linked_items_string_raw !== ""){
                 $lists_array = explode('|',$linked_items_string_raw);
-                foreach($lists_array as $stock_id){
-                    if($stock_id !== null && $stock_id !== ""){
-                        $item = self::where('stock_id',$stock_id)->first();
-                        if($item){
-                            array_push($list_products,$item);
+                foreach($lists_array as $stock_n_qty){
+                    if(!empty($stock_n_qty)){
+                    $stock_n_qty = explode('&',$stock_n_qty);
+                    if(count($stock_n_qty)>1){
+                        $stock_id = $stock_n_qty[0];
+                        $qty = $stock_n_qty[1];
+                        if($stock_id !== null && $stock_id !== ""){
+                            $item = self::where('stock_id',$stock_id)->first();
+                            if($item){
+                                array_push($list_products,array('item'=>$item, 'quantity'=>$qty));
+                            }
                         }
                     }
+                    
+                }
                 }
             }
             return $list_products;
         }
         return null;
+    }
+    public function getStateLabelAttribute(){
+        if($this->inactive == 1){
+            return '<label class="label label-default">Inactive</label>';
+        }else if($this->inactive == 0){
+            return '<label class="label label-success">Active</label>';
+        }else{
+            return '<label class="label label-danger">Unknown State</label>';
+        }
+    }
+    public function getItemTypeAttribute(){
+        if($this->item_type_id==1){
+            return "Simple Product";
+        }else{
+            return "Grouped Product";   
+        }
     }
     public function getAllItem()
     {

@@ -164,7 +164,10 @@ class ItemController extends Controller
             return back()->withInput()->withErrors(['email' => "Invalid Request !"]);
         }
     }
-
+    public function ajaxGetAllItems(){
+        $items = Item::with('category')->get();
+        return response()->json($items);
+    }
     /**
      * Store a newly created Item  sales price in storage.
      * @param  \Illuminate\Http\Request  $request

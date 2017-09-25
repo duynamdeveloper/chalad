@@ -68,62 +68,34 @@
   
             <!-- /.box-header -->
             <div class="box-body">
-              <table id="itemList" class="table table-bordered table-striped">
+              <table id="itemList" class="table table-bordered table-striped" data-toolbar="#toolbar"
+           data-search="true"
+           data-show-refresh="true"
+           data-show-toggle="true"
+           data-show-columns="true"
+         
+          
+         data-pagination="true"
+        
+          
+           data-show-footer="false"
+         
+           data-url="{{url('item/ajax/list')}}">
                 <thead>
-                <tr>
-                  <th class="text-center">{{ trans('message.table.picture') }}</th>
-                  <th class="text-center">{{ trans('message.table.name') }}</th>
-                  <th class="text-center">{{ trans('message.table.category') }}</th>
-                  <th class="text-center">{{ trans('message.table.on_hand') }}</th>
-                  <th class="text-center">{{ trans('message.table.purchase') }}({{Session::get('currency_symbol')}})</th>
-                  <th class="text-center">{{ trans('message.table.wholesale') }}({{Session::get('currency_symbol')}})</th>
-                  <th class="text-center">{{ trans('message.table.retail') }}({{Session::get('currency_symbol')}})</th>
-                  <th class="text-center">{{ trans('message.form.status') }}</th>
-                  <th width="14%" class="text-center">{{ trans('message.table.action') }}</th>
-                </tr>
+                <th data-field="state" data-checkbox="true" align="center" valign="middle"></th>
+         <th data-field="id" data-align="center" data-valign="middle" sortable="true">ID</th>
+         <th data-field="item_type" data-align="center" data-valign="middle" sortable="true">Type</th>
+         <th data-field="name" data-align="left" data-valign="middle" sortable="true">Name</th>
+         <th data-field="item_image" data-align="left" data-valign="middle" sortable="true" data-formatter="itemImageFormatter">Image</th>
+         <th data-field="category" data-align="left" data-valign="middle" sortable="true" data-formatter="categoryFormatter">Category </th>
+         
+         <th data-field="stock_on_hand" data-align="right" data-valign="middle" sortable="true">On Hand</th>
+         <th data-field="price" data-align="right" data-valign="middle" sortable="true">Price</th>
+         <th data-field="linked_products" data-align="left" data-valign="middle" sortable="false" data-formatter="linkedProductFormatter">Linked Products</th>
+         <th data-field="state_label" data-align="center" data-valign="middle" sortable="true">Status</th>
+         <th data-align="center" data-valign="middle" sortable="false" data-formatter="operateFormatter">Action</th>
                 </thead>
-                <tbody>
-                @foreach ($itemData as $data)
-                <tr>
-                  <td width="5%" class="text-center">
-                  <a href="{{ url("edit-item/item-info/$data->item_id") }}">
-                    @if (!empty($data->img))
-                    <img src='{{url("public/uploads/itemPic/$data->img")}}' alt="" width="50" height="50">
-                    @else
-                    <img src='{{url("public/uploads/default-image.png")}}' alt="" width="50" height="50">
-                    @endif
-                    </a>
-                  </td>
-                  <td class="text-center"><a href="{{ url("edit-item/item-info/$data->item_id") }}">{{ $data->description }}</a></td>
-                  <td class="text-center">{{ $data->category_name }}</td>
-                  <td class="text-center">{{ $data->item_qty }}</td>
-                  <td class="text-center">{{ $data->purchase_price }}</td>
-                  <td class="text-center">{{ $data->whole_sale_price }}</td>
-                  <td class="text-center">{{ $data->retail_sale_price }}</td>
-                  <td class="text-center">
-                  @if($data->inactive == 0)
-                    <span class='label label-success'>{{ trans('message.table.active') }}</span>
-                  @else
-                    <span class='label label-danger'>{{ trans('message.table.inactive') }}</span>
-                  @endif
-                  </td>
-                  
-                  <td class="text-center">
-                  @if (!empty(Session::get('item_edit')))
-                      <a title="edit" class="btn btn-xs btn-primary" href='{{ url("edit-item/item-info/$data->item_id") }}'><span class="fa fa-edit"></span></a> &nbsp;
-                  @endif
-                  @if (!empty(Session::get('item_delete')))
-                      <form method="POST" action="{{ url("item/delete/$data->item_id") }}" accept-charset="UTF-8" style="display:inline">
-                          {!! csrf_field() !!}
-                          <button title="{{ trans('message.form.Delete') }}" class="btn btn-xs btn-danger" type="button" data-toggle="modal" data-target="#confirmDelete" data-title="{{ trans('message.table.delete_item_header') }}" data-message="{{ trans('message.table.delete_item') }}">
-                              <i class="glyphicon glyphicon-trash"></i> 
-                          </button> &nbsp;
-                      </form>
-                  @endif
-                  </td>
-                </tr>
-               @endforeach
-                </tfoot>
+       
               </table>
             </div>
             <!-- /.box-body -->
@@ -137,22 +109,40 @@
 @endsection
 
 @section('js')
+<script src="{{asset('public/plugins/bootstrap-table/bootstrap-table.js')}}"></script>
+<link rel="stylesheet" type="text/css" href="{{asset('public/plugins/bootstrap-table/bootstrap-table.css')}}">
     <script type="text/javascript">
 
-  $(function () {
-    $("#itemList").DataTable({
-      "order": [],
-
-      "columnDefs": [ {
-        "targets": 8,
-        "orderable": false
-        } ],
-
-        "language": '{{Session::get('dflt_lang')}}',
-        "pageLength": '{{Session::get('row_per_page')}}'
-    });
+ 
     
-  });
-
+$(document).ready(function(){
+  $("#itemList").bootstrapTable();
+});
+function itemImageFormatter(value, index, row){
+      return ['<img src="' + SITE_URL + '/public/uploads/itemPic/' + value + '" width="80px" height="80px">'];
+    }
+function categoryFormatter(value, index, row){
+  return value.description;
+}
+function operateFormatter(value, row, index) {
+    return ['<a href="' + SITE_URL + '/item/edit/' + row.order_no + '"><i class="glyphicon glyphicon-edit"></i></a>'];
+}
+function linkedProductFormatter(value, row, index){
+    var product_list = "";
+    
+    $.each(value, function(i,product){
+      if(value !== null && value.length > 0){
+       
+      
+        product_list += '<span class="text-primary"><strong>'+product.item.name+'</strong></span>' +' : '+'<small class="label bg-green">'+product.quantity+'</small>'   + '<br>';
+      }
+      
+    })
+    console.log(product_list);
+    if(product_list.length == 0){
+      return " - ";
+    }
+    return product_list;
+}
     </script>
 @endsection
