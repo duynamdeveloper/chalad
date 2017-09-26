@@ -1,546 +1,218 @@
 @extends('layouts.app')
 @section('content')
-    <!-- Main content -->
-    <section class="content">
-      <!-- Top Box-->
-      <div class="box">
-        <div class="box-body">
-          <strong>{{$itemInfo->description}}</strong>
-        </div>
-      </div><!--Top Box End-->
-      <!-- Default box -->
-      <div class="box">
-
-          <!-- Custom Tabs -->
-          <div class="nav-tabs-custom" id="tabs">
-            <ul class="nav nav-tabs">
-              
-              <li class="<?= ($tab=='item-info') ? 'active' :'' ?>"><a href="#tab_1" data-toggle="tab" aria-expanded="false">{{ trans('message.table.general_settings') }}</a></li>
-              <li class="<?= ($tab=='sales-info') ? 'active' :'' ?>"><a href="#tab_2" data-toggle="tab" aria-expanded="false">{{ trans('message.table.sales_pricing') }}</a></li>
-              <li class="<?= ($tab=='purchase-info') ? 'active' :'' ?>"><a href="#tab_3" data-toggle="tab" aria-expanded="true">{{ trans('message.table.purchase_pricing') }}</a></li>
-              <li class="<?= ($tab=='transaction-info') ? 'active' :'' ?>"><a href="#tab_4" data-toggle="tab" aria-expanded="false">{{ trans('message.table.transctions') }}</a></li>
-              <li class="<?= ($tab=='status-info') ? 'active' :'' ?>"><a href="#tab_5" data-toggle="tab" aria-expanded="true">{{ trans('message.table.status') }}</a></li>
-            
-            </ul>
-            <div class="tab-content">
-              <div class="tab-pane <?= ($tab=='item-info') ? 'active' :'' ?>" id="tab_1">
-                <div class="row">
-                <div class="col-md-6">
-                  <h4 class="text-info text-center">{{ trans('message.table.item_info') }}</h4>
-                  <form action="{{ url('update-item-info') }}" method="post" id="itemEditForm" class="form-horizontal" enctype="multipart/form-data">
-                    <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
-                    <input type="hidden" value="{{$itemInfo->id}}" name="id">
-                    <div class="box-body">
-                      <div class="form-group">
-                        <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.item_id') }}</label>
-                        <div class="col-sm-9">
-                          <input type="text" placeholder="{{ trans('message.form.item_id') }}" class="form-control" name="stock_id" value="{{$itemInfo->stock_id}}" readonly="true">
-                        </div>
-                      </div>
-
-                      <div class="form-group">
-                        <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.item_name') }}</label>
-
-                        <div class="col-sm-9">
-                          <input type="text" class="form-control" name="description" value="{{$itemInfo->description}}">
-                        </div>
-                      </div>
-
-                      <div class="form-group">
-                        <label class="col-sm-3 control-label" for="inputEmail3">{{ trans('message.form.category') }}</label>
-                        <div class="col-sm-9">
-                          <select class="form-control select2" name="category_id">
-                         
-                          @foreach ($categoryData as $data)
-                            <option value="{{$data->category_id}}" <?= ($data->category_id==$itemInfo->category_id)?'selected':''?>>{{$data->description}}</option>
-                          @endforeach
-                          </select>
-                        </div>
-                      </div>
-
-                    <div class="form-group">
-                        <label class="col-sm-3 control-label" for="inputEmail3">{{ trans('message.form.unit') }}</label>
-                        <div class="col-sm-9">
-                          <select class="form-control select2" name="units">
-                          @foreach ($unitData as $data)
-                            <option value="{{$data->name}}" <?= ($data->name==$itemInfo->units)?'selected':''?>>{{$data->name}}</option>
-                          @endforeach
-                          </select>
-                        </div>
-                      </div>                      
-                      
-                      <div class="form-group">
-                        <label class="col-sm-3 control-label" for="inputEmail3">{{ trans('message.form.item_tax_type') }}</label>
-                        <div class="col-sm-9">
-                          <select class="form-control select2" name="tax_type_id">
-                        
-                          @foreach ($taxTypes as $taxType)
-                            <option value="{{$taxType->id}}" <?= ($taxType->id==$itemInfo->tax_type_id)?'selected':''?>>{{$taxType->name}}</option>
-                          @endforeach
-                          </select>
-                        </div>
-                      </div>
-
-                     <!-- <div class="form-group">
-                        <label class="col-sm-3 control-label" for="inputEmail3">{{ trans('message.form.item_des') }}</label>
-
-                        <div class="col-sm-9">
-                          <textarea placeholder="{{ trans('message.form.item_des') }} ..." rows="3" class="form-control" name="long_description">{{$itemInfo->long_description}}</textarea>
-                        </div>
-                      </div>-->
-                      
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.weight') }}</label>
-                      <div class="col-sm-9">
-                        <input type="text" placeholder="{{ trans('message.form.weight') }}" class="form-control" name="weight" value="{{$itemInfo->weight}}">
-                      </div>
-                    </div>
-                    
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.special_price') }}</label>
-                      <div class="col-sm-9">
-                        <input type="text" placeholder="{{ trans('message.form.special_price') }}" class="form-control" name="special_price" value="{{$itemInfo->special_price}}">
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.qty_per_pack') }}</label>
-                      <div class="col-sm-9">
-                        <input type="text" placeholder="{{ trans('message.form.qty_per_pack') }}" class="form-control" name="qty_per_pack" value="{{$itemInfo->qty_per_pack}}">
-                      </div>
-                    </div>
-
-                      <div class="form-group">
-                        <label class="col-sm-3 control-label" for="inputEmail3">{{ trans('message.form.status') }}</label>
-
-                        <div class="col-sm-9">
-                          <select class="form-control valdation_select" name="inactive" >
-                            
-                            <option value="0" <?=isset($itemInfo->inactive) && $itemInfo->inactive ==  0? 'selected':""?> >Active</option>
-                            <option value="1"  <?=isset($itemInfo->inactive) && $itemInfo->inactive == 1 ? 'selected':""?> >Inactive</option>
-                          
-                          </select>
-                        </div>
-                      </div>
-
-                      <div class="form-group">
-                        <label class="col-sm-3 control-label" for="inputEmail3">{{ trans('message.form.picture') }}</label>
-                        <div class="col-sm-9">
-                          <input type="file" class="form-control input-file-field" name="item_image">
-                          <br>
-                          @if (!empty($itemInfo->item_image))
-                          <img src='{{ url("public/uploads/itemPic/$itemInfo->item_image") }}' alt="Item Image" width="80" height="80">
-                          @else
-                          <img src='{{ url("public/uploads/default_product.jpg") }}' alt="Item Image" width="80" height="80">
-                          @endif
-                         <input type="hidden" name="pic" value="{{ $itemInfo->item_image ? $itemInfo->item_image : 'NULL' }}">
-                            
-                        </div>
-                      </div>
-                      
-                    </div>
-                    <!-- /.box-body -->
-                    @if (!empty(Session::get('item_edit')))
-                    <div class="box-footer">
-                      <a href="{{ url('item') }}" class="btn btn-info btn-flat">{{ trans('message.form.cancel') }}</a>
-                      <button class="btn btn-primary pull-right btn-flat" type="submit">{{ trans('message.form.submit') }}</button>
-                    </div>
-                    @endif
-                    <!-- /.box-footer -->
-                  </form>
-              </div>
-              </div>
-              </div>
-              <!-- /.tab-pane -->
-              <div class="tab-pane <?= ($tab=='sales-info') ? 'active' :'' ?>" id="tab_2">
-                <div class="row">
-                <div class="col-md-6">
-                  <h4 class="text-info text-center"></h4>
-                <div class="box-body">
-                  @if (!empty(Session::get('item_edit')))
-                  <button data-toggle="modal" data-target="#add-type" type="button" class="btn btn-default add_br btn-flat btn-border-orange" style="margin-bottom: 10px;">{{ trans('message.table.add_new') }}</button>
-                  @endif
-                  <table id="example1" class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                      <th>{{ trans('message.table.sale_type') }}</th>
-                      <th>{{ trans('message.table.price') }}({{Session::get('currency_symbol')}})</th>
-                      <th width="15%" class="text-center">{{ trans('message.table.action') }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php 
-                      $type = [1,2];
-                    ?>
-                 @foreach($salePriceData as $value)
-                    <tr>
-                      <td>{{$salesTypeName[$value->sales_type_id]}}</td>
-                      <td>{{$value->price}}</td>
-                      <td class="text-center">
-                        @if (!empty(Session::get('item_edit')))
-                          <button class="btn btn-xs btn-primary edit_type" id="{{$value->id}}" type="button">
-                              <i class="glyphicon glyphicon-edit"></i> 
-                          </button>&nbsp;
-                        @endif
-                        @if (!empty(Session::get('item_delete')))
-                          @if(! in_array($value->sales_type_id, $type))
-                          <form method="POST" action="{{ url("delete-sale-price/$value->id/$itemInfo->id") }}" accept-charset="UTF-8" style="display:inline">
-                              {!! csrf_field() !!}
-                              <button title="{{ trans('message.form.Delete') }}" class="btn btn-xs btn-danger" type="button" data-toggle="modal" data-target="#confirmDelete" data-title="{{ trans('message.table.delete_item_header') }}" data-message="{{ trans('message.table.delete_item') }}">
-                                  <i class="glyphicon glyphicon-trash"></i> 
-                              </button> &nbsp;
-                          </form>
-                          @endif
-
-                          @endif
-                      </td>
-                    </tr>
-                   @endforeach
-
-                    </tfoot>
-                  </table>
-
+    <div class="container-fluid">
+        <div class="row">
+            <div class="box box-success">
+                <div class="box-header text-left">
+                    <h3 class="text-primary">Edit Product <span class="text-warning">{{$item->name}}</span></h3>
                 </div>
-
-
-<div id="add-type" class="modal fade" role="dialog" style="display: none;">
-  <div class="modal-dialog">
-
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">×</button>
-        <h4 class="modal-title">{{ trans('message.table.add_new') }}</h4>
-      </div>
-      <div class="modal-body">
-        <form action="{{ url('add-sale-price') }}" method="post" id="salesInfoForm" class="form-horizontal">
-            <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
-            <input type="hidden" value="{{$salesInfo->stock_id}}" name="stock_id">
-            <input type="hidden" value="USD" name="curr_abrev" id="curr_abrev">
-            <input type="hidden" value="{{$itemInfo->id}}" name="item_id">
-
-          <div class="form-group">
-            <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.sales_type') }}</label>
-
-            <div class="col-sm-6">
-              <select class="form-control" name="sales_type_id">
-              <option value="">{{ trans('message.form.select_one') }}</option>
-              @foreach ($saleTypes as $saleType)
-                <option value="{{$saleType->id}}">{{$saleType->sales_type}}</option>
-              @endforeach
-              </select>
+               
             </div>
-          </div>
-          
-          <div class="form-group">
-            <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.price') }}</label>
-
-            <div class="col-sm-6">
-              <input type="text" class="form-control" name="price" placeholder="{{ trans('message.form.price') }}">
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="btn_save" class="col-sm-3 control-label"></label>
-            <div class="col-sm-6">
-              <button type="button" class="btn btn-info btn-flat" data-dismiss="modal">{{ trans('message.form.close') }}</button>
-              <button type="submit" class="btn btn-primary pull-right btn-flat">{{ trans('message.form.submit') }}</button>
-            </div>
-          </div>
-        </form>
-      </div>
-
-    </div>
-
-  </div>
-</div>
-
-<!-- edit modal sales type -->
-<div id="edit-type-modal" class="modal fade" role="dialog" style="display: none;">
-  <div class="modal-dialog">
-
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">×</button>
-        <h4 class="modal-title">{{ trans('message.table.edit') }}</h4>
-      </div>
-      <div class="modal-body">
-        <form action="{{ url('update-sale-price') }}" method="post" id="editType" class="form-horizontal">
-            {!! csrf_field() !!}
-
-          <div class="form-group">
-            <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.sales_type') }}</label>
-
-            <div class="col-sm-6">
-              <input type="text" id="sales_type_id" class="form-control" readonly>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.price') }}</label>
-
-            <div class="col-sm-6">
-              <input type="text" id="price" class="form-control" name="price" placeholder="{{ trans('message.form.price') }}">
-            </div>
-          </div>
-          
-          <input type="hidden" name="id" id="type_id">
-          <input type="hidden" value="{{$itemInfo->id}}" name="item_id">
-
-          
-          <div class="form-group">
-            <label for="btn_save" class="col-sm-3 control-label"></label>
-            <div class="col-sm-6">
-              @if (!empty(Session::get('item_edit')))
-              <button type="button" class="btn btn-info btn-flat" data-dismiss="modal">{{ trans('message.form.close') }}</button>
-              <button type="submit" class="btn btn-primary btn-flat">{{ trans('message.form.submit') }}</button>
-              @endif
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
-  </div>
-</div>
-              </div>
-              </div>
-
-              </div>
-              <!-- /.tab-pane -->
-              <div class="tab-pane <?= ($tab=='purchase-info') ? 'active' :'' ?>" id="tab_3">
-                <div class="row">
-                <div class="col-md-6">
-                  <h4 class="text-info text-center"></h4>
-                  <form action="{{ url('update-purchase-price') }}" method="post" id="purchaseInfoForm" class="form-horizontal">
-                    <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
-                    <input type="hidden" value="{{$itemInfo->stock_id }}" name="stock_id">
-                    <input type="hidden" value="{{$itemInfo->id}}" name="item_id">
+           <form id="addProductForm" class="form-horizontal" method="post" action="{{url('item/update')}}" enctype="multipart/form-data">
+      <input type="hidden" name="id" value="{{$item->id}}">
+        <div class="row">
+           {{ csrf_field() }}
+            <!--Left Panel-->
+            <div class="col-md-8">
+                <div class="box box-success">
+                    <div class="box-header text-left">
+                        <h4 class="text-primary">Basic Information</h4>
+                    </div>
                     <div class="box-body">
-                                     
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label" for="inputEmail3">{{ trans('message.form.price') }} <span class="text-danger"> *</label>
-                      <div class="col-sm-9">
-                        <input type="text" placeholder="{{ trans('message.form.price') }}" class="form-control" name="price" value="{{isset($purchaseInfo->price) ? $purchaseInfo->price : 0}}">
-                      </div>
-                    </div>
-                                                            
-                  </div>
-                  <!-- /.box-body -->
-                  @if (!empty(Session::get('item_edit')))
-                  <div class="box-footer">
-                    <a href="{{ url('item') }}" class="btn btn-primary btn-flat">{{ trans('message.form.cancel') }}</a>
-                    <button class="btn btn-info pull-right btn-flat" type="submit">{{ trans('message.form.submit') }}</button>
-                  </div>
-                  @endif
-                  <!-- /.box-footer -->
-                </form>
-              </div>
-              </div>
-
-              </div>
-             
-              <div style="min-height:200px" class="tab-pane <?= ($tab=='transaction-info') ? 'active' :'' ?>" id="tab_4">
-                @if(count($transations)>0)
-                <table class="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th class="text-center">{{ trans('message.table.transaction_type')}}</th>
-                      <th class="text-center">{{ trans('message.table.transaction_date')}}</th>
-                      <th class="text-center">{{ trans('message.table.location')}}</th>
-                      <th class="text-center">{{ trans('message.table.qty_in')}}</th>
-                      <th class="text-center">{{ trans('message.table.qty_out')}}</th>
-                      <th class="text-center">{{ trans('message.table.qty_on_hand')}}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                    $sum = 0;
-                    $StockIn = 0;
-                    $StockOut = 0;
-                    ?>
-                    @foreach($transations as $result)
-                    <tr>
-                      <td align="center">
-                        
-                        @if($result->trans_type == PURCHINVOICE)
-                          <a href="{{URL::to('/purchase/view-purchase-details/'.$result->transaction_reference_id)}}">Purchase</a>
-                        @elseif($result->trans_type == SALESINVOICE)
-                          <a href="{{URL::to('/invoice/view-detail-invoice/'.$result->order_no.'/'.$result->transaction_reference_id)}}">Sale</a>
-                        @elseif($result->trans_type == STOCKMOVEIN)
-                          <a href="{{URL::to('/transfer/view-details/'.$result->transaction_reference_id)}}">Transfer</a>
-                        @elseif($result->trans_type == STOCKMOVEOUT)
-                          <a href="{{URL::to('/transfer/view-details/'.$result->transaction_reference_id)}}">Transfer</a>
-                        @endif
-
-                      </td>
-                      <td align="center">{{formatDate($result->tran_date)}}</td>
-                      <td align="center">{{$result->location_name}}</td>
-                      <td align="center">
-                        @if($result->qty >0 )
-                          {{$result->qty}}
-                          <?php
-                          $StockIn +=$result->qty;
-                          ?>
-                        @else
-                        -
-                        @endif
-                      </td>
-                      <td align="center">
-                        @if($result->qty <0 )
-                          {{str_ireplace('-','',$result->qty)}}
-                          <?php
-                          $StockOut +=$result->qty;
-                          ?>
-                        @else
-                        -
-                        @endif
-                      </td>
-                      <td align="center">{{$sum += $result->qty}}</td>
-                    </tr>
-                    @endforeach
-                    <tr><td colspan="3" align="right">{{ trans('message.table.total')}}</td><td align="center">{{$StockIn}}</td><td align="center">{{str_ireplace('-','',$StockOut)}}</td><td align="center">{{$StockIn+$StockOut}}</td></tr>
-                  </tbody>
-                </table>
-                @else
-                <br>
-                {{ trans('message.table.no_transaction')}}
-                @endif
-
-              </div>
-
-          <!-- /.tab-pane status -->
-              <div class="tab-pane <?= ($tab=='status-info') ? 'active' :'' ?>" id="tab_5">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="box-body">
-                      <table id="example1" class="table table-bordered table-striped">
-                        <thead>
-                        <tr>
-                          <th>{{ trans('message.table.location')}}</th>
-                          <th>{{ trans('message.table.qty_available')}}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @if(!empty($locData))
-                        <?php
-                          $sum = 0;
-                        ?>
-                        @foreach ($locData as $data)
-                        <tr>
-                          <td>{{$data->location_name}}</td>
-                          <td>{{getItemQtyByLocationName($data->loc_code,$salesInfo->stock_id)}}</td>
-                        </tr>
-                        <?php
-                          $sum += getItemQtyByLocationName($data->loc_code,$salesInfo->stock_id); 
-                        ?>
-                       @endforeach
-                       @endif
-                       <tr><td align="right">{{ trans('message.invoice.total') }}</td><td>{{$sum}}</td></tr>
-                        </tfoot>
-                      </table>
+                        <div class="form-group">
+                        <label class="text-left control-label col-sm-2 ">Name:</label>
+                        <div class="col-sm-6">
+                            <input class="form-control" name="product_name" width="50%" placeholder="Product Name" value="{{$item->name}}">    
+                        </div>
+                        </div>
+                          <div class="form-group">
+                        <label class="text-left control-label col-sm-2 ">SKU:</label>
+                        <div class="col-sm-6">
+                            <input class="form-control" name="product_sku" width="50%" placeholder="SKU" value="{{$item->stock_id}}">    
+                        </div>
+                        </div>
+                         <div class="form-group">
+                      
+                        <div class="col-sm-12">
+                          <label class="control-label">Description:</label>
+                            <textarea class="form-control" name="description">{{$item->description}}</textarea>    
+                        </div>
+                        </div>
+                         <div class="form-group">
+                      
+                        <div class="col-sm-12">
+                          <label class="control-label">Short Description:</label>
+                            <textarea class="form-control" name="short_description">{{$item->short_description}}</textarea>    
+                        </div>
+                        </div>
+                         <div class="form-group">
+                        <label class="text-left control-label col-sm-2 ">Category:</label>
+                        <div class="col-sm-6">
+                            <select class="form-control select2" name="category_id" id="cat">
+                       
+                                @foreach ($categoryData as $data)
+                                <option value="{{$data->category_id}}" data='{{$unit_name["$data->dflt_units"]}}' @if($item->category_id == $data->category_id) selected="true" @endif>{{$data->description}}</option>
+                                @endforeach
+                            </select>    
+                        </div>
+                        </div>
+                        <div class="form-group">
+                        <label class="text-left control-label col-sm-2 ">Regular Price:</label>
+                        <div class="col-sm-6">
+                            <input class="form-control" name="regular_price" width="50%" value="{{$item->price}}">    
+                        </div>
+                        </div>
+                          <div class="form-group">
+                        <label class="text-left control-label col-sm-2 ">Special Price:</label>
+                        <div class="col-sm-6">
+                            <input class="form-control" name="special_price" width="50%" value="{{$item->special_price}}">    
+                        </div>
+                        </div>
+                         <div class="form-group">
+                        <label class="col-sm-2 control-label">Status:</label>
+                        <div class="col-sm-9">
+                            <label class="radio-inline"><input type="radio" name="status" value="0" @if($item->inactive==0) checked @endif>Active</label>
+                                <label class="radio-inline"><input type="radio" name="status" value="1" @if($item->inactive==1) checked @endif>Inactive</label>
+                        </div>
                     </div>
                     </div>
-                    </div>
-              </div>
-              
-              <!-- /.tab-pane -->
+                   
+                </div>
+       
             </div>
-            <!-- /.tab-content -->
-          </div>
-          <!-- nav-tabs-custom -->
-        
-          </div>
-        <div class="clearfix"></div>
-        <!-- /.box-footer-->
-      
-      <!-- /.box -->
+               <div class="col-md-4">
+               
+       
+                <div class="box box-success">
+                    <div class="box box-header">
+                        <h4 class="text-primary text-left">Specifications</h4>
+                    </div>
+                    <div class="box box-body">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Product Type</label>
+                            <div class="col-sm-9">
+                                <label class="radio-inline"><input type="radio" name="item_type" value="1" @if($item->item_type_id == 1) checked @else disabled="true" @endif>Simple Product</label>
+                                <label class="radio-inline"><input type="radio" name="item_type" value="2" @if($item->item_type_id == 2) checked @else disabled="true" @endif>Grouped Product</label>
+                            </div>
+                        </div>
+                            <div id="simple_product_group" @if($item->item_type_id !== 1) hidden @endif>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-lable">Weight: </label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="weight" placeholder="weight" value="{{$item->weight}}">
+                                    </div>
+                                </div>
+                                 <div class="form-group">
+                                    <label class="col-sm-3 control-lable">Pieces/Pack: </label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="qty_per_pack" placeholder="Pieces/Pack" value="{{$item->qty_per_pack}}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="grouped_product_group" @if($item->item_type_id !== 2) hidden @endif>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                       <div class="form-group">
 
-    </section>
+                                        <label class="col-md-3 control-label">Search :</label>
+                                        <div class="col-md-4">
 
-    @include('layouts.includes.message_boxes')
+                                            <input class="form-control" id="inp_live_search">
+
+                                            <div id="livesearch" hidden>
+
+                                                <ul>
+                                                    <li><img src="{{asset('public/img/loading-icon.gif')}}" width="50px" height="50px"> Loading...</li>
+
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        </div>
+                                        <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <table class="table table-bordered" id="list-products">
+                                        <thead>
+                                        <th>STOCK ID</th>
+                                        <th>IMAGE</th>
+                                        <th>NAME</th>
+                                        <th>QUANTITY</th>
+                                        <th>ACTION</th>
+                                        </thead>
+                                        <tbody>
+                                        @if(!empty($item->linked_products))
+                                        @foreach($item->linked_products as $linked_product)
+                                            
+                                            <tr item-id="{{$linked_product['item']->stock_id}}">
+                                                <td>{{$linked_product['item']->stock_id}}</td>
+                                                <td><img src="{{asset('public/uploads/itemPic/'.$linked_product['item']->item_image)}}" width="80px" height="80px"></td>
+                                                <td>{{$linked_product['item']->name}}</td>
+                                                <td><input name="item_quantity" class="form-control inp_item_qty" value="{{$linked_product['quantity']}}"></td>
+                                                <td><span class="glyphicon glyphicon-remove text-danger removeProduct"></span></td>
+
+                                            </tr>
+                                        @endforeach
+                                        @endif
+                                        </tbody>
+                                        </table>
+                                        </div>
+                                    <input type="hidden" name="product_list" id="hiddenProductList">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                             <div class="box box-success">
+                    <div class="box-header text-left">
+                        <h4 class="text-primary">Image</h4>
+                    </div>
+                    <div class="box-body">
+                    	<div class="form-group">
+                     
+                      <div class="col-sm-8 col-sm-offset-2 text-center">
+                                       <span class="btn btn-success fileinput-button">
+        <i class="glyphicon glyphicon-plus"></i>
+        <span>Choose a image</span>
+                        <input type="file" class="form-control input-file-field" name="item_image" id="simpleProductForm_itemImage">
+                          </span>
+                          
+                          <img width="100%" height="300px" id="simpleProductForm_imagePreview" src="{{asset('/public/uploads/itemPic/'.$item->item_image)}}" style="margin-top: 15px;"><br>
+                          <p class="text-primary" id="simpleProductForm_imageName">Current Image</p>
+                      </div>
+ 
 
 
+                    </div>
+                    </div>
+                </div>
+               
+                </div>
+            </div>
+           
+        </div>
+         <div class="row">
+                  <div class="box box-success">
+                   
+                    <div class="box-body text-center">
+                        <button class="btn btn-success" type="submit">Save Product</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+            <!-- End Left Panel -->
+
+            <!-- Right Panel -->
+         
+            <!-- End right Panel -->
+        </div>
+    </div>
 @endsection
 @section('js')
-    <script type="text/javascript">
-$(document).ready(function () {
-// Item form validation
-    $('#itemEditForm').validate({
-        rules: {
-            stock_id: {
-                required: true
-            },
-            description: {
-                required: true
-            },
-            category_id:{
-               required: true
-            },
-            tax_type_id:{
-               required: true
-            }, 
-            units:{
-               required: true
-            }                        
-        }
-    });
-    // Sales form validation
-    $('#salesInfoForm').validate({
-        rules: {
-            sales_type_id: {
-                required: true
-            },
-            price: {
-                required: true
-            }                        
-        }
-    });
-
-    // Purchse form validation
-    $('#purchaseInfoForm').validate({
-        rules: {
-            supplier_id: {
-                required: true
-            },
-            price: {
-                required: true
-            },
-            suppliers_uom: {
-                required: true
-            }                                     
-        }
-    });
-
-    $(".select2").select2({
+<script type="text/javascript">
+     $(".select2").select2({
        width: '100%'
     });
-
-
-    $('.edit_type').on('click', function() {
-      
-        var id = $(this).attr("id");
-
-        $.ajax({
-            url: '{{ URL::to('edit-sale-price')}}',
-            data:{  // data that will be sent
-                id:id
-            },
-            type: 'POST',
-            dataType: 'JSON',
-            success: function (data) {
-              
-                $('#sales_type_id').val(data.sales_type_id);
-                $('#price').val(data.price);
-                $('#type_id').val(data.id);
-
-                $('#edit-type-modal').modal();
-            }
-        });
-
-    });
-
-});
-
-    </script>
+</script>
+<script type="text/javascript" src="{{asset('public/dist/js/pages/item/item-add.js')}}"></script>
 @endsection

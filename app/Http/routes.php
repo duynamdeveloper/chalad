@@ -110,9 +110,12 @@
 		], function(){
 			Route::get('/','ItemController@index');
 			Route::get('/add','ItemController@create');
-			Route::post('/save-simple-product','ItemController@storeSimpleProduct');
+			Route::get('/edit/{id}','ItemController@edit');
+			Route::post('/save','ItemController@store');
+			Route::post('/update','ItemController@update');
 			Route::post('/save-grouped-product','ItemController@storeGroupedProduct');
 			Route::get('/save-specification','ItemController@saveSpecification');
+			Route::get('/ajax/list','ItemController@ajaxGetAllItems');
 		});
 		Route::get('item','ItemController@index');
 		Route::get('create-item/{tab}','ItemController@create');

@@ -581,3 +581,26 @@ color:#3C8DBC;
     font-size: 18px;
     cursor: pointer;
 }
+#addProductForm .control-label{
+    text-align: left !important;
+}
+#inpProductName{
+    font-size: 18px;
+    font-weight: bold;
+}
+.fileinput-button {
+	position: relative;
+	overflow: hidden;
+	display: inline-block;
+}
+.fileinput-button input {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: 0;
+	opacity: 0;
+	-ms-filter: 'alpha(opacity=0)';
+	font-size: 200px !important;
+	direction: ltr;
+	cursor: pointer;
+}

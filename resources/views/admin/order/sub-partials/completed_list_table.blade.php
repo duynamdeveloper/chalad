@@ -6,8 +6,7 @@
            data-show-refresh="true"
            data-show-toggle="true"
            data-show-columns="true"
-           data-detail-view="true"
-           data-detail-formatter="detailFormatter"
+         
            data-show-pagination-switch="true"
          data-pagination="true"
         
