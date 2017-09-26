@@ -40,73 +40,6 @@
                         </div>
                          <div class="form-group">
                       
-<<<<<<< HEAD
-                      </div>
-                    </div>
-                      <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">Cost Price</label>
-
-                      <div class="col-sm-9">
-                        <input type="text" placeholder="Cost Price" class="form-control" name="cost_price" value="{{old('cost_price')}}">
-                        <span id="price" style="color: red"></span>
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label" for="inputEmail3">{{ trans('message.form.picture') }}</label>
-                      <div class="col-sm-9">
-                        <input type="file" class="form-control input-file-field" name="item_image">
-                      </div>
-                    </div>
-                     <div class="form-group">
-                      <label class="col-sm-3 control-label" for="inputEmail3">Status</label>
-                      <div class="col-sm-9">
-                        <select class="form-control" name="status">
-                          <option value="0">Active</option>
-                           <option value="1">Inactive</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- /.box-body -->
-                  <div class="box-footer">
-                    <a href="{{ url('item') }}" class="btn btn-info btn-flat">{{ trans('message.form.cancel') }}</a>
-                    <button class="btn btn-primary pull-right btn-flat" type="submit">{{ trans('message.form.submit') }}</button>
-                  </div>
-                  <!-- /.box-footer -->
-                </form>
-              </div>
-              </div>
-              </div>
-              <!-- /.tab-pane -->
-              <div class="tab-pane" id="tab_2">
-
-                     <div class="row">
-                <div class="col-md-6">
-                  <h4 class="text-info text-center">{{ trans('message.table.item_info') }}</h4>
-                <form action="{{ url('item/save-grouped-product') }}" method="post" id="addGroupedProduct" class="form-horizontal" enctype="multipart/form-data">
-                  <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
-                  <div class="box-body">
-             
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">Product Code</label>
-                      <div class="col-sm-9">
-                        <input type="text" placeholder="{{ trans('message.form.item_id') }}" class="form-control" name="stock_id" value="{{old('stock_id')}}" required>
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label require" for="inputEmail3">{{ trans('message.form.item_name') }}</label>
-
-                      <div class="col-sm-9">
-                        <input type="text" placeholder="{{ trans('message.form.item_name') }}" class="form-control valdation_check" name="description" value="{{old('description')}}" required>
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label" for="inputEmail3">{{ trans('message.form.category') }}</label>
-                      <div class="col-sm-9">
-                        <select class="form-control select2" name="category_id" id="cat">
-=======
                         <div class="col-sm-12">
                           <label class="control-label">Short Description:</label>
                             <textarea class="form-control" name="short_description"></textarea>    
@@ -116,7 +49,6 @@
                         <label class="text-left control-label col-sm-2 ">Category:</label>
                         <div class="col-sm-6">
                             <select class="form-control select2" name="category_id" id="cat">
->>>>>>> e611f1bd972188b5834f68442a84193766c4d704
                        
                                 @foreach ($categoryData as $data)
                                 <option value="{{$data->category_id}}" data='{{$unit_name["$data->dflt_units"]}}' >{{$data->description}}</option>
