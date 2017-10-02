@@ -201,5 +201,6 @@
        width: '100%'
     });
 </script>
+
 <script type="text/javascript" src="{{asset('public/dist/js/pages/item/item-add.js')}}"></script>
 @endsection

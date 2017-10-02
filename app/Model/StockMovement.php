@@ -10,11 +10,18 @@ class StockMovement extends Model
 {
 	protected $table="stock_movements";
 	protected $fillable = ['product_code','shipment_id','quantity','created_at','updated_at'];
+	protected $appends = ['type_label'];
 	public function item(){
 		return $this->belongsTo('App\Model\Item','stock_id','stock_id');
 	}
-	public function reason(){
-		return $this->belongsTo('App\Model\Reason','reason_id','id');
+	public function getTypeLabelAttribute(){
+		if($this->type == 'in'){
+			return '<span class="glyphicon glyphicon-arrow-right text-success"></span>';
+		}else if($this->type == 'out'){
+			return '<span class="glyphicon glyphicon-arrow-left text-danger"></span>';
+		}else{
+			return 'Unknown';
+		}
 	}
 	public function updateStockMoveWithShipment($shipment_id)
 	{
@@ -22,36 +29,30 @@ class StockMovement extends Model
 		if(!empty($shipment_details)){
 			foreach($shipment_details as $detail){
 
-				$quantity = - $detail->quantity;
+				$quantity = $detail->quantity;
 				$status = $detail->status;
 				$stock_id = $detail->stock_id;
 				$condition = true;
 
-				if($status == 0){
-				
-					$reason = Config::get('constants.REASON.READY_TO_SHIP');
-				}else if($status == 1){
-	
-					$reason = Config::get('constants.REASON.SHIPPED');
-				}else{
-					$condition = false;
-				}
+				$reason = 'Sale Orders';
 
-				if($condition){
-					$stock_move = StockMovement::where('shipment_id',$shipment_id)->where('stock_id',$stock_id)->first();
-					if(empty($stock_move)){
-						$stock_move = new StockMovement();
-						$stock_move->shipment_id = $shipment_id;
-						$stock_move->stock_id = $stock_id;
-						$stock_move->quantity = $quantity;
-						$stock_move->reason_id = $reason;
-						$stock_move->save();
-					}else{
-						$stock_move->quantity = $quantity;
-						$stock_move->reason_id = $reason;
-						$stock_move->update();
-					}
+				
+				$stock_move = StockMovement::where('shipment_id',$shipment_id)->where('stock_id',$stock_id)->first();
+				if(empty($stock_move)){
+					$stock_move = new StockMovement();
+					$stock_move->shipment_id = $shipment_id;
+					$stock_move->stock_id = $stock_id;
+					$stock_move->quantity = $quantity;
+					$stock_move->type = 'out';
+					$stock_move->reason = $reason;
+					$stock_move->save();
+				}else{
+					$stock_move->quantity = $quantity;
+					$stock_move->type = 'out';
+					$stock_move->reason = $reason;
+					$stock_move->update();
 				}
+				
 
 			}
 		}
@@ -63,7 +64,7 @@ class StockMovement extends Model
 	}
 	public function getAllStockMoves()
 	{
-		$sql = "select stock_movements.*, item_code.description as item_name, stock_move_reasons.name as reason from stock_movements left join item_code on stock_movements.stock_id = item_code.stock_id left JOIN stock_move_reasons on stock_movements.reason_id = stock_move_reasons.id order by stock_movements.id";
+		$sql = "select stock_movements.*, item_code.description as item_name from stock_movements left join item_code on stock_movements.stock_id = item_code.stock_id left JOIN stock_move_reasons on stock_movements.reason_id = stock_move_reasons.id order by stock_movements.id";
 		$data = DB::select(DB::raw($sql));
 		return $data;
 	}
