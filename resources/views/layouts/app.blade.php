@@ -8,27 +8,27 @@
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <meta name="_token" content="{!! csrf_token() !!}"/>
   <!-- Bootstrap 3.3.6 -->
-  <link rel="stylesheet" href="{{ asset('/bootstrap/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('public/bootstrap/css/bootstrap.min.css') }}">
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="{{ asset('/bootstrap/css/font-awesome.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('public/bootstrap/css/font-awesome.min.css') }}">
   <!-- Ionicons -->
-  <link rel="stylesheet" href="{{ asset('/bootstrap/css/ionicons.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('public/bootstrap/css/ionicons.min.css') }}">
   <!-- DataTables -->
-  <link rel="stylesheet" href="{{ asset('/plugins/datatables/dataTables.bootstrap.css') }}">
+  <link rel="stylesheet" href="{{ asset('public/plugins/datatables/dataTables.bootstrap.css') }}">
   <!-- Select2 -->
-  <link rel="stylesheet" href="{{ asset('/plugins/select2/select2.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('public/plugins/select2/select2.min.css') }}">
   <!-- Theme style -->
-  <link rel="stylesheet" href="{{ asset('/dist/css/AdminLTE.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('public/dist/css/AdminLTE.min.css') }}">
   <!--<link rel="stylesheet" href="{{ asset('dist/css/custom.css') }}">-->
   <!-- AdminLTE Skins. Choose a skin from the css/skins
        folder instead of downloading all of them to reduce the load. -->
-  <link rel="stylesheet" href="{{ asset('/dist/css/skins/_all-skins.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('public/dist/css/skins/_all-skins.min.css') }}">
   <!-- Date Picker -->
-  <link rel="stylesheet" href="{{ asset('/plugins/datepicker/datepicker3.css') }}">
-  <link rel="stylesheet" href="{{ asset('/dist/css/jquery-ui.min.css') }}" type="text/css" />
-  <link rel="stylesheet" href="{{ asset('/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css') }}" type="text/css" />
-  <link rel="stylesheet" href="{{ asset('/dist/css/custom.css') }}">
-  <link rel="stylesheet" href="{{ asset('/dist/css/bootstrap-confirm-delete.css') }}">
+  <link rel="stylesheet" href="{{ asset('public/plugins/datepicker/datepicker3.css') }}">
+  <link rel="stylesheet" href="{{ asset('public/dist/css/jquery-ui.min.css') }}" type="text/css" />
+  <link rel="stylesheet" href="{{ asset('public/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css') }}" type="text/css" />
+  <link rel="stylesheet" href="{{ asset('public/dist/css/custom.css') }}">
+  <link rel="stylesheet" href="{{ asset('public/dist/css/bootstrap-confirm-delete.css') }}">
 @yield('styles')
   <script type="text/javascript">
     var SITE_URL = "{{URL::to('/')}}";

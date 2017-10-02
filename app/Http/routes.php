@@ -333,6 +333,12 @@
 		});
 
 		// supplier 
+		Route::group([
+			'prefix' => 'supplier',
+			'as' => '.supplier'
+		], function(){
+			Route::get('/ajax/get','SupplierController@ajaxGet');
+		});
 		Route::get('supplier','SupplierController@index');
 		Route::get('create-supplier','SupplierController@create');
 		Route::post('save-supplier','SupplierController@store');
@@ -346,9 +352,14 @@
 		Route::post('supplierimportcsv', 'SupplierController@importCsv');
 
 		// check-in Purchese Order
+		Route::group([
+			'prefix' => 'purchase',
+			'as' => '.purchase'
+		], function(){
+			Route::post('/save', 'PurchaseController@store');
+		})
 		Route::get('purchase/list','PurchaseController@index');
 		Route::get('purchase/add','PurchaseController@create');
-		Route::post('purchase/save','PurchaseController@store');
 		Route::get('purchase/edit/{id}','PurchaseController@edit');
 		Route::post('purchase/update','PurchaseController@update');
 		Route::post('purchase/delete/{id}','PurchaseController@destroy');

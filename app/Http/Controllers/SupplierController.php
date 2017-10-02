@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Model\Purchase;
+use App\Model\Supplier;
 use DB;
 use Excel;
 use Validator;
@@ -44,11 +45,18 @@ class SupplierController extends Controller
         $data['supplierData'] = \DB::table('suppliers')->where('supplier_id', $sid)->first();
         //d($data['supplierData'],1);
         $data['purchData'] = (new Purchase)->getAllPurchOrderById($sid);
-        
         return view('admin.supplier.supplier_order', $data);
     }
 
+    public function ajaxGet(Request $request)
+    {
+        $supplier = Supplier::find($request->id);
+        if($supplier){
+            return response()->json(['state'=>true, 'supplier'=>$supplier]);
+        }
 
+        return response()->json(['state'=>false]);
+    }
     /**
      * Show the form for creating a new Customer.
      *

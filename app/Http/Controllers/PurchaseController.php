@@ -7,6 +7,7 @@ use App\Model\Purchase;
 use App\Http\Requests;
 use DB;
 use PDF;
+use App\Model\Supplier;
 
 class PurchaseController extends Controller
 {
@@ -36,34 +37,10 @@ class PurchaseController extends Controller
     public function create()
     {
         $data['menu'] = 'purchase';
-
-        $data['itemList'] = DB::table('item_code')->where(['inactive'=>0,'deleted_status'=>0])->get();
-
-        $data['suppData'] = DB::table('suppliers')->where(['inactive'=>0])->get();
-        $data['locData'] = DB::table('location')->get();
-        $data['order'] = DB::table('purch_orders')->select('order_no')->orderBy('order_no', 'desc')->limit(1)->first();
-        $order_count = DB::table('purch_orders')->count();
-
-        if($order_count>0){
-        $orderReference = DB::table('purch_orders')->select('reference')->orderBy('order_no','DESC')->first();
-
-        $ref = explode("-",$orderReference->reference);
-        $data['order_count'] = (int) $ref[1];
-        }else{
-            $data['order_count'] = 0 ;
-        }
-
-        $taxTypeList = DB::table('item_tax_types')->get();
-        $taxOptions = '';
-        $selectStart = "<select class='form-control taxList' name='tax_id[]'>";
-        $selectEnd = "</select>";
-        
-        foreach ($taxTypeList as $key => $value) {
-            $taxOptions .= "<option value='".$value->id."' taxrate='".$value->tax_rate."'>".$value->name.'('.$value->tax_rate.')'."</option>";          
-        }
-        $data['tax_type'] = $selectStart.$taxOptions.$selectEnd;
-      
-        return view('admin.purchase.purch_add', $data);
+        $data['tax_types'] = DB::table('item_tax_types')->get();
+        $data['suppliers'] = Supplier::all();
+        $data['countries'] = DB::table('countries')->get();
+        return view('admin.purchase.purchase_add', $data);
     }
 
     /**
@@ -76,84 +53,14 @@ class PurchaseController extends Controller
     {
         $user_id = \Auth::user()->id;
 
-        $this->validate($request, [
-            'reference'=>'required|unique:purch_orders',
-            'into_stock_location' => 'required',
-            'ord_date' => 'required',
-            'supplier_id' => 'required',
-            'item_quantity' => 'required',
-        ]);
+        $supplier = $request->supplier;
+        $items = $request->item;
+        $shipping_cost = $request->shipping_cost;
+        $grand_total = $request->grand_total;
 
-
-        $itemQty = $request->item_quantity;        
-        $itemIds = $request->item_id;
-        $taxIds = $request->tax_id;
-        $itemPrice = $request->item_price;
-        $stock_id = $request->stock_id;
-        $description = $request->description;
-        $unitPrice = $request->unit_price; 
+        $supplier = json_decode($supplier);
         
-        foreach ($itemQty as $key => $value) {
-            $product[$itemIds[$key]] = $value;
-        }
-
-        $orderReferenceNo = DB::table('purch_orders')->count();
-        $data['ord_date'] = DbDateFormat($request->ord_date);
-        $data['supplier_id'] = $request->supplier_id;
-        $data['person_id'] = $user_id;
-        $data['reference'] = 'PO-'. sprintf("%04d", $orderReferenceNo+1);
-        $data['total'] = $request->total;
-        $data['into_stock_location'] = $request->into_stock_location;
-        $data['comments'] = $request->comments;
-        $data['created_at'] = date('Y-m-d H:i:s');
-        $order_id = DB::table('purch_orders')->insertGetId($data);
-
-        for ($i=0; $i < count($itemIds); $i++) {
-            foreach ($product as $key => $value) {
-                if($itemIds[$i] == $key){
-                    // purchOrderdetail information
-                    $purchOrderdetail[$i]['order_no'] = $order_id;
-                    $purchOrderdetail[$i]['item_code'] = $stock_id[$i];
-                    $purchOrderdetail[$i]['description'] = $description[$i];
-                    $purchOrderdetail[$i]['quantity_ordered'] = $value;
-                    $purchOrderdetail[$i]['quantity_received'] = $value;
-                    $purchOrderdetail[$i]['qty_invoiced'] = $value;
-                    $purchOrderdetail[$i]['unit_price'] = $unitPrice[$i];
-                    $purchOrderdetail[$i]['tax_type_id'] = $taxIds[$i];
-                     // stockMove information
-                    $stockMove[$i]['stock_id'] = $stock_id[$i];
-                    $stockMove[$i]['trans_type'] = PURCHINVOICE;
-                    $stockMove[$i]['loc_code'] = $request->into_stock_location;
-                    $stockMove[$i]['tran_date'] = DbDateFormat($request->ord_date);
-                    $stockMove[$i]['person_id'] = $user_id;
-                    $stockMove[$i]['reference'] = 'store_in_'.$order_id;
-                    $stockMove[$i]['transaction_reference_id'] =$order_id;
-                    $stockMove[$i]['qty'] = $value;
-                    $stockMove[$i]['price'] = $unitPrice[$i];
-                }
-
-                $purchaseDataInfo = DB::table('purchase_prices')->where('stock_id',$stock_id[$i])->count(); 
-               
-                //d($purchaseDataInfo,1);
-                if($purchaseDataInfo == false){
-                    $purchaseData['supplier_id'] = $request->supplier_id;
-                    $purchaseData['stock_id'] = $stock_id[$i];
-                    $purchaseData['price'] = $itemPrice[$i];
-                    DB::table('purchase_prices')->insert($purchaseData);
-                }
-
-            }
-        }
-
-        for ($i=0; $i < count($purchOrderdetail); $i++) {
-            DB::table('purch_order_details')->insertGetId($purchOrderdetail[$i]);
-            DB::table('stock_moves')->insertGetId($stockMove[$i]);
-        }
-
-        if (!empty($order_id)) {
-            \Session::flash('success',trans('message.success.save_success'));
-            return redirect()->intended('purchase/list');
-        }
+        if()
 
     }
 
