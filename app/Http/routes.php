@@ -357,10 +357,11 @@
 			'as' => '.purchase'
 		], function(){
 			Route::post('/save', 'PurchaseController@store');
-		})
+			Route::get('/add', 'PurchaseController@create');
+			Route::get('/edit/{id}','PurchaseController@edit');
+		});
 		Route::get('purchase/list','PurchaseController@index');
-		Route::get('purchase/add','PurchaseController@create');
-		Route::get('purchase/edit/{id}','PurchaseController@edit');
+
 		Route::post('purchase/update','PurchaseController@update');
 		Route::post('purchase/delete/{id}','PurchaseController@destroy');
 		

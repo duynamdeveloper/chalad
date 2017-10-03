@@ -83,17 +83,13 @@ class OrderController extends Controller
     }
     public function ajaxGetPendingOrders(){
         $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',2)->get();
-       
         return response()->json($orders);
-        
-       
     }
     public function ajaxGetCancelledOrders(){
         $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',0)->get();
-       
+
         return response()->json($orders);
-        
-       
+
     }
     public function ajaxGetReadyToShipOrders(){
         $orders = Order::with(['details','payments','shipments','customer'])->where('order_status',1)->get();

@@ -39,7 +39,7 @@ PURCHASE.save = function(){
 		type: 'post',
 		data: {
 			'items': items,
-			'supploer': supplier,
+			'supplier': supplier,
 			'shipping_cost': shipping_cost,
 			'grand_total': grand_total
 		},
@@ -165,6 +165,9 @@ $(document).ready(function() {
     });
     $(document).on('keyup', "#shipping_cost", function() {
         PURCHASE.updateStatistic();
+    });
+    $(document).on('click',"#btnSaveOrder", function(){
+    	PURCHASE.save();
     });
     $(document).on('change', "#sel_supplier",function() {
 

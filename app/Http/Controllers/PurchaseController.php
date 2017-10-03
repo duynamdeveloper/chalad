@@ -8,6 +8,7 @@ use App\Http\Requests;
 use DB;
 use PDF;
 use App\Model\Supplier;
+use App\Model\PurchaseOrderDetail;
 
 class PurchaseController extends Controller
 {
@@ -53,14 +54,55 @@ class PurchaseController extends Controller
     {
         $user_id = \Auth::user()->id;
 
-        $supplier = $request->supplier;
-        $items = $request->item;
+        $supplier_data = $request->supplier;
+        $items = $request->items;
         $shipping_cost = $request->shipping_cost;
         $grand_total = $request->grand_total;
 
-        $supplier = json_decode($supplier);
-        
-        if()
+        $supplier_data = json_decode($supplier_data);
+        $items = json_decode($items);
+
+        if($supplier_data->id == -1){
+            $supplier = new Supplier();
+            $supplier->name = $supplier_data->name;
+            $supplier->phone = $supplier_data->phone;
+            $supplier->email = $supplier_data->email;
+            $supplier->address = $supplier_data->address;
+            $supplier->city = $supplier_data->city;
+            $supplier->state = $supplier_data->state;
+            $supplier->zip_code = $supplier_data->zip_code;
+            $supplier->country = $supplier_data->country;
+            $supplier->save();
+            $supplier_id = $supplier->id;
+        }else{
+            $supplier_id = $supplier_data->id;
+        }
+
+        $last_purchase_id = DB::table('purch_orders')->max('order_no');
+        $purchase = new Purchase();
+
+        $purchase->supplier_id = $supplier_id;
+        $purchase->ord_date = date('Y-m-d');
+        $purchase->total = $request->grand_total;
+        $purchase->shipping_cost = $request->shipping_cost;
+        $purchase->user_id = $user_id;
+
+        $purchase->save();
+
+        $purchase_id = $purchase->order_no;
+
+        DB::table('purch_order_details')->where('order_no',$purchase_id)->delete();
+        foreach($items as $item){
+            if(!is_null($item)){
+                $orderDetail = new PurchaseOrderDetail();
+                $orderDetail->order_no = $purchase_id;
+                $orderDetail->stock_id = $item->item_id;
+                $orderDetail->item_name = $item->name;
+                $orderDetail->quantity = $item->qty;
+                $orderDetail->unit_price = $item->price;
+                $orderDetail->save();
+            }
+        }
 
     }
 
@@ -73,24 +115,9 @@ class PurchaseController extends Controller
     public function edit($id)
     {
         $data['menu'] = 'purchase';
-        $data['taxType'] = (new Purchase)->calculateTaxRow($id);
-        $data['supplierData'] = DB::table('suppliers')->get();
-        $data['locData'] = DB::table('location')->get();
-        $data['invoiceData'] = (new Purchase)->getPurchaseInvoiceByID($id);
-        $data['purchData'] = DB::table('purch_orders')->where('order_no', '=', $id)->first();
-        
-        $taxTypeList = DB::table('item_tax_types')->get();
-        $taxOptions = '';
-        $selectStart = "<select class='form-control taxList' name='tax_id_new[]'>";
-        $selectEnd = "</select>";
-        
-        foreach ($taxTypeList as $key => $value) {
-            $taxOptions .= "<option value='".$value->id."' taxrate='".$value->tax_rate."'>".$value->name.'('.$value->tax_rate.')'."</option>";          
-        }
-        $data['tax_type_new'] = $selectStart.$taxOptions.$selectEnd;
-        $data['tax_types'] = $taxTypeList;
+        $data['purchase'] = Purchase::find($id);
 
-        return view('admin.purchase.purch_edit', $data);
+        return view('admin.purchase.purchase_edit',$data);
     }
 
     /**
@@ -111,7 +138,7 @@ class PurchaseController extends Controller
         ]);
 
        // d($request->all());
-        $order_id = $request->order_no;        
+        $order_id = $request->order_no;
         $data['ord_date'] = DbDateFormat($request->ord_date);
         $data['supplier_id'] = $request->supplier_id;
         //$data['reference'] = $request->reference;
@@ -123,7 +150,6 @@ class PurchaseController extends Controller
         DB::table('purch_orders')->where('order_no', $order_id)->update($data);
 
         if(isset($request->item_quantity)) {
-            
             $itemQty = $request->item_quantity;        
             $itemIds = $request->item_id;
             $taxIds = $request->tax_id;

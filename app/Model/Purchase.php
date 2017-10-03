@@ -7,9 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 class Purchase extends Model
 {
 	protected $table = 'purch_orders';
+    protected $primaryKey = 'order_no';
 
+    public function supplier(){
+        return $this->belongsTo('App\Model\Supplier');
+    }
+    public function user(){
+        return $this->hasOne('App\User','id','user_id');
+    }
+    public function details(){
+        return $this->hasMany('App\Model\PurchaseOrderDetail','order_no');
+    }
     public function getAllPurchOrder()
-    { 
+    {
         return $this->leftJoin('suppliers', 'purch_orders.supplier_id', '=', 'suppliers.supplier_id')
                     ->leftJoin('location', 'purch_orders.into_stock_location', '=', 'location.loc_code')
                     ->select('purch_orders.*', 'suppliers.supp_name','location.location_name as loc_name')
