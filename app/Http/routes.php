@@ -359,10 +359,13 @@
 			Route::post('/save', 'PurchaseController@store');
 			Route::get('/add', 'PurchaseController@create');
 			Route::get('/edit/{id}','PurchaseController@edit');
+			Route::post('/update','PurchaseController@update');
+			Route::post('/addpayment','PurchaseController@addPayment');
+			Route::post('/editpayment','PurchaseController@editPayment');
+			Route::post('/saveshipment','PurchaseController@saveShipment');
+			Route::post('/markshipped','PurchaseController@markShipped');
 		});
 		Route::get('purchase/list','PurchaseController@index');
-
-		Route::post('purchase/update','PurchaseController@update');
 		Route::post('purchase/delete/{id}','PurchaseController@destroy');
 		
 		Route::post('purchase/item-search','PurchaseController@searchItem');

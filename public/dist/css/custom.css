@@ -604,3 +604,12 @@ color:#3C8DBC;
 	direction: ltr;
 	cursor: pointer;
 }
+.icon-control{
+    font-size: 16px;
+    margin-left: 3px;
+    transition: all 0.2 ease-in-out;
+    cursor: pointer;
+}
+.icon-control:hover{
+    transform: scale(1.1);
+}

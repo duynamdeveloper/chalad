@@ -18,6 +18,12 @@ class Purchase extends Model
     public function details(){
         return $this->hasMany('App\Model\PurchaseOrderDetail','order_no');
     }
+    public function payments(){
+        return $this->hasMany('App\Model\PurchasePayment','order_no');
+    }
+    public function shipments(){
+        return $this->hasMany('App\Model\PurchaseShipment','order_no');
+    }
     public function getAllPurchOrder()
     {
         return $this->leftJoin('suppliers', 'purch_orders.supplier_id', '=', 'suppliers.supplier_id')

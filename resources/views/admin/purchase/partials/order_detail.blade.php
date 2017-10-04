@@ -16,7 +16,7 @@
     <div class="box-body">
 
         <h4 class="text-info"><strong>Order Details</strong></h4>
-        <div class="form-group">
+        <div class="form-group livesearch_container">
 
             <div class="col-md-3">Search :</div>
             <div class="col-md-4">

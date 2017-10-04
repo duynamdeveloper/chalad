@@ -101,6 +101,10 @@
 
 
         var DATE_FORMAT_TYPE = '{{Session::get('date_format_type')}}';
+
+        var purchase_id = {{$purchase->order_no}};
+        $(".datetime").datepicker();
     </script>
 <script type="text/javascript" src="{{asset('public/dist/js/item-tool.js')}}"></script>
+<script type="text/javascript" src="{{asset('public/dist/js/pages/purchase/purchase_edit.js')}}"></script>
 @endsection

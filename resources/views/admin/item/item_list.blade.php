@@ -109,8 +109,8 @@
 @endsection
 
 @section('js')
-<script src="{{asset('public/plugins/bootstrap-table/bootstrap-table.js')}}"></script>
-<link rel="stylesheet" type="text/css" href="{{asset('public/plugins/bootstrap-table/bootstrap-table.css')}}">
+<script src="{{asset('plugins/bootstrap-table/bootstrap-table.js')}}"></script>
+<link rel="stylesheet" type="text/css" href="{{asset('/plugins/bootstrap-table/bootstrap-table.css')}}">
     <script type="text/javascript">
 
  

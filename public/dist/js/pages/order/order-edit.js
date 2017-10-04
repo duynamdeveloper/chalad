@@ -476,7 +476,7 @@ $(document).ready(function() {
         ORDER.updateAmount(item_id);
         ORDER.updateStatistic();
     });
-
+   
     $(document).on('keyup', '.inp_price', function() {
         var item_id = $(this).closest('tr').attr('item-id');
         ORDER.updateAmount(item_id);

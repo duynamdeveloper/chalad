@@ -14,15 +14,18 @@ class Item extends Model
    
 
     public function getStockOnHandAttribute(){
-      $data = DB::table('stock_movements')
-      ->select(DB::raw('sum(quantity) as total'))
-      ->where(['stock_id'=>$this->stock_id])
-      ->groupBy('stock_id')
-      ->first();
-      if(!empty($data)){
-        return $data->total;
+      $data = DB::table('stock_movements')->where('stock_id',$this->stock_id)->get();
+      $total = 0;
+      foreach($data as $movement){
+          $quantity = 0;
+          if($movement->type == 'in'){
+              $quantity = $movement->quantity;
+          }else{
+              $quantity = - $movement->quantity;
+          }
+          $total += $quantity;
       }
-      return 0;
+      return $total;
    
     }
     public function getLinkedProductsAttribute(){

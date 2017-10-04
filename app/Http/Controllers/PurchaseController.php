@@ -9,7 +9,8 @@ use DB;
 use PDF;
 use App\Model\Supplier;
 use App\Model\PurchaseOrderDetail;
-
+use App\Model\PurchasePayment;
+use App\Model\PurchaseShipment;
 class PurchaseController extends Controller
 {
     public function __construct() {
@@ -131,141 +132,112 @@ class PurchaseController extends Controller
     {
 
         $user_id = \Auth::user()->id;
-        $this->validate($request, [
-            'into_stock_location' => 'required',
-            'ord_date' => 'required',
-            'supplier_id' => 'required',
-        ]);
+        $purchase_id = $request->purchase_id;
+        $items = $request->items;
+        $shipping_cost = $request->shipping_cost;
+        $grand_total = $request->grand_total;
 
-       // d($request->all());
-        $order_id = $request->order_no;
-        $data['ord_date'] = DbDateFormat($request->ord_date);
-        $data['supplier_id'] = $request->supplier_id;
-        //$data['reference'] = $request->reference;
-        $data['into_stock_location'] = $request->into_stock_location;
-        $data['comments'] = $request->comments;
-        $data['total'] = $request->total;
-        $data['updated_at'] = date('Y-m-d H:i:s');
+        $items = json_decode($items);
 
-        DB::table('purch_orders')->where('order_no', $order_id)->update($data);
 
-        if(isset($request->item_quantity)) {
-            $itemQty = $request->item_quantity;        
-            $itemIds = $request->item_id;
-            $taxIds = $request->tax_id;
-            $itemPrice = $request->item_price;
-            $stock_id = $request->stock_id;
-            $description = $request->description;
-            $unitPrice = $request->unit_price;            
+      
+        $purchase = Purchase::find($purchase_id);
+        $purchase->total = $request->grand_total;
+        $purchase->shipping_cost = $request->shipping_cost;
+        $purchase->user_id = $user_id;
 
-            $invoiceData = (new Purchase)->getPurchaseInvoiceByID($order_id);
-            $invoiceData = objectToArray($invoiceData);
+        $purchase->update();
 
-            for ($i=0;$i<count($invoiceData);$i++) {
-                
-                if (!in_array($invoiceData[$i]['item_id'],$itemIds)) {
-                    DB::table('purch_order_details')->where([['order_no','=',$invoiceData[$i]['order_no']],['item_code','=',$invoiceData[$i]['item_code']],])->delete();
-                    DB::table('stock_moves')->where([['stock_id','=',$invoiceData[$i]['item_code']],['reference','=','store_in_'.$order_id],])->delete();
-                }
-            }
-
-            foreach ($itemQty as $key => $value) {
-                
-                $product[$itemIds[$key]] = $value;
-
-            }
-
-            for ($i=0; $i < count($itemIds); $i++) {
-                foreach ($product as $key => $value) {
-                    if($itemIds[$i] == $key){
-                        // Order Details
-                        $purchaseOrderDetails[$i]['item_code'] = $stock_id[$i];
-                        $purchaseOrderDetails[$i]['description'] = $stock_id[$i];
-                        $purchaseOrderDetails[$i]['quantity_ordered'] = $value;
-                        $purchaseOrderDetails[$i]['quantity_received'] = $value;
-                        $purchaseOrderDetails[$i]['qty_invoiced'] = $value;
-                        $purchaseOrderDetails[$i]['unit_price'] = $unitPrice[$i];
-                        // Order Details
-                        $stockMove[$i]['stock_id'] = $stock_id[$i];
-                        $stockMove[$i]['trans_type'] = PURCHINVOICE;
-                        $stockMove[$i]['loc_code'] = $request->into_stock_location;
-                        $stockMove[$i]['tran_date'] = DbDateFormat($request->ord_date);
-                        $stockMove[$i]['person_id'] = $user_id;
-                        $stockMove[$i]['reference'] = 'store_in_'.$order_id;
-                        $stockMove[$i]['transaction_reference_id'] = $order_id;
-                        $stockMove[$i]['qty'] = $value;
-                        $stockMove[$i]['price'] = $itemPrice[$i];
-                    }
-                }
-            }
-
-            for ($i=0; $i < count($purchaseOrderDetails); $i++) {
-                DB::table('purch_order_details')->where([['item_code','=',$purchaseOrderDetails[$i]['item_code']],['order_no','=',$order_id],])->update($purchaseOrderDetails[$i]);
-                DB::table('stock_moves')->where([['stock_id','=',$stockMove[$i]['stock_id']],['reference','=','store_in_'.$order_id],])->update($stockMove[$i]);
-            }
-        } else {
-            $invoiceData = (new Purchase)->getPurchInvoiceByID($order_id);
-            $invoiceData = objectToArray($invoiceData);
-            for ($i=0;$i<count($invoiceData);$i++) {
-                DB::table('purch_order_details')->where([['order_no','=',$invoiceData[$i]['order_no']],['item_code','=',$invoiceData[$i]['item_code']],])->delete();
-                DB::table('stock_moves')->where([['stock_id','=',$invoiceData[$i]['item_code']],['reference','=','store_in_'.$order_id],])->delete(); 
+        DB::table('purch_order_details')->where('order_no',$purchase_id)->delete();
+        foreach($items as $item){
+            if(!is_null($item)){
+                $orderDetail = new PurchaseOrderDetail();
+                $orderDetail->order_no = $purchase_id;
+                $orderDetail->stock_id = $item->item_id;
+                $orderDetail->item_name = $item->name;
+                $orderDetail->quantity = $item->qty;
+                $orderDetail->unit_price = $item->price;
+                $orderDetail->save();
             }
         }
 
-        if(isset($request->item_quantity_new)) 
-        {
-            $item_quantity_new = $request->item_quantity_new;        
-            $ids_new = $request->item_id_new;
-            $taxIds_new = $request->tax_id_new;
-            $itemPrice_new = $request->item_price_new;
-            $unitPrice_new = $request->unit_price_new;
-            $stock_id_new = $request->stock_id_new;
-            $description_new = $request->description_new;
-            
-            foreach ($item_quantity_new as $key => $value) {
-                $product_new[$ids_new[$key]] = $value;
-
-            }
-            
-
-            for ($i=0; $i < count($ids_new); $i++) {
-                foreach ($product_new as $key => $value) {
-                    if ($ids_new[$i]== $key) {
-                        // Order
-                        $purchOrderdetailNew[$i]['order_no'] = $order_id;
-                        $purchOrderdetailNew[$i]['item_code'] = $stock_id_new[$i];
-                        $purchOrderdetailNew[$i]['description'] = $description_new[$i];
-                        $purchOrderdetailNew[$i]['quantity_ordered'] = $value;
-                        $purchOrderdetailNew[$i]['quantity_received'] = $value;
-                        $purchOrderdetailNew[$i]['qty_invoiced'] = $value;
-                        $purchOrderdetailNew[$i]['unit_price'] = $itemPrice_new[$i];
-                        $purchOrderdetailNew[$i]['tax_type_id'] = $taxIds_new[$i];
-                        $purchOrderdetailNew[$i]['unit_price'] = $unitPrice_new[$i];
-                       
-                        // Order Details
-                        $stockMoveNew[$i]['stock_id'] = $stock_id_new[$i];
-                        $stockMoveNew[$i]['trans_type'] = PURCHINVOICE;
-                        $stockMoveNew[$i]['loc_code'] = $request->into_stock_location;
-                        $stockMoveNew[$i]['tran_date'] = DbDateFormat($request->ord_date);
-                        $stockMoveNew[$i]['person_id'] = $user_id;
-                        $stockMoveNew[$i]['reference'] = 'store_in_'.$order_id;
-                        $stockMoveNew[$i]['transaction_reference_id'] =$order_id;
-                        $stockMoveNew[$i]['qty'] = $value;
-                        $stockMoveNew[$i]['price'] = $itemPrice_new[$i];
-                    }
-                }
-            }
-            //d($purchOrderdetailNew,1);
-            for ($i=0; $i<count($purchOrderdetailNew); $i++) { 
-                DB::table('purch_order_details')->insertGetId($purchOrderdetailNew[$i]);
-                DB::table('stock_moves')->insertGetId($stockMoveNew[$i]);
-            }
-        }
-
-        \Session::flash('success',trans('message.success.save_success'));
-            return redirect()->intended('purchase/list');
     }
+    public function addPayment(Request $request){
+         $payment = new PurchasePayment();
+        $payment->order_no = $request->order_no;
+        $payment->method = $request->payment_type;
+        $payment->supplier_id = $request->payment_supplier_id;
+        $payment->amount = $request->payment_amount;
+        $payment->payment_date = date("Y-m-d", strtotime($request->payment_date));
+        if ($request->hasFile('payment_image')) {
+            $image = $request->file('payment_image');
+            $imageName = 'img_'.time().$image->getClientOriginalName();
+            $imagePath = 'uploads/paymentPic/';
+            $image->move(base_path().'/public/'.$imagePath, $imageName);
+            $imageUrl = $imageName;
+            $payment->file = $imageUrl;
+        } else {
+            $payment->file = "404";
+        }
+        $payment->save();
+        \Session::flash('success', trans('message.success.save_success'));
+        return redirect()->intended('/purchase/edit/'.$payment->order_no);
+    }
+    public function editPayment(Request $request){
+        $payment = PurchasePayment::find($request->payment_id);
+       
+        $payment->method = $request->payment_type;
+      
+        $payment->amount = $request->payment_amount;
+        $payment->payment_date = date("Y-m-d", strtotime($request->payment_date));
+        if ($request->hasFile('payment_image')) {
+            $image = $request->file('payment_image');
+            $imageName = 'img_'.time().$image->getClientOriginalName();
+            $imagePath = 'uploads/paymentPic/';
+            $image->move(base_path().'/public/'.$imagePath, $imageName);
+            $imageUrl = $imageName;
+            $payment->file = $imageUrl;
+        }
+        
+        $payment->update();
+        \Session::flash('success', trans('message.success.save_success'));
+        return redirect()->intended('/purchase/edit/'.$payment->order_no);
+    }
+    public function saveShipment(Request $request){
+        $data = $request->data;
+        $purchase_id = $request->purchase_id;
+        $data = json_decode($data);
 
+        if($data->shipment_id == -1){
+            $shipment = new PurchaseShipment();
+            $shipment->stock_id = $data->stock_id;
+            $shipment->quantity = $data->quantity;
+            $shipment->order_no = $purchase_id;
+            $shipment->tracking = $data->tracking;
+            $shipment->date_arrival =  DbDateFormat($data->date_arrival);
+            $shipment->save();
+
+            return response()->json(['state'=>true, 'shipment'=>$shipment]);
+        }else{
+            $shipment = PurchaseShipment::find($data->shipment_id);
+            $shipment->stock_id = $data->stock_id;
+            $shipment->order_no = $purchase_id;
+            $shipment->quantity = $data->quantity;
+            $shipment->tracking = $data->tracking;
+            $shipment->date_arrival =  DbDateFormat($data->date_arrival);
+            $shipment->update();
+
+            return response()->json(['state'=>true, 'shipment'=>$shipment]);
+        }
+
+    }
+    public function markShipped(Request $request){
+        $shipment_id = $request->shipment_id;
+        $shipment = PurchaseShipment::find($shipment_id);
+        $shipment->status = 1;
+        $shipment->update();
+        return response()->json(['state'=>true,'shipment'=>$shipment]);
+    }
     /**
      * Remove the specified resource from storage.
      *
